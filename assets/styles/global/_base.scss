@@ -1,0 +1,33 @@
+.container {
+  width: 100%;
+  max-width: 1290px;
+  margin: 0 auto;
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+body {
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+.header,
+.footer {
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+.button {
+  color: #fff;
+  background-color: var(--color-primary);
+
+  &:hover {
+    background-color: var(--color-secondary);
+  }
+}
+
+.border {
+  border-color: var(--color-border);
+}

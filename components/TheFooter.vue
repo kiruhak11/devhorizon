@@ -9,6 +9,6 @@
   text-align: center;
   padding: 20px;
   background-color: #333;
-  color: white;
+  color: var(--text-color);
 }
 </style>

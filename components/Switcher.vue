@@ -22,7 +22,7 @@ function toggleTheme() {
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 5px;
-  color: var(--color-text);
+  color: var(--color-border);
   background-color: var(--color-primary);
 
   &:hover {

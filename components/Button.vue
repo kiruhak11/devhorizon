@@ -17,7 +17,6 @@ defineProps<{ extraClass?: string }>();
   border-radius: 5px;
   background-color: #0070f3;
   color: white;
-  transition: background 0.3s;
 
   &:hover {
     background-color: #005bb5;

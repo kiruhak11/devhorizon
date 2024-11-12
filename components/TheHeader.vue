@@ -4,7 +4,7 @@
       <ul>
         <li><NuxtLink to="/">Главная</NuxtLink></li>
         <li><NuxtLink to="/about">О курсе</NuxtLink></li>
-        <li><NuxtLink to="/account">Личный кабинет</NuxtLink></li>
+        <li><NuxtLink to="/profile">Личный кабинет</NuxtLink></li>
       </ul>
     </nav>
     <Switcher />

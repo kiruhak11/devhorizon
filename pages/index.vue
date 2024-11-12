@@ -1,13 +1,11 @@
 <template>
   <div class="home">
-    <!-- Main banner -->
     <section class="banner">
       <h1>Добро пожаловать на DevHorizon</h1>
       <p>Ваш путь к освоению веб-разработки начинается здесь</p>
       <Button @click="goToCourse" class="cta-button">Начать обучение</Button>
     </section>
 
-    <!-- Course Benefits -->
     <section class="benefits">
       <h2>Почему DevHorizon?</h2>
       <div class="benefit-cards">
@@ -41,7 +39,7 @@ function goToCourse() {
   text-align: center;
 
   .banner {
-    background-color: #f5f5f5;
+    background-color: var(--background-color);
     padding: 50px 20px;
 
     h1 {
@@ -79,5 +77,12 @@ function goToCourse() {
       flex-wrap: wrap;
     }
   }
+}
+.line {
+  display: flex;
+  height: 1px;
+  margin: 10px 0;
+  width: 100vw;
+  background-color: var(--color-text);
 }
 </style>

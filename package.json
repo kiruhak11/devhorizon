@@ -34,7 +34,7 @@
     "@nuxtjs/google-fonts": "^3.2.0",
     "@nuxtjs/stylelint-module": "^5.2.0",
     "@rushstack/eslint-patch": "^1.10.2",
-    "sass": "^1.77.4",
+    "sass": "^1.80.6",
     "stylelint": "^16.7.0",
     "stylelint-config-rational-order-fix": "^0.1.9",
     "stylelint-config-recommended-vue": "latest",

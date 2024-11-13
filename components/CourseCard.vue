@@ -1,29 +1,56 @@
 <template>
   <div class="course-card">
-    <h3>{{ title }}</h3>
-    <p>{{ description }}</p>
+    <h3 class="course-title">{{ course.title }}</h3>
+    <p class="course-description">{{ course.description }}</p>
+    <NuxtLink :to="`/course/${course.id}`" class="course-link"
+      >Подробнее</NuxtLink
+    >
   </div>
 </template>
 
-<script lang="ts" setup>
-defineProps<{ title: string; description: string }>();
+<script setup>
+defineProps({
+  course: {
+    type: Object,
+    required: true,
+  },
+});
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .course-card {
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  text-align: center;
-  max-width: 300px;
-  transition: box-shadow 0.3s;
+  background-color: var(--white);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
 
-  &:hover {
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  }
+.course-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
 
-  h3 {
-    margin-bottom: 10px;
-  }
+.course-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.course-description {
+  font-size: 16px;
+  color: var(--text-gray);
+  margin-bottom: 16px;
+}
+
+.course-link {
+  color: var(--secondary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.course-link:hover {
+  text-decoration: underline;
 }
 </style>

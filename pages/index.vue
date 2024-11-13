@@ -1,88 +1,109 @@
 <template>
-  <div class="home">
-    <section class="banner">
-      <h1>Добро пожаловать на DevHorizon</h1>
-      <p>Ваш путь к освоению веб-разработки начинается здесь</p>
-      <Button @click="goToCourse" class="cta-button">Начать обучение</Button>
-    </section>
+  <div class="welcome-container">
+    <!-- Заголовок и описание -->
+    <h2 class="welcome-title">Добро пожаловать в DevHorizon</h2>
+    <p class="welcome-description">
+      Начните свое путешествие в веб-разработке с нуля до профессионала!
+    </p>
 
-    <section class="benefits">
-      <h2>Почему DevHorizon?</h2>
-      <div class="benefit-cards">
-        <CourseCard
-          title="Практические навыки"
-          description="Решайте задачи и выполняйте реальные проекты."
-        />
-        <CourseCard
-          title="Постоянный прогресс"
-          description="Отслеживайте своё обучение в личном кабинете."
-        />
-        <CourseCard
-          title="Поддержка сообщества"
-          description="Учитесь вместе с другими участниками."
-        />
+    <!-- Кнопка перехода к курсам -->
+    <NuxtLink to="/course" class="btn-primary"> Изучить курсы </NuxtLink>
+
+    <!-- Причины выбрать нас -->
+    <div class="reasons-container">
+      <div class="reason-card">
+        <h3 class="reason-title">Практический подход</h3>
+        <p class="reason-description">
+          Наши курсы основаны на практических заданиях, которые помогут вам
+          научиться быстро.
+        </p>
       </div>
-    </section>
+      <div class="reason-card">
+        <h3 class="reason-title">Обучение с опытными наставниками</h3>
+        <p class="reason-description">
+          Учитесь у профессионалов, которые помогут вам разобраться в любой
+          трудной теме.
+        </p>
+      </div>
+      <div class="reason-card">
+        <h3 class="reason-title">Гибкость обучения</h3>
+        <p class="reason-description">
+          Учитесь в удобное для вас время и в своем темпе. Мы обеспечиваем
+          полную гибкость.
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-const router = useRouter();
-
-function goToCourse() {
-  router.push("/about"); // перенаправление на страницу о курсе
-}
+<script setup>
+// Дополнительная логика, если требуется
 </script>
 
-<style lang="scss" scoped>
-.home {
+<style scoped lang="scss">
+.welcome-container {
   text-align: center;
+  padding: 80px 0;
 
-  .banner {
-    background-color: var(--background-color);
-    padding: 50px 20px;
+  .welcome-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 16px;
+  }
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
+  .welcome-description {
+    font-size: 1.125rem;
+    color: var(--color-text);
+    margin-bottom: 24px;
+  }
 
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-      color: #555;
-    }
+  .btn-primary {
+    display: inline-block;
+    padding: 16px 32px;
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 
-    .cta-button {
-      padding: 10px 20px;
-      font-size: 1.2rem;
-      background-color: #0070f3;
-      color: white;
-      border-radius: 5px;
+    &:hover {
+      background-color: dark(var(--color-secondary), 10%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
   }
 
-  .benefits {
-    margin: 40px 0;
+  .reasons-container {
+    margin-top: 64px;
+    display: flex;
+    gap: 32px;
+    padding: 0 16px;
+  }
 
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 20px;
+  .reason-card {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-text);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 6px 12px var(--color-text);
     }
 
-    .benefit-cards {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
+    .reason-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: 12px;
+    }
+
+    .reason-description {
+      color: var(--color-text);
     }
   }
-}
-.line {
-  display: flex;
-  height: 1px;
-  margin: 10px 0;
-  width: 100vw;
-  background-color: var(--color-text);
 }
 </style>

@@ -1,19 +1,31 @@
+/* Основные цвета для светлой темы */
 :root {
-  --color-primary: #3498db;
-  --color-primary-dark: #2979b5;
-  --color-secondary: #2ecc71;
-  --color-secondary-dark: #27ae60;
-  --background-color: #f5f7fa;
-  --card-bg-color: #fff;
-  --text-color: #333;
+  --color-header-background: linear-gradient(to right, #3490dc, #41b5f8);
+  --color-primary: #3490dc;
+  --color-secondary: #ffed4a;
+  --color-background: #f9fafb;
+  --color-text: #333;
+  --color-border: #e2e8f0;
+  --color-header-text: #333;
+  --color-btn: #0ebbe6;
+  --color-footer-background: #1f2937;
+  --color-footer-text: #f9fafb;
+  --color-button-background: #3490dc;
+  --color-button-hover: #2779bd;
 }
 
+/* Основные цвета для темной темы */
 .dark {
-  --color-primary: #1e90ff;
-  --color-primary-dark: #1a75d1;
-  --color-secondary: #27ae60;
-  --color-secondary-dark: #1f8b50;
-  --background-color: #1f1f1f;
-  --card-bg-color: #2c2c2c;
-  --text-color: #f5f5f5;
+  --color-primary: #4c8bff;
+  --color-secondary: #ff9f00;
+  --color-background: #1f2937;
+  --color-btn: #720ee6;
+  --color-text: #f9fafb;
+  --color-border: #4b5563;
+  --color-header-background: linear-gradient(to right, #3490dc, #000);
+  --color-header-text: #f9fafb;
+  --color-footer-background: #111827;
+  --color-footer-text: #f9fafb;
+  --color-button-background: #4c8bff;
+  --color-button-hover: #3c74d3;
 }

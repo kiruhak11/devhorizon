@@ -1,79 +1,41 @@
 <template>
-  <div class="app">
+  <div class="layout-container">
     <TheHeader />
-    <div class="content"><slot></slot></div>
-    <button
-      :class="['button-go-top', { 'button-go-top_active': isActive }]"
-      @click="goTop"
-    >
-      <IconGoTop />
-    </button>
-
+    <main class="main-content">
+      <NuxtPage />
+    </main>
     <TheFooter />
   </div>
 </template>
 
-<script setup lang="ts">
-const goTop = () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-};
-const isActive = ref<boolean>(false);
-const scrollListener = () => {
-  if (window.scrollY >= 400) {
-    isActive.value = true;
-    return;
-  }
-  isActive.value = false;
-};
-onMounted(() => {
-  window.addEventListener("scroll", scrollListener);
-});
-onUnmounted(() => {
-  window.removeEventListener("scroll", scrollListener);
-});
+<script setup>
+// Этот скрипт можно оставить пустым, если не требуется дополнительная логика
 </script>
 
 <style scoped lang="scss">
-.content {
-  flex-grow: 1;
-}
-body {
-  background-color: var(--background-color);
-}
-.app {
+.layout-container {
   display: flex;
-  position: relative;
   flex-direction: column;
-  min-height: 100dvh;
+  min-height: 100vh;
+  background-color: var(--color-background);
 }
-.button-go-top {
-  background-color: var(--color-text);
-  color: var(--background-color);
-  padding: 12px;
-  border-radius: 100%;
-  position: fixed;
-  right: 32px;
-  bottom: 32px;
-  z-index: 2;
-  opacity: 0;
-  cursor: pointer;
-  visibility: hidden;
-  border: 1px solid var(--color-text);
-  transition: all 0.3s cubic-bezier(0.27, 0.09, 0.42, 1.53);
 
-  &_active {
-    opacity: 1;
-    visibility: visible;
-  }
-  &:hover {
-    background-color: var(--background-color-hover);
-    color: var(--color-text-hover);
-    border: 1px solid var(--color-text);
-  }
+.main-content {
+  flex-grow: 1;
+  margin: 0 auto;
+  padding: 0 20px;
+  max-width: 1200px; // или любое другое ограничение по ширине
+}
 
-  svg {
-    width: 18px;
-    height: 18px;
+@media screen and (min-width: 640px) {
+  .main-content {
+    padding: 0 24px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .main-content {
+    padding: 0 32px;
   }
 }
 </style>

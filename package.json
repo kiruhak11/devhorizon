@@ -36,6 +36,7 @@
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@rushstack/eslint-patch": "^1.10.2",
     "autoprefixer": "^10.4.20",
+    "nuxt-particles": "^0.3.0",
     "postcss": "^8.4.49",
     "sass": "^1.80.6",
     "stylelint": "^16.7.0",

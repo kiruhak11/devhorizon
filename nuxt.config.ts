@@ -2,7 +2,24 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
-  modules: ["@nuxtjs/device", "@nuxtjs/google-fonts", "nuxt-particles"],
+  modules: [
+    "@nuxtjs/device",
+    "@nuxtjs/google-fonts",
+    "nuxt-particles",
+    "@pinia/nuxt",
+    "@nuxt/ui",
+    "@pinia-plugin-persistedstate/nuxt",
+  ],
+  piniaPersistedstate: {
+    cookieOptions: {
+      sameSite: "strict",
+    },
+    storage: "localStorage",
+  },
+  colorMode: {
+    preference: "system", // default value of $colorMode.preference
+    fallback: "light", // fallback value if not system preference found
+  },
   googleFonts: {
     families: {
       Ubuntu: [400, 500, 600, 700],

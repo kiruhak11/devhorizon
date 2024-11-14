@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer">
+  <footer class="container footer">
     <div class="footer-content">
       <p class="footer-text">© 2024 DevHorizon. Все права защищены.</p>
     </div>
@@ -12,11 +12,13 @@
 
 <style scoped lang="scss">
 .footer {
-  background: var(--color-header-background);
+  background: var(--color-header-background); /* Градиентный фон */
   color: white;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  padding: 16px 0;
+  position: sticky;
+  z-index: 10;
+  box-shadow: 0 -4px 6px var(--color-shadow);
+  padding: 24px 32px;
+  border-radius: 24px 24px 0 0;
 }
 
 .footer-content {

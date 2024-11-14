@@ -8,6 +8,8 @@
   </div>
 </template>
 
-<script setup>
-// Этот скрипт можно оставить пустым, если не требуется дополнительная логика
-</script>
+<style lang="scss">
+main {
+  height: 100vh;
+}
+</style>

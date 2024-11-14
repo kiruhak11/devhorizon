@@ -1,9 +1,13 @@
 <template>
-  <header class="header">
+  <header class="container header">
     <nav class="nav container">
-      <NuxtLink to="/" class="logo"> DevHorizon </NuxtLink>
+      <NuxtLink v-if="!isLoginPage" to="/" class="logo"> DevHorizon </NuxtLink>
 
-      <div class="nav-links">
+      <div v-if="isLoginPage" class="welcome-text">
+        <NuxtLink to="/"> Добро пожаловать в DevHorizon</NuxtLink>
+      </div>
+
+      <div v-else class="nav-links">
         <NuxtLink to="/" class="nav-link" exact-active-class="active-link">
           Главная
         </NuxtLink>
@@ -24,20 +28,31 @@
         <NuxtLink to="/login" class="nav-link" exact-active-class="active-link">
           Войти
         </NuxtLink>
-        <Switcher />
+        <Switcher class="switcher" />
       </div>
     </nav>
   </header>
 </template>
 
+<script setup lang="ts">
+import { useRoute } from "vue-router";
+const route = useRoute();
+const isLoginPage = computed(() => route.path === "/login");
+</script>
+
 <style scoped lang="scss">
+.switcher {
+  margin-top: 1px;
+}
 .header {
-  background: var(--color-header-background); /* Градиентный фон */
+  background: var(--color-header-background);
   color: white;
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px var(--color-shadow);
+  padding: 24px 32px;
+  border-radius: 0 0 24px 24px;
 }
 
 .nav {
@@ -61,18 +76,26 @@
   align-items: center;
 }
 
+.welcome-text {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: white;
+  flex: 1;
+}
+
 .nav-link {
   font-size: 16px;
   text-decoration: none;
   color: white;
   transition: color 0.3s ease;
   &:hover {
-    color: #fbbf24; /* Желтый цвет при наведении */
+    color: #fbbf24;
   }
 }
 
 .nav-link.active-link {
-  color: #fbbf24; /* Желтый цвет для активной ссылки */
+  color: #fbbf24;
 }
 
 @media (max-width: 768px) {

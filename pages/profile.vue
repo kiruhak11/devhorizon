@@ -1,6 +1,17 @@
 <template>
   <div class="profile-container">
-    <h2 class="profile-title">Личный кабинет</h2>
+    <h3 class="profile-title">Ваш профиль</h3>
+
+    <p class="profile-info">
+      Имя пользователя: <span class="font-medium">user123</span>
+    </p>
+
+    <button class="btn btn-primary">Изменить пароль</button>
+
+    <button class="btn btn-danger">Удалить аккаунт</button>
+
+    <NuxtLink to="/profile" class="btn btn-primary">Назад</NuxtLink>
+
     <p class="profile-description">Ваш прогресс по курсам:</p>
 
     <ul class="course-list">
@@ -42,10 +53,9 @@ const getProgressBarColor = (progress) => {
 </script>
 
 <style scoped lang="scss">
-.profile-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px;
+.btn {
+  display: flex;
+  justify-self: center;
 }
 
 .profile-title {
@@ -69,7 +79,8 @@ const getProgressBarColor = (progress) => {
 }
 
 .course-item {
-  background-color: var(--color-white);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 8px;
@@ -106,5 +117,65 @@ const getProgressBarColor = (progress) => {
 .progress-bar-fill {
   height: 100%;
   transition: width 0.3s ease-in-out;
+}
+.profile-container {
+  max-width: 1290px;
+  margin: 40px auto;
+  border: 1px solid var(--color-border);
+  padding: 24px;
+  background-color: var(--color-white);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-title {
+  font-size: 1.75rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.profile-info {
+  font-size: 1.125rem;
+  color: var(--color-text);
+  margin-bottom: 20px;
+
+  text-align: center;
+  .font-medium {
+    font-weight: 500;
+  }
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  &.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    text-align: center;
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  &.btn-danger {
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+
+    display: flex;
+    justify-content: center;
+    &:hover {
+      background-color: #c53030;
+      transform: translateY(-2px);
+    }
+  }
 }
 </style>

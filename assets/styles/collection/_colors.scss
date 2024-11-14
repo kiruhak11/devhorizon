@@ -1,17 +1,22 @@
 /* Основные цвета для светлой темы */
 :root {
-  --color-header-background: linear-gradient(to right, #3490dc, #41b5f8);
+  --color-header-background: linear-gradient(to right, #3490dc, #82cdff);
   --color-primary: #3490dc;
   --color-secondary: #ffed4a;
   --color-background: #f9fafb;
   --color-text: #333;
+  --color-shadow: #33333350;
   --color-border: #e2e8f0;
   --color-header-text: #333;
-  --color-btn: #0ebbe6;
   --color-footer-background: #1f2937;
   --color-footer-text: #f9fafb;
   --color-button-background: #3490dc;
   --color-button-hover: #2779bd;
+  --color-blur: radial-gradient(
+    circle,
+    rgb(255 223 136 / 90%),
+    rgb(255 223 136 / 30%)
+  );
 }
 
 /* Основные цвета для темной темы */
@@ -19,13 +24,18 @@
   --color-primary: #4c8bff;
   --color-secondary: #ff9f00;
   --color-background: #1f2937;
-  --color-btn: #720ee6;
   --color-text: #f9fafb;
+  --color-shadow: #f9fafb50;
   --color-border: #4b5563;
-  --color-header-background: linear-gradient(to right, #3490dc, #000);
+  --color-header-background: linear-gradient(to right, #3490dc, #1f2937);
   --color-header-text: #f9fafb;
   --color-footer-background: #111827;
   --color-footer-text: #f9fafb;
   --color-button-background: #4c8bff;
   --color-button-hover: #3c74d3;
+  --color-blur: radial-gradient(
+    circle,
+    rgb(200 200 255 / 80%),
+    rgb(60 60 100 / 30%)
+  );
 }

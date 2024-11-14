@@ -1,5 +1,5 @@
 <template>
-  <div class="welcome-container">
+  <div class="welcome-container container">
     <!-- Заголовок и описание -->
     <h2 class="welcome-title">Добро пожаловать в DevHorizon</h2>
     <p class="welcome-description">
@@ -56,23 +56,6 @@
     font-size: 1.125rem;
     color: var(--color-text);
     margin-bottom: 24px;
-  }
-
-  .btn-primary {
-    display: inline-block;
-    padding: 16px 32px;
-    background-color: var(--color-primary);
-    color: var(--color-text);
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-
-    &:hover {
-      background-color: dark(var(--color-secondary), 10%);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
   }
 
   .reasons-container {

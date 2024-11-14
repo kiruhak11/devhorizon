@@ -1,7 +1,12 @@
 <template>
   <div class="auth-container">
-    <NuxtParticles id="tsparticles" :options="particlesOptions" @load="onLoad">
-    </NuxtParticles>
+    <NuxtParticles
+      v-if="isShowParticles"
+      id="tsparticles"
+      :options="particlesOptions"
+      @load="onLoad"
+    />
+    <div :class="['bg-overlay', { dark: isDark }]"></div>
     <div class="auth-box">
       <h2 class="auth-title">Добро пожаловать в DevHorizon</h2>
 
@@ -21,7 +26,6 @@
           Зарегистрироваться
         </button>
       </div>
-
       <form v-if="isLogin" @submit.prevent="handleLogin">
         <div class="input-group">
           <label for="email">Email</label>
@@ -84,86 +88,62 @@
 </template>
 
 <script setup lang="ts">
-import { useColorMode } from "@vueuse/core";
 //@ts-ignore
-import type { Container } from "tsparticles-engine";
+import { Container } from "tsparticles-engine";
 
 const isLogin = ref(true);
 const email = ref("");
 const password = ref("");
 const username = ref("");
 
-// Получаем текущую тему
 const colorMode = useColorMode();
 const isDark = computed(() => colorMode.value === "dark");
-const getCssVariable = (variable: string) => {
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue(variable)
-    .trim();
-  console.log(variable, value); // Выводим значения переменных
-  return value;
-};
 
-// Опции для частиц, зависящие от темы
+const isShowParticles = ref(true);
 const particlesOptions = computed(() => {
-  const backgroundColor = getCssVariable("--color-background");
-  const particleColor = getCssVariable("--color-text");
-
   return {
-    fullScreen: {
-      enable: true,
-      zIndex: -1,
-    },
-    background: {
-      color: {
-        value: backgroundColor,
-      },
-    },
+    fullScreen: { enable: true, zIndex: -1 },
     particles: {
-      color: {
-        value: particleColor,
-      },
-      number: {
-        value: 100,
-      },
-      shape: {
-        type: "circle",
-      },
-      size: {
-        value: 3,
-      },
-      move: {
-        enable: true,
-        speed: 1,
-      },
+      color: { value: isDark.value ? "#a3a3a3" : "#333" },
+      number: { value: 150 },
+      shape: { type: "circle" },
+      opacity: { value: 0.8 },
+      size: { value: 3 },
+      move: { enable: true, direction: "bottom", speed: 1 },
     },
   };
 });
 const handleLogin = () => {
   console.log("Login with", email.value, password.value);
-  // Логика для входа
 };
 
 const handleRegister = () => {
   console.log("Register with", email.value, username.value, password.value);
-  // Логика для регистрации
 };
 const onLoad = (container: Container) => {
-  // Do something with the container
   container.pause();
-  setTimeout(() => container.play(), 2000);
+  setTimeout(() => container.play(), 1);
 };
+
+watch(
+  () => colorMode.value,
+  () => {
+    isShowParticles.value = false;
+    setTimeout(() => {
+      isShowParticles.value = true;
+    }, 100);
+  }
+);
 </script>
 
 <style scoped lang="scss">
 .auth-container {
   position: relative;
   width: 100%;
-  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 .auth-box {
@@ -253,5 +233,18 @@ const onLoad = (container: Container) => {
   &:hover {
     background-color: #2980b9;
   }
+}
+
+.bg-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  background: var(--color-blur);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(50px);
+  z-index: -2;
 }
 </style>

@@ -1,11 +1,7 @@
 <template>
   <div class="auth-container">
-    <NuxtParticles
-      id="tsparticles"
-      :options="particlesOptions"
-      @load="onLoad"
-    />
-
+    <NuxtParticles id="tsparticles" :options="particlesOptions" @load="onLoad">
+    </NuxtParticles>
     <div class="auth-box">
       <h2 class="auth-title">Добро пожаловать в DevHorizon</h2>
 
@@ -87,9 +83,10 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from "vue";
+<script setup lang="ts">
 import { useColorMode } from "@vueuse/core";
+//@ts-ignore
+import type { Container } from "tsparticles-engine";
 
 const isLogin = ref(true);
 const email = ref("");
@@ -99,28 +96,48 @@ const username = ref("");
 // Получаем текущую тему
 const colorMode = useColorMode();
 const isDark = computed(() => colorMode.value === "dark");
+const getCssVariable = (variable: string) => {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(variable)
+    .trim();
+  console.log(variable, value); // Выводим значения переменных
+  return value;
+};
 
 // Опции для частиц, зависящие от темы
 const particlesOptions = computed(() => {
-  return isDark.value
-    ? {
-        particles: {
-          color: { value: "#ffffff" },
-          opacity: { value: 0.5 },
-          size: { value: 3 },
-          move: { speed: 1 },
-          number: { value: 100 },
-        },
-      }
-    : {
-        particles: {
-          color: { value: "#ffdd57" },
-          opacity: { value: 0.7 },
-          size: { value: 3 },
-          move: { speed: 0.5 },
-          number: { value: 80 },
-        },
-      };
+  const backgroundColor = getCssVariable("--color-background");
+  const particleColor = getCssVariable("--color-text");
+
+  return {
+    fullScreen: {
+      enable: true,
+      zIndex: -1,
+    },
+    background: {
+      color: {
+        value: backgroundColor,
+      },
+    },
+    particles: {
+      color: {
+        value: particleColor,
+      },
+      number: {
+        value: 100,
+      },
+      shape: {
+        type: "circle",
+      },
+      size: {
+        value: 3,
+      },
+      move: {
+        enable: true,
+        speed: 1,
+      },
+    },
+  };
 });
 const handleLogin = () => {
   console.log("Login with", email.value, password.value);
@@ -130,6 +147,11 @@ const handleLogin = () => {
 const handleRegister = () => {
   console.log("Register with", email.value, username.value, password.value);
   // Логика для регистрации
+};
+const onLoad = (container: Container) => {
+  // Do something with the container
+  container.pause();
+  setTimeout(() => container.play(), 2000);
 };
 </script>
 

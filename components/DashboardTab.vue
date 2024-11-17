@@ -1,22 +1,23 @@
 <template>
   <div class="dashboard">
     <h3 class="tab-title">Личный кабинет</h3>
-    <div class="dashboard-cards">
+    <div class="dashboard-cards" v-if="userStore.user">
       <div class="card">
         <p class="card-title">Кошелек</p>
-        <p class="card-value">{{ wallet }} монет</p>
+        <p class="card-value">{{ userStore.user.coins }} монет</p>
       </div>
       <div class="card">
         <p class="card-title">Оставшиеся жизни</p>
-        <p class="card-value">{{ lives }}</p>
+        <p class="card-value">{{ userStore.user.lives }}</p>
       </div>
       <div class="card">
         <p class="card-title">Мана</p>
-        <p class="card-value">{{ mana }}</p>
+        <p class="card-value">{{ userStore.user.mana }}</p>
+        <UiButton class="btn btn-small" @click="buyMana"> +5 </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Подписка</p>
-        <p class="card-value">{{ subscriptionType }}</p>
+        <p class="card-value">{{ userStore.user.subscription }}</p>
         <p class="card-detail">Осталось: {{ subscriptionEnd }}</p>
         <UiButton class="btn btn-small" @click="renewSubscription">
           Продлить
@@ -59,21 +60,18 @@
 
 <script setup>
 import { ref } from "vue";
-import user from "/_nuxt/data/userData";
+const userStore = useUserStore();
 
-console.log("user", user);
-// Данныеs
-const wallet = user.coins;
-const lives = user.lives;
-const mana = user.mana;
-const subscriptionType = user.subscription;
 const subscriptionEnd = "5 дней";
 const userCourses = [
   { title: "Основы HTML и CSS", progress: 60 },
   { title: "JavaScript для начинающих", progress: 28 },
   { title: "Введение в Vue.js", progress: 80 },
 ];
-
+const buyMana = () => {
+  userStore.user.mana += 5;
+  userStore.setUser(userStore.user);
+};
 // Текущее состояние открытой панели
 const activeCourse = ref(null);
 
@@ -116,6 +114,9 @@ const renewSubscription = () => {
 }
 
 .card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 8px;

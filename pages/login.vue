@@ -90,7 +90,6 @@ import { Container } from "tsparticles-engine";
 import axios from "axios";
 
 import { useRouter } from "vue-router";
-import { updateUserFromLocalStorage } from "~/data/userData";
 
 const isLogin = ref(true);
 const telegramId = ref("");
@@ -115,31 +114,21 @@ const particlesOptions = computed(() => {
   };
 });
 const handleLogin = async (event: { preventDefault: () => void }) => {
-  // Отменяем стандартное поведение формы
   event.preventDefault();
 
   try {
-    // Отправляем запрос на сервер с данными для авторизации
     const response = await axios.post("/api/login", {
       telegramId: telegramId.value,
       password: password.value,
     });
 
     if (response.data.message.includes("Login successful")) {
-      // Если успешный вход, сохраняем данные пользователя в localStorage
-      // Сохраняем только данные пользователя с соответствующим telegramId
-
-      const user = Object.values(response.data.user);
-      console.log("user", user);
-      if (user) {
-        localStorage.setItem("userData", JSON.stringify(user));
-        updateUserFromLocalStorage();
-        router.push("/profile"); // Перенаправляем на страницу
-      } else {
-        console.log("User data not found in response.");
-      }
+      const user = useUserStore();
+      console.log();
+      user.setUser(Object.fromEntries(Object.values(response.data.user))); // Сохраняем пользователя в хранилище
+      router.push("/profile"); // Перенаправляем на страницу профиля
     } else {
-      console.log("Login failed:", response.data.message);
+      console.error("Login failed:", response.data.message);
     }
   } catch (error) {
     console.error("Login failed:", error);

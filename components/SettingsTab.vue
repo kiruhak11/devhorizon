@@ -7,16 +7,16 @@
         <input v-model="name" id="name" type="text" placeholder="Ваше имя" />
       </div>
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="lastname">Фамилия</label>
         <input
-          v-model="email"
-          id="email"
-          type="email"
-          placeholder="Ваш email"
+          v-model="lastname"
+          id="lastname"
+          type="text"
+          placeholder="Ваш lastname"
         />
       </div>
       <div class="btns">
-        <UiButton>Сохранить изменения</UiButton>
+        <UiButton @click="updateProfile">Сохранить изменения</UiButton>
         <UiButton theme="danger" @click="deleteAccount"
           >Удалить аккаунт</UiButton
         >
@@ -27,17 +27,31 @@
 
 <script setup>
 import { ref } from "vue";
-import user from "/_nuxt/data/userData";
 
-import { updateUserFromLocalStorage } from "~/data/userData";
+const userStore = useUserStore();
 const router = useRouter();
-const name = user.first_name;
-const email = ref("ivan.ivanov@example.com");
+const name = ref(userStore.user.first_name);
+const lastname = ref(userStore.user.last_name);
+
+const updateProfile = () => {
+  const updatedUserData = {
+    first_name: name,
+    last_name: lastname,
+  };
+  console.log(updatedUserData);
+  userStore.updateUserDataOnServer(updatedUserData);
+
+  alert(
+    "Ваши данные обнавлены успешно: " +
+      userStore.user.first_name +
+      " " +
+      userStore.user.last_name
+  );
+};
 
 const deleteAccount = () => {
-  localStorage.clear();
-  updateUserFromLocalStorage();
-  router.push("/login");
+  userStore.clearUser();
+  router.push("/");
 };
 </script>
 

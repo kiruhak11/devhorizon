@@ -20,7 +20,7 @@
           Курсы
         </NuxtLink>
         <NuxtLink
-          v-if="!user.first_name"
+          v-if="!userStore.user"
           to="/login"
           class="nav-link"
           exact-active-class="active-link"
@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 // @ts-ignore
-import user from "/_nuxt/data/userData";
+const userStore = useUserStore();
 const route = useRoute();
 const isLoginPage = computed(() => route.path === "/login");
 </script>

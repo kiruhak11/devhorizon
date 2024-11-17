@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="tab-title">Настройки профиля</h3>
-    <form @submit.prevent="updateProfile">
+    <div>
       <div class="form-group">
         <label for="name">Имя</label>
         <input v-model="name" id="name" type="text" placeholder="Ваше имя" />
@@ -17,20 +17,27 @@
       </div>
       <div class="btns">
         <UiButton>Сохранить изменения</UiButton>
-        <UiButton theme="danger">Удалить аккаунт</UiButton>
+        <UiButton theme="danger" @click="deleteAccount"
+          >Удалить аккаунт</UiButton
+        >
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import user from "/_nuxt/data/userData";
 
-const name = ref("Иван Иванов");
+import { updateUserFromLocalStorage } from "~/data/userData";
+const router = useRouter();
+const name = user.first_name;
 const email = ref("ivan.ivanov@example.com");
 
-const updateProfile = () => {
-  console.log("Профиль обновлен", { name: name.value, email: email.value });
+const deleteAccount = () => {
+  localStorage.clear();
+  updateUserFromLocalStorage();
+  router.push("/login");
 };
 </script>
 

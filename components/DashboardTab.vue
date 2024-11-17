@@ -5,29 +5,20 @@
       <div class="card">
         <p class="card-title">Кошелек</p>
         <p class="card-value">{{ wallet }} монет</p>
-        <UiButton class="btn-small" @click="renewSubscription">
-          Пополнить баланс
-        </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Оставшиеся жизни</p>
         <p class="card-value">{{ lives }}</p>
-        <UiButton class="btn-small" @click="renewSubscription">
-          Пополнить жизни
-        </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Мана</p>
         <p class="card-value">{{ mana }}</p>
-        <UiButton class="btn-small" @click="renewSubscription">
-          пополнить ману
-        </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Подписка</p>
         <p class="card-value">{{ subscriptionType }}</p>
         <p class="card-detail">Осталось: {{ subscriptionEnd }}</p>
-        <UiButton class="btn-small" @click="renewSubscription">
+        <UiButton class="btn btn-small" @click="renewSubscription">
           Продлить
         </UiButton>
       </div>
@@ -68,14 +59,21 @@
 
 <script setup>
 import { ref } from "vue";
-import { userData } from "~/data/userData";
-// Данные
-const wallet = userData.wallet;
-const lives = userData.lives;
-const mana = userData.mana;
-const subscriptionType = userData.subscriptionType;
-const subscriptionEnd = userData.subscriptionEnd;
-const userCourses = userData.userCourses;
+import user from "/_nuxt/data/userData";
+
+console.log("user", user);
+// Данныеs
+const wallet = user.coins;
+const lives = user.lives;
+const mana = user.mana;
+const subscriptionType = user.subscription;
+const subscriptionEnd = "5 дней";
+const userCourses = [
+  { title: "Основы HTML и CSS", progress: 60 },
+  { title: "JavaScript для начинающих", progress: 28 },
+  { title: "Введение в Vue.js", progress: 80 },
+];
+
 // Текущее состояние открытой панели
 const activeCourse = ref(null);
 
@@ -118,10 +116,6 @@ const renewSubscription = () => {
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -156,6 +150,15 @@ const renewSubscription = () => {
     margin-top: 12px;
     padding: 8px 16px;
     font-size: 0.875rem;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--color-primary-light);
+    }
   }
 }
 

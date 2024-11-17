@@ -11,13 +11,7 @@
         <NuxtLink to="/" class="nav-link" exact-active-class="active-link">
           Главная
         </NuxtLink>
-        <NuxtLink
-          to="/profile"
-          class="nav-link"
-          exact-active-class="active-link"
-        >
-          Профиль
-        </NuxtLink>
+
         <NuxtLink
           to="/course"
           class="nav-link"
@@ -25,8 +19,21 @@
         >
           Курсы
         </NuxtLink>
-        <NuxtLink to="/login" class="nav-link" exact-active-class="active-link">
+        <NuxtLink
+          v-if="!user.first_name"
+          to="/login"
+          class="nav-link"
+          exact-active-class="active-link"
+        >
           Войти
+        </NuxtLink>
+        <NuxtLink
+          v-else
+          to="/profile"
+          class="nav-link"
+          exact-active-class="active-link"
+        >
+          Профиль
         </NuxtLink>
         <Switcher class="switcher" />
       </div>
@@ -36,6 +43,8 @@
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
+// @ts-ignore
+import user from "/_nuxt/data/userData";
 const route = useRoute();
 const isLoginPage = computed(() => route.path === "/login");
 </script>

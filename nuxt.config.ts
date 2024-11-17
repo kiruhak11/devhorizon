@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
@@ -9,7 +8,12 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxt/ui",
     "@pinia-plugin-persistedstate/nuxt",
+    "nuxt-telegram-auth",
   ],
+  telegramAuth: {
+    botToken: "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8", // Замени на токен Telegram-бота
+    useUserPhoto: true,
+  },
   piniaPersistedstate: {
     cookieOptions: {
       sameSite: "strict",

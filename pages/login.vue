@@ -27,13 +27,13 @@
             Зарегистрироваться
           </button>
         </div>
-        <form v-if="isLogin" @submit.prevent="handleLogin">
+        <form v-if="isLogin" @submit="handleLogin">
           <div class="input-group">
-            <label for="email">Email</label>
+            <label for="telegram_id">Login</label>
             <input
-              type="email"
-              id="email"
-              v-model="email"
+              type="text"
+              id="telegram_id"
+              v-model="telegramId"
               class="input-field"
               required
             />
@@ -51,17 +51,7 @@
           <button type="submit" class="submit-button">Войти</button>
         </form>
 
-        <form v-if="!isLogin" @submit.prevent="handleRegister">
-          <div class="input-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              v-model="email"
-              class="input-field"
-              required
-            />
-          </div>
+        <form v-if="!isLogin">
           <div class="input-group">
             <label for="username">Имя пользователя</label>
             <input
@@ -97,12 +87,16 @@
 <script setup lang="ts">
 //@ts-ignore
 import { Container } from "tsparticles-engine";
+import axios from "axios";
+
+import { useRouter } from "vue-router";
+import { updateUserFromLocalStorage } from "~/data/userData";
 
 const isLogin = ref(true);
-const email = ref("");
+const telegramId = ref("");
 const password = ref("");
 const username = ref("");
-
+const router = useRouter();
 const colorMode = useColorMode();
 const isDark = computed(() => colorMode.value === "dark");
 
@@ -120,13 +114,38 @@ const particlesOptions = computed(() => {
     },
   };
 });
-const handleLogin = () => {
-  console.log("Login with", email.value, password.value);
+const handleLogin = async (event: { preventDefault: () => void }) => {
+  // Отменяем стандартное поведение формы
+  event.preventDefault();
+
+  try {
+    // Отправляем запрос на сервер с данными для авторизации
+    const response = await axios.post("/api/login", {
+      telegramId: telegramId.value,
+      password: password.value,
+    });
+
+    if (response.data.message.includes("Login successful")) {
+      // Если успешный вход, сохраняем данные пользователя в localStorage
+      // Сохраняем только данные пользователя с соответствующим telegramId
+
+      const user = Object.values(response.data.user);
+      console.log("user", user);
+      if (user) {
+        localStorage.setItem("userData", JSON.stringify(user));
+        updateUserFromLocalStorage();
+        router.push("/profile"); // Перенаправляем на страницу
+      } else {
+        console.log("User data not found in response.");
+      }
+    } else {
+      console.log("Login failed:", response.data.message);
+    }
+  } catch (error) {
+    console.error("Login failed:", error);
+  }
 };
 
-const handleRegister = () => {
-  console.log("Register with", email.value, username.value, password.value);
-};
 const onLoad = (container: Container) => {
   container.pause();
   setTimeout(() => container.play(), 1);

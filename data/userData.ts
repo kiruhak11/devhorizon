@@ -1,12 +1,42 @@
-export const userData = {
-  wallet: 1500,
-  lives: 3,
-  mana: 120,
-  subscriptionType: "Премиум",
-  subscriptionEnd: "5 дней",
-  userCourses: [
-    { title: "Основы HTML и CSS", progress: 60 },
-    { title: "JavaScript для начинающих", progress: 28 },
-    { title: "Введение в Vue.js", progress: 80 },
-  ],
-};
+let user: Record<string, any> = {};
+
+if (typeof window !== "undefined") {
+  const userM = localStorage.getItem("userData");
+
+  if (userM) {
+    try {
+      const userJS = JSON.parse(userM);
+
+      if (Array.isArray(userJS)) {
+        user = Object.fromEntries(userJS);
+      } else {
+        console.warn("userData is not in the expected format (not an array)");
+      }
+    } catch (error) {
+      console.error("Failed to parse userData from localStorage:", error);
+    }
+  } else {
+    console.log("userData not found in localStorage");
+  }
+}
+export function updateUserFromLocalStorage() {
+  if (typeof window !== "undefined") {
+    const userM = localStorage.getItem("userData");
+
+    if (userM) {
+      try {
+        const userJS = JSON.parse(userM);
+        if (Array.isArray(userJS)) {
+          user = Object.fromEntries(userJS);
+        } else {
+          console.warn("userData is not in the expected format (not an array)");
+        }
+      } catch (error) {
+        console.error("Failed to parse userData from localStorage:", error);
+      }
+    } else {
+      location.reload();
+    }
+  }
+}
+export default user;

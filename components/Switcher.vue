@@ -1,6 +1,6 @@
 <template>
   <label class="switch">
-    <input type="checkbox" @click="isDark = !isDark" />
+    <input v-model="isDark" type="checkbox" />
     <span class="slider">
       <span class="circle">
         <IconSun />

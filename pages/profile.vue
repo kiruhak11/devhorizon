@@ -1,181 +1,126 @@
 <template>
-  <div class="profile-container">
-    <h3 class="profile-title">Ваш профиль</h3>
+  <NuxtLayout>
+    <div class="profile-container">
+      <h3 class="profile-title">Ваш профиль</h3>
 
-    <p class="profile-info">
-      Имя пользователя: <span class="font-medium">user123</span>
-    </p>
+      <nav class="tabs">
+        <button
+          class="tab-button"
+          :class="{ active: activeTab === 'dashboard' }"
+          @click="setActiveTab('dashboard')"
+        >
+          Личный кабинет
+        </button>
+        <button
+          class="tab-button"
+          :class="{ active: activeTab === 'settings' }"
+          @click="setActiveTab('settings')"
+        >
+          Настройки профиля
+        </button>
+      </nav>
 
-    <button class="btn btn-primary">Изменить пароль</button>
-
-    <button class="btn btn-danger">Удалить аккаунт</button>
-
-    <NuxtLink to="/profile" class="btn btn-primary">Назад</NuxtLink>
-
-    <p class="profile-description">Ваш прогресс по курсам:</p>
-
-    <ul class="course-list">
-      <li
-        v-for="(course, index) in userCourses"
-        :key="index"
-        class="course-item"
-      >
-        <h3 class="course-title">{{ course.title }}</h3>
-        <p class="course-progress">Прогресс: {{ course.progress }}%</p>
-
-        <div class="progress-bar">
-          <div
-            class="progress-bar-fill"
-            :style="{
-              width: course.progress + '%',
-              backgroundColor: getProgressBarColor(course.progress),
-            }"
-          ></div>
+      <transition :name="transitionName" mode="out-in">
+        <div :key="activeTab">
+          <DashboardTab v-if="activeTab === 'dashboard'" />
+          <SettingsTab v-if="activeTab === 'settings'" />
         </div>
-      </li>
-    </ul>
-  </div>
+      </transition>
+    </div>
+  </NuxtLayout>
 </template>
+<script setup lang="ts">
+const activeTab = ref("dashboard");
 
-<script setup>
-const userCourses = [
-  { title: "Основы HTML и CSS", progress: 60 },
-  { title: "JavaScript для начинающих", progress: 28 },
-  { title: "Введение в Vue.js", progress: 80 },
-];
-
-// Функция для определения цвета прогресс-бара
-const getProgressBarColor = (progress) => {
-  if (progress < 30) return "red"; // Красный
-  if (progress >= 30 && progress <= 60) return "orange"; // Оранжевый
-  return "green"; // Зеленый
-};
-</script>
-
-<style scoped lang="scss">
-.btn {
-  display: flex;
-  justify-self: center;
-}
-
-.profile-title {
-  font-size: 32px;
-  font-weight: 700;
-  text-align: center;
-  color: var(--color-primary);
-  margin-bottom: 20px;
-}
-
-.profile-description {
-  font-size: 18px;
-  text-align: center;
-  color: var(--color-text);
-  margin-bottom: 40px;
-}
-
-.course-list {
-  list-style: none;
-  padding: 0;
-}
-
-.course-item {
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateY(-5px);
+const setActiveTab = (tab: string) => {
+  if (activeTab.value !== tab) {
+    activeTab.value = tab;
   }
-}
-
-.course-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--color-primary);
-}
-
-.course-progress {
-  font-size: 16px;
-  color: var(--color-text-light);
-  margin-bottom: 15px;
-}
-
-.progress-bar {
-  background-color: var(--color-bg-light);
-  border-radius: 50px;
-  height: 8px;
-  overflow: hidden;
-
-  border: 1px solid var(--color-border);
-}
-
-.progress-bar-fill {
-  height: 100%;
-  transition: width 0.3s ease-in-out;
-}
+};
+const transitionName = computed(() => {
+  return activeTab.value === "dashboard"
+    ? "slide-fade-left"
+    : "slide-fade-right";
+});
+</script>
+<style scoped lang="scss">
 .profile-container {
+  display: flex;
+  flex-direction: column;
   max-width: 1290px;
   margin: 40px auto;
-  border: 1px solid var(--color-border);
   padding: 24px;
   background-color: var(--color-white);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
 }
 
 .profile-title {
   font-size: 1.75rem;
   color: var(--color-primary);
   font-weight: 600;
-  margin-bottom: 16px;
-}
-
-.profile-info {
-  font-size: 1.125rem;
-  color: var(--color-text);
-  margin-bottom: 20px;
-
   text-align: center;
-  .font-medium {
-    font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+
+  .tab-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 1px solid var(--color-primary);
+    background-color: var(--color-white);
+    color: var(--color-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.active {
+      background-color: var(--color-primary);
+      color: white;
+    }
+
+    &:hover {
+      background-color: var(--color-primary-light);
+    }
   }
 }
 
-.btn {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
+.slide-fade-left-enter-active,
+.slide-fade-left-leave-active,
+.slide-fade-right-enter-active,
+.slide-fade-right-leave-active {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
 
-  &.btn-primary {
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    text-align: center;
-    &:hover {
-      transform: translateY(-2px);
-    }
-  }
+.slide-fade-left-enter,
+.slide-fade-left-leave-to,
+.slide-fade-right-enter,
+.slide-fade-right-leave-to {
+  opacity: 0;
+}
 
-  &.btn-danger {
-    background-color: #e53e3e;
-    color: white;
-    border: none;
+.slide-fade-left-enter {
+  transform: translateX(-100%);
+}
 
-    display: flex;
-    justify-content: center;
-    &:hover {
-      background-color: #c53030;
-      transform: translateY(-2px);
-    }
-  }
+.slide-fade-left-leave-to {
+  transform: translateX(100%);
+}
+
+.slide-fade-right-enter {
+  transform: translateX(100%);
+}
+
+.slide-fade-right-leave-to {
+  transform: translateX(-100%);
 }
 </style>

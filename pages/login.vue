@@ -1,90 +1,97 @@
 <template>
-  <div class="auth-container">
-    <NuxtParticles
-      v-if="isShowParticles"
-      id="tsparticles"
-      :options="particlesOptions"
-      @load="onLoad"
-    />
-    <div :class="['bg-overlay', { dark: isDark }]"></div>
-    <div class="auth-box">
-      <h2 class="auth-title">Добро пожаловать в DevHorizon</h2>
+  <NuxtLayout name="auth">
+    <div class="auth-container">
+      <NuxtParticles
+        v-if="isShowParticles"
+        id="tsparticles"
+        :options="particlesOptions"
+        @load="onLoad"
+      />
+      <div :class="['bg-overlay', { dark: isDark }]"></div>
+      <div class="auth-box">
+        <h2 class="auth-title">Добро пожаловать в DevHorizon</h2>
 
-      <div class="auth-toggle">
-        <button
-          :class="{ active: isLogin }"
-          @click="isLogin = true"
-          class="toggle-button"
-        >
-          Войти
-        </button>
-        <button
-          :class="{ active: !isLogin }"
-          @click="isLogin = false"
-          class="toggle-button"
-        >
-          Зарегистрироваться
-        </button>
+        <div class="auth-toggle">
+          <button
+            :class="{ active: isLogin }"
+            @click="isLogin = true"
+            class="toggle-button"
+          >
+            Войти
+          </button>
+          <button
+            :class="{ active: !isLogin }"
+            @click="isLogin = false"
+            class="toggle-button"
+          >
+            Зарегистрироваться
+          </button>
+        </div>
+        <form v-if="isLogin" @submit.prevent="handleLogin">
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              v-model="email"
+              class="input-field"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="password">Пароль</label>
+            <input
+              type="password"
+              id="password"
+              v-model="password"
+              class="input-field"
+              required
+            />
+          </div>
+          <button type="submit" class="submit-button">Войти</button>
+        </form>
+
+        <form v-if="!isLogin" @submit.prevent="handleRegister">
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              v-model="email"
+              class="input-field"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="username">Имя пользователя</label>
+            <input
+              type="text"
+              id="username"
+              v-model="username"
+              class="input-field"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="password">Пароль</label>
+            <input
+              type="password"
+              id="password"
+              v-model="password"
+              class="input-field"
+              required
+            />
+          </div>
+          <button type="submit" class="submit-button">
+            Зарегистрироваться
+          </button>
+        </form>
+        <div class="auth-box__back">
+          <ButtonBack />
+        </div>
       </div>
-      <form v-if="isLogin" @submit.prevent="handleLogin">
-        <div class="input-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            v-model="email"
-            class="input-field"
-            required
-          />
-        </div>
-        <div class="input-group">
-          <label for="password">Пароль</label>
-          <input
-            type="password"
-            id="password"
-            v-model="password"
-            class="input-field"
-            required
-          />
-        </div>
-        <button type="submit" class="submit-button">Войти</button>
-      </form>
-
-      <form v-if="!isLogin" @submit.prevent="handleRegister">
-        <div class="input-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            v-model="email"
-            class="input-field"
-            required
-          />
-        </div>
-        <div class="input-group">
-          <label for="username">Имя пользователя</label>
-          <input
-            type="text"
-            id="username"
-            v-model="username"
-            class="input-field"
-            required
-          />
-        </div>
-        <div class="input-group">
-          <label for="password">Пароль</label>
-          <input
-            type="password"
-            id="password"
-            v-model="password"
-            class="input-field"
-            required
-          />
-        </div>
-        <button type="submit" class="submit-button">Зарегистрироваться</button>
-      </form>
     </div>
-  </div>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
@@ -156,6 +163,11 @@ watch(
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
+  &__back {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
 }
 
 .auth-title {

@@ -1,34 +1,17 @@
 <template>
-  <div class="course-container">
-    <h2 class="course-title">{{ course.title }}</h2>
-    <p class="course-description">{{ course.description }}</p>
-    <NuxtLink to="/course" class="back-link">Назад к курсам</NuxtLink>
-  </div>
+  <NuxtLayout>
+    <div class="course-container">
+      <h2 class="course-title">{{ course.title }}</h2>
+      <p class="course-description">{{ course.description }}</p>
+      <NuxtLink to="/course" class="back-link">Назад к курсам</NuxtLink>
+    </div>
+  </NuxtLayout>
 </template>
 
 <script setup>
-import { useRoute } from "vue-router";
-
+import { courses } from "~/data/courses";
 const route = useRoute();
-const courseId = route.params.id;
-
-const courses = [
-  {
-    id: "1",
-    title: "Основы HTML и CSS",
-    description: "Изучите базовые принципы веб-разработки.",
-  },
-  {
-    id: "2",
-    title: "JavaScript для начинающих",
-    description: "Начните программировать на JavaScript с нуля.",
-  },
-  {
-    id: "3",
-    title: "Введение в Vue.js",
-    description: "Постройте свой первый проект на Vue.",
-  },
-];
+const courseId = Number(route.params.id);
 
 const course = courses.find((c) => c.id === courseId);
 </script>

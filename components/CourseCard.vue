@@ -1,14 +1,16 @@
 <template>
-  <div class="course-card">
-    <h3 class="course-title">{{ course.title }}</h3>
-    <p class="course-description">{{ course.description }}</p>
-    <NuxtLink :to="`/course/${course.id}`" class="course-link"
-      >Подробнее</NuxtLink
-    >
-  </div>
+  <NuxtLink
+    :to="`/course/${course.id}`"
+    class="subscription-card"
+    :class="`subscription-card__${course.theme}`"
+  >
+    <h3 class="subscription-title">{{ course.title }}</h3>
+    <p class="subscription-price">{{ course.price }}</p>
+    <p class="subscription-description">{{ course.description }}</p>
+  </NuxtLink>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   course: {
     type: Object,
@@ -17,40 +19,64 @@ defineProps({
 });
 </script>
 
-<style scoped>
-.course-card {
-  background-color: var(--white);
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
+<style scoped lang="scss">
+.subscription-card {
+  background-color: var(--color-background);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  flex: 1;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-.course-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-}
+  &__easy {
+    border: 3px solid #8bc34a;
+    .subscription-title {
+      color: #8bc34a;
+    }
+  }
 
-.course-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--primary);
-  margin-bottom: 8px;
-}
+  &__medium {
+    border: 3px solid #ff9800;
+    .subscription-title {
+      color: #ff9800;
+    }
+  }
 
-.course-description {
-  font-size: 16px;
-  color: var(--text-gray);
-  margin-bottom: 16px;
-}
+  &__hard {
+    border: 3px solid #f44336;
+    .subscription-title {
+      color: #f44336;
+    }
+  }
+  &__hardPlus {
+    border: 3px solid #490702;
+    .subscription-title {
+      color: #490702;
+    }
+  }
 
-.course-link {
-  color: var(--secondary);
-  text-decoration: none;
-  font-weight: 500;
-}
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
 
-.course-link:hover {
-  text-decoration: underline;
+  .subscription-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+
+  .subscription-price {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-primary);
+  }
+
+  .subscription-description {
+    font-size: 1rem;
+    color: var(--color-text);
+  }
 }
 </style>

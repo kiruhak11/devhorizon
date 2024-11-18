@@ -26,19 +26,21 @@ export const useUserStore = defineStore("user", {
       localStorage.removeItem("userData");
     },
 
-    async updateUserDataOnServer(updatedUserData: Record<string, any>) {
+    async updateUserDataOnServer() {
       try {
         if (this.user?.telegram_id) {
           // Используем flatted для безопасной сериализации
-          const userToSend = stringify(updatedUserData);
-
+          const userToSend = useUserStore();
           const response = await axios.post("/api/update-user", {
             telegramId: this.user.telegram_id,
-            updatedUserData: Object.values(userToSend), // Отправляем безопасно сериализованные данные
+            updatedUserData: userToSend.user, // Отправляем безопасно сериализованные данные
           });
 
           if (response.status === 200) {
-            console.log("User data updated on server");
+            if (userToSend.user) {
+              userToSend.setUser(userToSend.user);
+            }
+            console.log("User data updated on servera", userToSend.user);
           } else {
             console.error(
               "Failed to update user data on server",

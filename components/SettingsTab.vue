@@ -15,44 +15,76 @@
           placeholder="Ваш lastname"
         />
       </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          v-model="password"
+          id="password"
+          :type="passwordVisible ? 'text' : 'password'"
+          :placeholder="
+            passwordEmpty && passwordVisible
+              ? 'Создайте пароль!'
+              : userStore.user?.password
+          "
+        />
+      </div>
       <div class="btns">
         <UiButton @click="updateProfile">Сохранить изменения</UiButton>
-        <UiButton theme="danger" @click="deleteAccount"
-          >Удалить аккаунт</UiButton
-        >
+        <UiButton theme="danger" @click="deleteAccount">
+          Удалить аккаунт
+        </UiButton>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { useUserStore } from "@/stores/userStore";
+import { useRouter } from "vue-router";
+import bcrypt from "bcrypt";
 
 const userStore = useUserStore();
 const router = useRouter();
-const name = ref(userStore.user.first_name);
-const lastname = ref(userStore.user.last_name);
 
+const name = ref<string>(userStore.user?.first_name || "");
+const lastname = ref<string>(userStore.user?.last_name || "");
+const password = ref<string>(userStore.user?.password || "");
+const passwordVisible = ref<boolean>(false);
+const passwordEmpty = ref<boolean>(false);
+
+const togglePasswordVisibility = () => {
+  passwordVisible.value = !passwordVisible.value;
+};
+const hashedPassword = await bcrypt.hash(password.value, 10);
 const updateProfile = () => {
-  const updatedUserData = {
-    first_name: name,
-    last_name: lastname,
-  };
-  console.log(updatedUserData);
-  userStore.updateUserDataOnServer(updatedUserData);
-
-  alert(
-    "Ваши данные обнавлены успешно: " +
-      userStore.user.first_name +
-      " " +
-      userStore.user.last_name
-  );
+  if (userStore.user) {
+    userStore.user.first_name = name.value;
+    userStore.user.last_name = lastname.value;
+    userStore.user.password = password.value;
+    userStore.updateUserDataOnServer();
+    handlePassword();
+    alert(
+      `Ваши данные обновлены успешно: ${userStore.user.first_name} ${userStore.user.last_name} ${userStore.user.password}`
+    );
+  }
 };
 
 const deleteAccount = () => {
   userStore.clearUser();
   router.push("/");
 };
+const handlePassword = () => {
+  if (!userStore.user?.password) {
+    passwordVisible.value = true;
+    passwordEmpty.value = true;
+  } else {
+    passwordVisible.value = false;
+    passwordEmpty.value = false;
+  }
+};
+onMounted(() => {
+  handlePassword();
+});
 </script>
 
 <style scoped lang="scss">

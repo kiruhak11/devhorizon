@@ -11,8 +11,7 @@ export default defineNuxtConfig({
     "nuxt-telegram-auth",
   ],
   telegramAuth: {
-    botToken: "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8", // Замени на токен Telegram-бота
-    useUserPhoto: true,
+    TELEGRAM_TOKEN: "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8", // Замени на токен Telegram-бота
   },
   piniaPersistedstate: {
     cookieOptions: {

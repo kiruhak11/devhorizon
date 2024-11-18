@@ -49,6 +49,10 @@
             />
           </div>
           <button type="submit" class="submit-button">Войти</button>
+          <TelegramLoginWidget
+            telegram-login="devhorizon_bot"
+            @callback="testCallback"
+          />
         </form>
 
         <form v-if="!isLogin">
@@ -120,6 +124,8 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
     const response = await axios.post("/api/login", {
       telegramId: telegramId.value,
       password: password.value,
+      type: "password",
+      tguser: null,
     });
 
     if (response.data.message.includes("Login successful")) {
@@ -135,6 +141,28 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
   }
 };
 
+const testCallback = async (user: any) => {
+  console.log("Custom callback function: ", user.id);
+  try {
+    const response = await axios.post("/api/login", {
+      telegramId: user.id,
+      password: "",
+      type: "telegram",
+      tguser: user,
+    });
+
+    if (response.data.message.includes("Login successful")) {
+      const user = useUserStore();
+      console.log();
+      user.setUser(Object.fromEntries(Object.values(response.data.user))); // Сохраняем пользователя в хранилище
+      router.push("/profile"); // Перенаправляем на страницу профиля
+    } else {
+      console.error("Login failed:", response.data.message);
+    }
+  } catch (error) {
+    console.error("Login failed:", error);
+  }
+};
 const onLoad = (container: Container) => {
   container.pause();
   setTimeout(() => container.play(), 1);

@@ -58,35 +58,56 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
+import { useUserStore } from "@/stores/userStore"; // импорт хранилища пользователя
+
+// Типизация данных пользователя
+interface User {
+  coins: number;
+  lives: number;
+  mana: number;
+  subscription: string;
+}
+
 const userStore = useUserStore();
 
+// Пример данных пользователя
 const subscriptionEnd = "5 дней";
+
+// Массив с курсами и прогрессом
 const userCourses = [
   { title: "Основы HTML и CSS", progress: 60 },
   { title: "JavaScript для начинающих", progress: 28 },
   { title: "Введение в Vue.js", progress: 80 },
 ];
-const buyMana = () => {
-  userStore.user.mana += 5;
-  userStore.setUser(userStore.user);
-};
-// Текущее состояние открытой панели
-const activeCourse = ref(null);
 
-const toggleProgress = (index) => {
+// Функция для покупки маны
+const buyMana = () => {
+  if (userStore.user) {
+    userStore.user.mana += 5;
+    userStore.updateUserDataOnServer();
+  } else {
+    console.error("User data not found");
+  }
+};
+
+// Состояние текущего открытого курса
+const activeCourse = ref<number | null>(null);
+
+// Функция для переключения курса
+const toggleProgress = (index: number) => {
   activeCourse.value = activeCourse.value === index ? null : index;
 };
 
-// Функция для цвета прогресс-бара
-const getProgressBarColor = (progress) => {
+// Функция для определения цвета прогресс-бара
+const getProgressBarColor = (progress: number): string => {
   if (progress < 30) return "red"; // Красный
   if (progress >= 30 && progress <= 60) return "orange"; // Оранжевый
   return "green"; // Зеленый
 };
 
-// Продление подписки (заглушка)
+// Функция для продления подписки
 const renewSubscription = () => {
   alert("Подписка продлена!");
 };

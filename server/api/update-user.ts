@@ -1,6 +1,7 @@
 import { H3Event } from "h3";
 import fs from "fs";
 import path from "path";
+import bcrypt from "bcrypt"; // Для хэширования паролей
 
 // Абсолютный путь к файлу users.json
 const usersFilePath = path.resolve("server", "users.json");
@@ -42,6 +43,8 @@ export default defineEventHandler(async (event: H3Event) => {
       );
       users = Object.values(users); // Преобразуем объект в массив
     }
+    const hashedPassword = await bcrypt.hash(users[userIndex].password, 10);
+    updatedUserData.password = hashedPassword;
     // Обновляем данные пользователя
     users[userIndex] = { ...users[userIndex], ...updatedUserData };
 

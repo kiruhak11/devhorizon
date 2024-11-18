@@ -61,6 +61,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useUserStore } from "@/stores/userStore"; // импорт хранилища пользователя
+import axios from "axios";
 
 // Типизация данных пользователя
 interface User {
@@ -83,7 +84,7 @@ const userCourses = [
 ];
 
 // Функция для покупки маны
-const buyMana = () => {
+const buyMana = async () => {
   if (userStore.user) {
     userStore.user.mana += 5;
     userStore.updateUserDataOnServer();

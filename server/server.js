@@ -3,6 +3,8 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import fs from "fs";
 import express from "express";
+import bcrypt from "bcrypt";
+import { ref } from "vue";
 
 const app = express();
 const bot = new Telegraf("7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8"); // Токен вашего бота
@@ -33,21 +35,39 @@ function readUsers() {
 function writeUsers(users) {
   fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2), "utf-8");
 }
-
+export default add = (user, message) => {
+  console.warn("add", message, user);
+  bot.telegram.sendMessage(user, message);
+};
 // Обработка команды /start в боте
 bot.start((ctx) => {
   ctx.reply("Привет! Чтобы зарегистрироваться, придумай пароль!");
 });
-
+let newPassword;
 // Обработка получения данных пользователя в боте
-bot.on("text", (ctx) => {
+bot.on("text", async (ctx) => {
   const message = ctx.message.text;
   const user = ctx.message.from;
-
+  if (newPassword === true) {
+    const password = message;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const users = readUsers();
+    const existingUser = users.find((u) => u.telegram_id === user.id);
+    existingUser.password = hashedPassword;
+    writeUsers(users);
+    ctx.reply("Пароль изменен.");
+    newPassword = false;
+    return;
+  }
+  if (message.toLowerCase() === "password") {
+    ctx.reply("Введи новый пароль");
+    newPassword = true;
+    return;
+  }
   // Проверка пароля
   if (message != "12345") {
     const password = message;
-
+    const hashedPassword = await bcrypt.hash(password, 10);
     // Чтение данных о пользователях
     const users = readUsers();
 
@@ -68,7 +88,7 @@ bot.on("text", (ctx) => {
       mana: 0,
       lives: 3,
       subscription: "free",
-      password: password,
+      password: hashedPassword,
       created_at: new Date().toISOString(),
     };
 

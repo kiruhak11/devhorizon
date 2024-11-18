@@ -1,7 +1,7 @@
 import { H3Event } from "h3";
 import fs from "fs";
 import path from "path";
-
+import bcrypt from "bcrypt";
 // Абсолютный путь к файлу
 const usersFilePath = path.resolve("server", "users.json");
 
@@ -39,8 +39,9 @@ export default defineEventHandler(async (event: H3Event) => {
       if (!user) {
         return { statusCode: 404, message: "User not found" };
       }
-
-      if (user.password !== password) {
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      console.warn("isValidPassword", isValidPassword);
+      if (!isValidPassword) {
         return { statusCode: 401, message: "Incorrect password" };
       }
 

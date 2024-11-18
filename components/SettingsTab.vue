@@ -22,9 +22,7 @@
           id="password"
           :type="passwordVisible ? 'text' : 'password'"
           :placeholder="
-            passwordEmpty && passwordVisible
-              ? 'Создайте пароль!'
-              : userStore.user?.password
+            passwordEmpty ? 'Создайте пароль!' : userStore.user?.password
           "
         />
       </div>
@@ -41,7 +39,6 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
-import bcrypt from "bcrypt";
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -55,7 +52,6 @@ const passwordEmpty = ref<boolean>(false);
 const togglePasswordVisibility = () => {
   passwordVisible.value = !passwordVisible.value;
 };
-const hashedPassword = await bcrypt.hash(password.value, 10);
 const updateProfile = () => {
   if (userStore.user) {
     userStore.user.first_name = name.value;

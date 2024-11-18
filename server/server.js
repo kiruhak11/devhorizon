@@ -35,10 +35,7 @@ function readUsers() {
 function writeUsers(users) {
   fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2), "utf-8");
 }
-export default add = (user, message) => {
-  console.warn("add", message, user);
-  bot.telegram.sendMessage(user, message);
-};
+
 // Обработка команды /start в боте
 bot.start((ctx) => {
   ctx.reply("Привет! Чтобы зарегистрироваться, придумай пароль!");

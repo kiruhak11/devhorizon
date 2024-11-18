@@ -6,10 +6,10 @@
     "last_name": "Kovalenko",
     "phone": null,
     "coins": 0,
-    "mana": 120,
+    "mana": 125,
     "lives": 3,
     "subscription": "free",
-    "password": "$2b$10$3M25uujjLitIOY6bCACMg.JjSeun6ZCd3299bLBBX9Kq61r8zZ1kS",
+    "password": "$2b$10$QHFYhJBjdVSzCFIce0oiaOhUN15UqpL3HIdhQMfxlmn0JJQCUBhPe",
     "created_at": "2024-11-18T08:39:36.409Z"
   }
 ]

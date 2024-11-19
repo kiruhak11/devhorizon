@@ -39,33 +39,25 @@
             />
           </div>
           <div class="input-group">
-            <label for="password">Пароль</label>
+            <label for="password_login">Пароль</label>
             <input
               type="password"
-              id="password"
-              v-model="password"
+              id="password_login"
+              v-model="password_login"
               class="input-field"
               required
             />
           </div>
           <button type="submit" class="submit-button">Войти</button>
-          <TelegramLoginWidget
-            telegram-login="devhorizon_bot"
-            @callback="testCallback"
-          />
+          <div class="submit-telegram">
+            <TelegramLoginWidget
+              telegram-login="devhorizon_bot"
+              @callback="testCallback_login"
+            />
+          </div>
         </form>
 
         <form v-if="!isLogin">
-          <div class="input-group">
-            <label for="username">Имя пользователя</label>
-            <input
-              type="text"
-              id="username"
-              v-model="username"
-              class="input-field"
-              required
-            />
-          </div>
           <div class="input-group">
             <label for="password">Пароль</label>
             <input
@@ -76,10 +68,14 @@
               required
             />
           </div>
-          <button type="submit" class="submit-button">
-            Зарегистрироваться
-          </button>
+          <div v-if="password" class="submit-telegram">
+            <TelegramLoginWidget
+              telegram-login="devhorizon_bot"
+              @callback="testCallback_register"
+            />
+          </div>
         </form>
+        <a class="error-message">{{ error }}</a>
         <div class="auth-box__back">
           <ButtonBack />
         </div>
@@ -98,10 +94,12 @@ import { useRouter } from "vue-router";
 const isLogin = ref(true);
 const telegramId = ref("");
 const password = ref("");
-const username = ref("");
+const password_login = ref("");
+const error = ref("");
 const router = useRouter();
 const colorMode = useColorMode();
 const isDark = computed(() => colorMode.value === "dark");
+const userStore = useUserStore();
 
 const isShowParticles = ref(true);
 const particlesOptions = computed(() => {
@@ -119,48 +117,70 @@ const particlesOptions = computed(() => {
 });
 const handleLogin = async (event: { preventDefault: () => void }) => {
   event.preventDefault();
-
+  error.value = "";
   try {
     const response = await axios.post("/api/login", {
       telegramId: telegramId.value,
-      password: password.value,
+      password: password_login.value,
       type: "password",
+      method: "login",
       tguser: null,
     });
-
     if (response.data.message.includes("Login successful")) {
       const user = useUserStore();
-      console.log();
       user.setUser(Object.fromEntries(Object.values(response.data.user))); // Сохраняем пользователя в хранилище
       router.push("/profile"); // Перенаправляем на страницу профиля
     } else {
-      console.error("Login failed:", response.data.message);
+      error.value = "Login failed: " + response.data.message;
     }
-  } catch (error) {
-    console.error("Login failed:", error);
+  } catch (er) {
+    error.value = "Login failed catch:" + er;
   }
 };
 
-const testCallback = async (user: any) => {
-  console.log("Custom callback function: ", user.id);
+const testCallback_register = async (user: any) => {
+  error.value = "";
   try {
     const response = await axios.post("/api/login", {
       telegramId: user.id,
-      password: "",
+      password: password.value,
       type: "telegram",
+      method: "register",
       tguser: user,
     });
-
+    if (response.data.message.includes("User already exists")) {
+      error.value = "Такой пользователь уже существует.";
+    }
     if (response.data.message.includes("Login successful")) {
       const user = useUserStore();
-      console.log();
       user.setUser(Object.fromEntries(Object.values(response.data.user))); // Сохраняем пользователя в хранилище
       router.push("/profile"); // Перенаправляем на страницу профиля
     } else {
-      console.error("Login failed:", response.data.message);
+      error.value = "Login failed:" + response.data.message;
     }
-  } catch (error) {
-    console.error("Login failed:", error);
+  } catch (er) {
+    error.value = "Login failed:" + er;
+  }
+};
+const testCallback_login = async (user: any) => {
+  error.value = "";
+  try {
+    const response = await axios.post("/api/login", {
+      telegramId: user.id,
+      password: password.value,
+      type: "telegram",
+      method: "login",
+      tguser: user,
+    });
+    if (response.data.message.includes("Login successful")) {
+      const user = useUserStore();
+      user.setUser(Object.fromEntries(Object.values(response.data.user))); // Сохраняем пользователя в хранилище
+      router.push("/profile"); // Перенаправляем на страницу профиля
+    } else {
+      error.value = "Login failed:" + response.data.message;
+    }
+  } catch (er) {
+    error.value = "Login failed:" + er;
   }
 };
 const onLoad = (container: Container) => {
@@ -177,6 +197,9 @@ watch(
     }, 100);
   }
 );
+onMounted(() => {
+  if (userStore.user) router.push("/profile");
+});
 </script>
 
 <style scoped lang="scss">
@@ -188,7 +211,12 @@ watch(
   justify-content: center;
   min-height: 100vh;
 }
-
+.error-message {
+  display: flex;
+  justify-content: center;
+  color: var(--color-danger);
+  text-align: center;
+}
 .auth-box {
   position: relative;
   z-index: 10;
@@ -267,19 +295,26 @@ watch(
   }
 }
 
-.submit-button {
-  width: 100%;
-  padding: 12px;
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.submit {
+  &-button {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 
-  &:hover {
-    background-color: #2980b9;
+    &:hover {
+      background-color: #2980b9;
+    }
+  }
+  &-telegram {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
   }
 }
 

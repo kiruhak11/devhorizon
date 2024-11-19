@@ -30,8 +30,9 @@
   </NuxtLayout>
 </template>
 <script setup lang="ts">
+const router = useRouter();
 const activeTab = ref("dashboard");
-
+const userStore = useUserStore();
 const setActiveTab = (tab: string) => {
   if (activeTab.value !== tab) {
     activeTab.value = tab;
@@ -41,6 +42,9 @@ const transitionName = computed(() => {
   return activeTab.value === "dashboard"
     ? "slide-fade-left"
     : "slide-fade-right";
+});
+onMounted(() => {
+  if (!userStore.user) router.push("/");
 });
 </script>
 <style scoped lang="scss">
@@ -87,9 +91,9 @@ const transitionName = computed(() => {
       background-color: var(--color-primary);
       color: white;
     }
-
     &:hover {
-      background-color: var(--color-primary-light);
+      background-color: var(--color-primary);
+      color: white;
     }
   }
 }

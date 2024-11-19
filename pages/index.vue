@@ -14,8 +14,13 @@
         />
       </div>
 
-      <div class="auth-buttons">
+      <div class="auth-buttons" v-if="!userStore.user">
         <UiButton to="/login">Войти или создать аккаунт</UiButton>
+      </div>
+
+      <div class="auth-buttons" v-else>
+        <UiButton to="/profile">Перейти в личный кабинет</UiButton>
+        <UiButton theme="danger" @click="userStore.clearUser">Выход</UiButton>
       </div>
     </div>
   </NuxtLayout>
@@ -23,6 +28,7 @@
 
 <script setup lang="ts">
 import { courses } from "~/data/courses";
+const userStore = useUserStore();
 </script>
 
 <style scoped lang="scss">

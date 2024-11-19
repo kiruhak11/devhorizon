@@ -20,7 +20,8 @@
     background-color: var(--color-primary);
 
     &:hover {
-      background-color: dark(var(--color-secondary), 10%);
+      color: var(--color-primary);
+      background-color: var(--color-background);
       border: 1px solid var(--color-border);
       box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
       transform: translateY(-2px);
@@ -31,11 +32,14 @@
     display: flex;
     justify-content: center;
     color: white;
-    background-color: #e53e3e;
+    background-color: var(--color-danger);
     border: none;
 
     &:hover {
-      background-color: #c53030;
+      color: var(--color-danger);
+      background-color: var(--color-background);
+      border: 1px solid var(--color-border);
+      box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
       transform: translateY(-2px);
     }
   }

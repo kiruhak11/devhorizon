@@ -21,16 +21,12 @@
           v-model="password"
           id="password"
           :type="passwordVisible ? 'text' : 'password'"
-          :placeholder="
-            passwordEmpty ? 'Создайте пароль!' : userStore.user?.password
-          "
+          :placeholder="passwordEmpty ? 'Создайте пароль!' : 'Изменить пароль'"
         />
       </div>
       <div class="btns">
         <UiButton @click="updateProfile">Сохранить изменения</UiButton>
-        <UiButton theme="danger" @click="deleteAccount">
-          Удалить аккаунт
-        </UiButton>
+        <UiButton theme="danger" @click="deleteAccount"> Выйти </UiButton>
       </div>
     </div>
   </div>
@@ -45,7 +41,7 @@ const router = useRouter();
 
 const name = ref<string>(userStore.user?.first_name || "");
 const lastname = ref<string>(userStore.user?.last_name || "");
-const password = ref<string>(userStore.user?.password || "");
+const password = ref<string>();
 const passwordVisible = ref<boolean>(false);
 const passwordEmpty = ref<boolean>(false);
 

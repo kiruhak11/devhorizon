@@ -7,7 +7,9 @@ const usersFilePath = path.resolve("server", "users.json");
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    const { telegramId, password, type, tguser } = await readBody(event);
+    const { telegramId, password, type, tguser, method } = await readBody(
+      event
+    );
     console.log("Received telegramId:", telegramId);
     console.log("Received password:", password);
     if (type == "password") {
@@ -76,8 +78,13 @@ export default defineEventHandler(async (event: H3Event) => {
         (u: { telegram_id: any }) => u.telegram_id === Number(telegramId)
       );
 
+      if (user && method == "register") {
+        return { message: "User already exists" };
+      }
+
       if (!user) {
         console.log("User start creating");
+
         const newUser = {
           telegram_id: telegramId,
           username: tguser.username || "",
@@ -87,8 +94,11 @@ export default defineEventHandler(async (event: H3Event) => {
           coins: 0,
           mana: 0,
           lives: 3,
-          subscription: "free",
-          password: "",
+          subscription: {
+            type: 1,
+            end: new Date().toISOString(),
+          },
+          password: password ? await bcrypt.hash(password, 10) : "",
           created_at: new Date().toISOString(),
         };
         console.log("New user:", newUser);
@@ -99,6 +109,39 @@ export default defineEventHandler(async (event: H3Event) => {
         writeUsers(users);
 
         user = newUser;
+      } else {
+        console.log("User found:", user);
+      }
+
+      // Преобразуем user в массив и возвращаем его
+      const userArray = Object.entries(user); // Преобразуем объект в массив
+
+      return { message: "Login successful", user: userArray };
+    } else if (type == "reload") {
+      console.log("Путь к файлу users.json:", usersFilePath);
+
+      // Проверка существования файла
+      if (!fs.existsSync(usersFilePath)) {
+        console.log("Файл users.json не найден.");
+        return { statusCode: 404, message: "Users file not found" };
+      }
+
+      // Чтение пользователей
+      const readUsers = () => {
+        const data = fs.readFileSync(usersFilePath, "utf-8");
+        return JSON.parse(data);
+      };
+
+      const users = readUsers();
+      console.log("Users from file:", users);
+
+      // Убедимся, что telegramId в файле и в запросе имеют одинаковый тип
+      let user = users.find(
+        (u: { telegram_id: any }) => u.telegram_id === Number(telegramId)
+      );
+
+      if (!user) {
+        return { statusCode: 404, message: "User not found" };
       } else {
         console.log("User found:", user);
       }

@@ -1,41 +1,41 @@
-/* Основные цвета для светлой темы */
 :root {
-  --color-header-background: linear-gradient(to right, #3490dc, #82cdff);
-  --color-primary: #3490dc;
-  --color-secondary: #ffed4a;
-  --color-background: #f9fafb;
-  --color-text: #333;
-  --color-shadow: #33333350;
-  --color-border: #e2e8f0;
-  --color-header-text: #333;
-  --color-footer-background: #1f2937;
-  --color-footer-text: #f9fafb;
-  --color-button-background: #3490dc;
-  --color-button-hover: #2779bd;
+  --color-header-background: linear-gradient(to right, #4ca1ff, #82eaff);
+  --color-primary: #4ca1ff;
+  --color-secondary: #ffe066;
+  --color-background: #fff;
+  --color-text: #2d3748;
+  --color-shadow: #2d374850;
+  --color-border: #e0e6ed;
+  --color-header-text: #1a202c;
+  --color-footer-background: #2d3748;
+  --color-danger: #e53e3e;
+  --color-footer-text: #fff;
+  --color-button-background: #4ca1ff;
+  --color-button-hover: #3b82e6;
   --color-blur: radial-gradient(
     circle,
-    rgb(255 223 136 / 90%),
-    rgb(255 223 136 / 30%)
+    rgb(255 245 136 / 80%),
+    rgb(255 223 136 / 40%)
   );
 }
 
-/* Основные цвета для темной темы */
 .dark {
-  --color-primary: #4c8bff;
-  --color-secondary: #ff9f00;
-  --color-background: #1f2937;
-  --color-text: #f9fafb;
-  --color-shadow: #f9fafb50;
-  --color-border: #4b5563;
-  --color-header-background: linear-gradient(to right, #3490dc, #1f2937);
-  --color-header-text: #f9fafb;
+  --color-header-background: linear-gradient(to right, #1e40af, #1f2937);
+  --color-primary: #4f94ff;
+  --color-secondary: #ffc44d;
+  --color-background: #121826;
+  --color-text: #e5e7eb;
+  --color-shadow: #1a202c80;
+  --color-border: #374151;
+  --color-header-text: #f3f4f6;
+  --color-danger: #992a2a;
   --color-footer-background: #111827;
-  --color-footer-text: #f9fafb;
-  --color-button-background: #4c8bff;
+  --color-footer-text: #e5e7eb;
+  --color-button-background: #4f94ff;
   --color-button-hover: #3c74d3;
   --color-blur: radial-gradient(
     circle,
-    rgb(200 200 255 / 80%),
-    rgb(60 60 100 / 30%)
+    rgb(150 200 255 / 70%),
+    rgb(80 90 150 / 40%)
   );
 }

@@ -33,7 +33,7 @@
           class="nav-link"
           exact-active-class="active-link"
         >
-          Профиль
+          {{ userStore.user.first_name + " " + userStore.user.last_name }}
         </NuxtLink>
         <Switcher class="switcher" />
       </div>

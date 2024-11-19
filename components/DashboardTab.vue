@@ -5,10 +5,19 @@
       <div class="card">
         <p class="card-title">Кошелек</p>
         <p class="card-value">{{ userStore.user.coins }} монет</p>
+
+        <p class="card-detail">Используя нашего телеграм бота</p>
+        <UiButton
+          class="btn btn-small"
+          to="https://t.me/devhorizon_bot?start=<pay>"
+        >
+          Пополнить
+        </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Оставшиеся жизни</p>
         <p class="card-value">{{ userStore.user.lives }}</p>
+        <UiButton class="btn btn-small" @click="buyLife"> +5 </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Мана</p>
@@ -17,11 +26,16 @@
       </div>
       <div class="card">
         <p class="card-title">Подписка</p>
-        <p class="card-value">{{ userStore.user.subscription }}</p>
-        <p class="card-detail">Осталось: {{ subscriptionEnd }}</p>
-        <UiButton class="btn btn-small" @click="renewSubscription">
-          Продлить
-        </UiButton>
+        <p class="card-value">{{ userStore.user.subscription.type }}</p>
+        <div v-if="remainingTime != 'Срок истёк'" class="card-detail">
+          <p>Осталось: {{ remainingTime }}</p>
+        </div>
+        <div v-else class="card-detail">
+          <p>{{ remainingTime }}</p>
+          <UiButton class="btn btn-small" @click="renewSubscription">
+            Продлить
+          </UiButton>
+        </div>
       </div>
     </div>
 
@@ -74,7 +88,26 @@ interface User {
 const userStore = useUserStore();
 
 // Пример данных пользователя
-const subscriptionEnd = "5 дней";
+const remainingTime = computed(() => {
+  if (!userStore.user?.subscription?.end) return "Неизвестно";
+
+  const endDate = new Date(userStore.user.subscription.end);
+  const now = new Date();
+
+  if (endDate <= now) return "Срок истёк";
+
+  const diff = endDate.getTime() - now.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  let result = "";
+  if (days > 0) result += `${days} дн. `;
+  if (hours > 0 || days > 0) result += `${hours} ч. `;
+  result += `${minutes} мин.`;
+
+  return result;
+});
 
 // Массив с курсами и прогрессом
 const userCourses = [
@@ -87,6 +120,14 @@ const userCourses = [
 const buyMana = async () => {
   if (userStore.user) {
     userStore.user.mana += 5;
+    userStore.updateUserDataOnServer();
+  } else {
+    console.error("User data not found");
+  }
+};
+const buyLife = async () => {
+  if (userStore.user) {
+    userStore.user.lives += 5;
     userStore.updateUserDataOnServer();
   } else {
     console.error("User data not found");
@@ -144,12 +185,8 @@ const renewSubscription = () => {
   border-radius: 8px;
   padding: 16px;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px var(--color-shadow);
   transition: transform 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
 
   .card-title {
     font-size: 1rem;
@@ -164,24 +201,19 @@ const renewSubscription = () => {
   }
 
   .card-detail {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     font-size: 0.875rem;
     color: var(--color-text-light);
     margin-top: 8px;
   }
 
   .btn-small {
-    margin-top: 12px;
+    margin-top: auto;
     padding: 8px 16px;
-    font-size: 0.875rem;
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: var(--color-primary-light);
-    }
+    font-size: 14px;
   }
 }
 

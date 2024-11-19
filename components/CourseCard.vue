@@ -21,7 +21,7 @@ defineProps({
 
 <style scoped lang="scss">
 .subscription-card {
-  background-color: var(--color-background);
+  background-color: var(--color-header-background);
   border-radius: 12px;
   padding: 24px;
   text-align: center;

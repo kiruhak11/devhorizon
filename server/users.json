@@ -6,10 +6,29 @@
     "last_name": "Kovalenko",
     "phone": null,
     "coins": 0,
-    "mana": 125,
+    "mana": 0,
     "lives": 3,
-    "subscription": "free",
-    "password": "$2b$10$QHFYhJBjdVSzCFIce0oiaOhUN15UqpL3HIdhQMfxlmn0JJQCUBhPe",
-    "created_at": "2024-11-18T08:39:36.409Z"
+    "subscription": {
+      "type": 1,
+      "end": "9024-11-19T06:47:28.685Z"
+    },
+    "password": "",
+    "created_at": "2024-11-19T06:47:28.685Z"
+  },
+  {
+    "telegram_id": 221214664,
+    "username": "Rubillex",
+    "first_name": "Vadim Gubchenko",
+    "last_name": "",
+    "phone": null,
+    "coins": 0,
+    "mana": 0,
+    "lives": 18,
+    "subscription": {
+      "type": 100,
+      "end": "9024-11-19T06:59:54.627Z"
+    },
+    "password": "$2b$10$M/zERLRpOXcevTPL6iA4ZePIgDjOEzYhCq7mBMUCTvmIljlOu680u",
+    "created_at": "2024-11-19T06:59:54.627Z"
   }
 ]

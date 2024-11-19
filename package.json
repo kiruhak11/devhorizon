@@ -36,6 +36,7 @@
     "nuxt-telegram-auth": "^1.2.0",
     "pinia": "^2.1.6",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "socket.io-client": "^4.8.1",
     "telegraf": "^4.16.3",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",

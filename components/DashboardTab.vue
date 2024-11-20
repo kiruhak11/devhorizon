@@ -26,16 +26,16 @@
       </div>
       <div class="card">
         <p class="card-title">Подписка</p>
-        <p class="card-value">{{ userStore.user.subscription.type }}</p>
-        <div v-if="remainingTime != 'Срок истёк'" class="card-detail">
+        <p class="card-value">{{}}</p>
+        <!-- <div v-if="remainingTime != 'Срок истёк'" class="card-detail">
           <p>Осталось: {{ remainingTime }}</p>
         </div>
         <div v-else class="card-detail">
           <p>{{ remainingTime }}</p>
           <UiButton class="btn btn-small" @click="renewSubscription">
-            Продлить
+            Продлить  
           </UiButton>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -88,26 +88,26 @@ interface User {
 const userStore = useUserStore();
 
 // Пример данных пользователя
-const remainingTime = computed(() => {
-  if (!userStore.user?.subscription?.end) return "Неизвестно";
+// const remainingTime = computed(() => {
+//   if (!userStore.user?.subscription?.end) return "Неизвестно";
 
-  const endDate = new Date(userStore.user.subscription.end);
-  const now = new Date();
+//   const endDate = new Date(userStore.user.subscription.end);
+//   const now = new Date();
 
-  if (endDate <= now) return "Срок истёк";
+//   if (endDate <= now) return "Срок истёк";
 
-  const diff = endDate.getTime() - now.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+//   const diff = endDate.getTime() - now.getTime();
+//   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+//   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+//   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-  let result = "";
-  if (days > 0) result += `${days} дн. `;
-  if (hours > 0 || days > 0) result += `${hours} ч. `;
-  result += `${minutes} мин.`;
+//   let result = "";
+//   if (days > 0) result += `${days} дн. `;
+//   if (hours > 0 || days > 0) result += `${hours} ч. `;
+//   result += `${minutes} мин.`;
 
-  return result;
-});
+//   return result;
+// });
 
 // Массив с курсами и прогрессом
 const userCourses = [

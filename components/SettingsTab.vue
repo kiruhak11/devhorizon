@@ -39,8 +39,8 @@ import { useRouter } from "vue-router";
 const userStore = useUserStore();
 const router = useRouter();
 
-const name = ref<string>(userStore.user?.first_name || "");
-const lastname = ref<string>(userStore.user?.last_name || "");
+const name = ref<string>(userStore.user?.firstName || "");
+const lastname = ref<string>(userStore.user?.lastName || "");
 const password = ref<string>();
 const passwordVisible = ref<boolean>(false);
 const passwordEmpty = ref<boolean>(false);
@@ -50,13 +50,13 @@ const togglePasswordVisibility = () => {
 };
 const updateProfile = () => {
   if (userStore.user) {
-    userStore.user.first_name = name.value;
-    userStore.user.last_name = lastname.value;
+    userStore.user.firstName = name.value;
+    userStore.user.lastName = lastname.value;
     userStore.user.password = password.value;
     userStore.updateUserDataOnServer();
     handlePassword();
     alert(
-      `Ваши данные обновлены успешно: ${userStore.user.first_name} ${userStore.user.last_name} ${userStore.user.password}`
+      `Ваши данные обновлены успешно: ${userStore.user.firstName} ${userStore.user.lastName}`
     );
   }
 };

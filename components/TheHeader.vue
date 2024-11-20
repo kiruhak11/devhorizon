@@ -33,7 +33,7 @@
           class="nav-link"
           exact-active-class="active-link"
         >
-          {{ userStore.user.first_name + " " + userStore.user.last_name }}
+          {{ userStore.user.firstName + " " + userStore.user.lastName }}
         </NuxtLink>
         <Switcher class="switcher" />
       </div>

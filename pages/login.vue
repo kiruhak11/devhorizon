@@ -117,24 +117,33 @@ const particlesOptions = computed(() => {
 });
 const handleLogin = async (event: { preventDefault: () => void }) => {
   event.preventDefault();
-  error.value = "";
+  error.value = ""; // Сброс ошибок
+
   try {
+    // Отправляем данные на сервер для логина
     const response = await axios.post("/api/login", {
       telegramId: telegramId.value,
       password: password_login.value,
       type: "password",
       method: "login",
-      tguser: null,
+      tguser: null, // Можно передавать данные Telegram пользователя, если нужно
     });
+
     if (response.data.message.includes("Login successful")) {
-      const user = useUserStore();
-      user.setUser(Object.fromEntries(Object.values(response.data.user))); // Сохраняем пользователя в хранилище
-      router.push("/profile"); // Перенаправляем на страницу профиля
+      console.log("Login successful:", response.data.user);
+
+      // Сохраняем данные пользователя в хранилище Pinia
+      const userStore = useUserStore();
+      userStore.setUser(response.data.user); // Сохраняем пользователя в хранилище
+
+      // Перенаправляем на страницу профиля
+      router.push("/profile");
     } else {
-      error.value = "Login failed: " + response.data.message;
+      error.value = "Login failed: " + response.data.message; // В случае ошибки логина
     }
   } catch (er) {
-    error.value = "Login failed catch:" + er;
+    error.value = "Login failed catch: " + er; // Обрабатываем ошибки запроса
+    console.error("Login failed catch:", er);
   }
 };
 
@@ -152,8 +161,8 @@ const testCallback_register = async (user: any) => {
       error.value = "Такой пользователь уже существует.";
     }
     if (response.data.message.includes("Login successful")) {
-      const user = useUserStore();
-      user.setUser(Object.fromEntries(Object.values(response.data.user))); // Сохраняем пользователя в хранилище
+      const userStore = useUserStore();
+      userStore.setUser(response.data.user);
       router.push("/profile"); // Перенаправляем на страницу профиля
     } else {
       error.value = "Login failed:" + response.data.message;
@@ -174,7 +183,8 @@ const testCallback_login = async (user: any) => {
     });
     if (response.data.message.includes("Login successful")) {
       const user = useUserStore();
-      user.setUser(Object.fromEntries(Object.values(response.data.user))); // Сохраняем пользователя в хранилище
+      user.setUser(response.data.user); // Сохраняем пользователя в хранилище
+
       router.push("/profile"); // Перенаправляем на страницу профиля
     } else {
       error.value = "Login failed:" + response.data.message;

@@ -4,132 +4,108 @@ import { dirname, join } from "path";
 import fs from "fs";
 import express from "express";
 import bcrypt from "bcrypt";
-import { ref } from "vue";
+import { PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 const app = express();
-const bot = new Telegraf("7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8"); // Токен вашего бота
-
-// Получаем путь к текущей директории
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Путь к файлу, где будут храниться пользователи
-const usersFilePath = join(__dirname, "users.json");
-
+const bot = new Telegraf("7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8");
 app.use(express.json()); // Для парсинга JSON в запросах
 
-// Чтение данных о пользователях
-function readUsers() {
-  if (fs.existsSync(usersFilePath)) {
-    const data = fs.readFileSync(usersFilePath, "utf-8");
-    if (data.trim() === "") {
-      return []; // Если файл пустой, возвращаем пустой массив
-    }
-    return JSON.parse(data); // Парсим данные
-  } else {
-    return []; // Если файл не существует, возвращаем пустой массив
-  }
-}
-
-// Запись данных о пользователях в файл
-function writeUsers(users) {
-  fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2), "utf-8");
-}
+let isChangingPassword = {}; // Для отслеживания статуса смены пароля
 
 // Обработка команды /start в боте
-bot.start((ctx) => {
-  ctx.reply("Привет! Чтобы зарегистрироваться, придумай пароль!");
-});
-let newPassword;
-// Обработка получения данных пользователя в боте
-bot.on("text", async (ctx) => {
-  const message = ctx.message.text;
-  const user = ctx.message.from;
-  if (newPassword === true) {
-    const password = message;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const users = readUsers();
-    const existingUser = users.find((u) => u.telegram_id === user.id);
-    existingUser.password = hashedPassword;
-    writeUsers(users);
-    ctx.reply("Пароль изменен.");
-    newPassword = false;
-    return;
-  }
-  if (message.toLowerCase() === "password") {
-    ctx.reply("Введи новый пароль");
-    newPassword = true;
-    return;
-  }
-  // Проверка пароля
-  if (message != "12345") {
-    const password = message;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Чтение данных о пользователях
-    const users = readUsers();
+bot.start(async (ctx) => {
+  const telegramId = ctx.message?.from.id;
 
-    // Проверка на уникальность (если пользователь с таким telegram_id уже существует)
-    const existingUser = users.find((u) => u.telegram_id === user.id);
-    if (existingUser) {
-      return ctx.reply("Ты уже зарегистрирован.");
+  if (!telegramId)
+    return ctx.reply("Ошибка: не удалось определить Telegram ID.");
+
+  // Проверяем, есть ли пользователь в базе
+  const user = await prisma.user.findUnique({
+    where: { telegramId },
+  });
+
+  if (user) {
+    return ctx.reply(
+      `Привет, ${user.firstName || "пользователь"}! Вы уже зарегистрированы.`
+    );
+  }
+
+  ctx.reply("Привет! Чтобы зарегистрироваться, придумай пароль.");
+});
+
+// Обработка текстовых сообщений
+bot.on("text", async (ctx) => {
+  const message = ctx.message?.text;
+  const user = ctx.message?.from;
+
+  if (!message || !user) return;
+
+  const telegramId = user.id;
+
+  // Если пользователь находится в процессе смены пароля
+  if (isChangingPassword[telegramId]) {
+    const newPassword = message;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { telegramId },
+      data: { password: hashedPassword },
+    });
+
+    ctx.reply("Пароль успешно изменён!");
+    isChangingPassword[telegramId] = false;
+    return;
+  }
+
+  if (message.toLowerCase() === "password") {
+    const existingUser = await prisma.user.findUnique({
+      where: { telegramId },
+    });
+
+    if (!existingUser) {
+      return ctx.reply("Вы ещё не зарегистрированы.");
     }
 
-    // Создаем профиль пользователя
-    const newUser = {
-      telegram_id: user.id,
+    ctx.reply("Введите новый пароль:");
+    isChangingPassword[telegramId] = true;
+    return;
+  }
+
+  // Регистрация нового пользователя
+  const hashedPassword = await bcrypt.hash(message, 10);
+
+  const existingUser = await prisma.user.findUnique({
+    where: { telegramId },
+  });
+
+  if (existingUser) {
+    return ctx.reply("Вы уже зарегистрированы.");
+  }
+
+  const newUser = await prisma.user.create({
+    data: {
+      telegramId,
       username: user.username || "",
-      first_name: user.first_name || "",
-      last_name: user.last_name || "",
-      phone: null,
-      coins: 0,
-      mana: 0,
-      lives: 3,
-      subscription: "free",
+      firstName: user.first_name || "",
+      lastName: user.last_name || "",
       password: hashedPassword,
-      created_at: new Date().toISOString(),
-    };
+      subscription: {
+        create: {
+          type: 1, // Тип подписки (по умолчанию 1)
+          end: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Годовая подписка
+        },
+      },
+    },
+  });
 
-    // Добавляем нового пользователя в список
-    users.push(newUser);
-
-    // Сохраняем обновленный список пользователей в файл
-    writeUsers(users);
-
-    // Отправляем сообщение об успешной регистрации
-    ctx.reply(
-      `Ты зарегистрирован твой пароль: ${password} и логин: ${user.id}\nДобро пожаловать, ${user.first_name}!`
-    );
-  } else {
-    ctx.reply("Попробуй снова.");
-  }
+  ctx.reply(`Регистрация завершена! Ваш логин: ${newUser.telegramId}`);
 });
 
-bot.launch();
-
-// Обработка запроса на вход
-app.post("/api/login", (req, res) => {
-  const { telegramId, password } = req.body;
-
-  // Чтение данных о пользователях
-  const users = readUsers();
-
-  // Поиск пользователя по telegramId
-  const user = users.find((u) => u.telegram_id === telegramId);
-
-  if (!user) {
-    return res.status(404).json({ error: "Пользователь не найден" });
-  }
-
-  // Проверка пароля
-  if (user.password !== password) {
-    return res.status(401).json({ error: "Неверный пароль" });
-  }
-
-  // Если все правильно, отправляем успешный ответ
-  return res.status(200).json({ message: "Успешный вход" });
-});
-
-// Стартуем сервер на порту 3001
+// Старт сервера
 app.listen(3001, () => {
   console.log("Server running on port 3001");
 });
+
+// Запуск бота
+bot.launch();

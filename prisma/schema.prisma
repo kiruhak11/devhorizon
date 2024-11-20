@@ -1,0 +1,31 @@
+ generator client {
+   provider = "prisma-client-js"
+ }
+
+ datasource db {
+   provider = "sqlite"
+   url      = env("DATABASE_URL")
+ }
+
+model User {
+  id           Int          @id @default(autoincrement())
+  telegramId   Int          @unique
+  username     String?      @default("")
+  firstName    String?      @default("")
+  lastName     String?      @default("")
+  phone        String?      @default("")
+  coins        Int          @default(0)
+  mana         Int          @default(0)
+  lives        Int          @default(3)
+  subscription Subscription[]
+  password     String
+  createdAt    DateTime     @default(now())
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  type      Int      @default(1)
+  end       DateTime
+  userId    Int  
+  user      User     @relation(fields: [userId], references: [id])
+}

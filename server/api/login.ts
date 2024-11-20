@@ -1,173 +1,81 @@
-import { H3Event } from "h3";
-import fs from "fs";
-import path from "path";
+import prisma from "../prisma";
 import bcrypt from "bcrypt";
-// Абсолютный путь к файлу
-const usersFilePath = path.resolve("server", "users.json");
 
-export default defineEventHandler(async (event: H3Event) => {
-  try {
-    const { telegramId, password, type, tguser, method } = await readBody(
-      event
-    );
-    console.log("Received telegramId:", telegramId);
-    console.log("Received password:", password);
-    if (type == "password") {
-      console.log("Received type:", type);
-      console.log("Путь к файлу users.json:", usersFilePath);
+export default defineEventHandler(async (event) => {
+  const { telegramId, password, type, tguser, method } = await readBody(event);
 
-      // Проверка существования файла
-      if (!fs.existsSync(usersFilePath)) {
-        console.log("Файл users.json не найден.");
-        return { statusCode: 404, message: "Users file not found" };
-      }
+  if (type === "password") {
+    console.warn("Password login is not implemented yet");
+    const user = await prisma.user.findUnique({
+      where: { telegramId: Number(telegramId) },
+    });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw createError({ statusCode: 401, message: "Invalid credentials" });
+    }
 
-      // Чтение пользователей
-      const readUsers = () => {
-        const data = fs.readFileSync(usersFilePath, "utf-8");
-        return JSON.parse(data);
-      };
+    return { message: "Login successful", user };
+  } else if (type === "telegram" && method === "register") {
+    const existingUser = await prisma.user.findUnique({
+      where: { telegramId: Number(telegramId) },
+    });
 
-      const users = readUsers();
-      console.log("Users from file:", users);
+    if (existingUser) {
+      return { message: "User already exists" };
+    }
 
-      // Убедимся, что telegramId в файле и в запросе имеют одинаковый тип
-      const user = users.find(
-        (u: { telegram_id: any }) => u.telegram_id === Number(telegramId)
-      );
-
-      console.log("User found:", user);
-
-      if (!user) {
-        return { statusCode: 404, message: "User not found" };
-      }
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      console.warn("isValidPassword", isValidPassword);
-      if (!isValidPassword) {
-        return { statusCode: 401, message: "Incorrect password" };
-      }
-
-      // Преобразуем user в массив и возвращаем его
-      const userArray = Object.entries(user); // Преобразуем объект в массив
-
-      return { message: "Login successful", user: userArray };
-    } else if (type == "telegram") {
-      console.log("Received telegramId:", telegramId);
-      console.log("Received password:", password);
-      console.log("Received type:", type);
-
-      console.log("Путь к файлу users.json:", usersFilePath);
-
-      // Проверка существования файла
-      if (!fs.existsSync(usersFilePath)) {
-        console.log("Файл users.json не найден.");
-        return { statusCode: 404, message: "Users file not found" };
-      }
-
-      // Чтение пользователей
-      const readUsers = () => {
-        const data = fs.readFileSync(usersFilePath, "utf-8");
-        return JSON.parse(data);
-      };
-
-      const users = readUsers();
-      console.log("Users from file:", users);
-
-      // Убедимся, что telegramId в файле и в запросе имеют одинаковый тип
-      let user = users.find(
-        (u: { telegram_id: any }) => u.telegram_id === Number(telegramId)
-      );
-
-      if (user && method == "register") {
-        return { message: "User already exists" };
-      }
-
-      if (!user) {
-        console.log("User start creating");
-
-        const newUser = {
-          telegram_id: telegramId,
-          username: tguser.username || "",
-          first_name: tguser.first_name || "",
-          last_name: tguser.last_name || "",
-          phone: null,
-          coins: 0,
-          mana: 0,
-          lives: 3,
-          subscription: {
-            type: 1,
-            end: new Date().toISOString(),
+    const newUser = await prisma.user.create({
+      data: {
+        telegramId,
+        username: tguser.username || "",
+        firstName: tguser.first_name || "",
+        lastName: tguser.last_name || "",
+        password: password ? await bcrypt.hash(password, 10) : "",
+        subscription: {
+          create: {
+            type: 1, // Тип подписки
+            end: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Годовая подписка
           },
-          password: password ? await bcrypt.hash(password, 10) : "",
-          created_at: new Date().toISOString(),
-        };
-        console.log("New user:", newUser);
-        // Добавляем нового пользователя в список
-        users.push(newUser);
+        },
+      },
+    });
 
-        // Сохраняем обновленный список пользователей в файл
-        writeUsers(users);
+    return { message: "Login successful", user: newUser };
+  } else if (type === "reload") {
+    // Получаем пользователя и его подписку
+    const user = await prisma.user.findUnique({
+      where: { telegramId: Number(telegramId) },
+      include: { subscription: true }, // Включаем информацию о подписке
+    });
 
-        user = newUser;
-      } else {
-        console.log("User found:", user);
-      }
-
-      // Преобразуем user в массив и возвращаем его
-      const userArray = Object.entries(user); // Преобразуем объект в массив
-
-      return { message: "Login successful", user: userArray };
-    } else if (type == "reload") {
-      console.log("Путь к файлу users.json:", usersFilePath);
-
-      // Проверка существования файла
-      if (!fs.existsSync(usersFilePath)) {
-        console.log("Файл users.json не найден.");
-        return { statusCode: 404, message: "Users file not found" };
-      }
-
-      // Чтение пользователей
-      const readUsers = () => {
-        const data = fs.readFileSync(usersFilePath, "utf-8");
-        return JSON.parse(data);
-      };
-
-      const users = readUsers();
-      console.log("Users from file:", users);
-
-      // Убедимся, что telegramId в файле и в запросе имеют одинаковый тип
-      let user = users.find(
-        (u: { telegram_id: any }) => u.telegram_id === Number(telegramId)
-      );
-
-      if (!user) {
-        return { statusCode: 404, message: "User not found" };
-      } else {
-        console.log("User found:", user);
-      }
-
-      // Преобразуем user в массив и возвращаем его
-      const userArray = Object.entries(user); // Преобразуем объект в массив
-
-      return { message: "Login successful", user: userArray };
+    if (!user) {
+      throw createError({ statusCode: 404, message: "User not found" });
     }
-  } catch (error) {
-    console.error(error);
-    return { statusCode: 500, message: "Internal Server Error" };
+
+    // Если подписки нет, создаём новую подписку
+    const subscriptionData = user.subscription?.[0] || {
+      type: 1,
+      end: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Если подписки нет, создаём на 1 год
+    };
+
+    // Обновляем данные пользователя
+    const updatedUser = await prisma.user.update({
+      where: { telegramId: Number(telegramId) },
+      data: {
+        username: user.username || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phone: user.phone || "", // Если добавляете номер телефона
+        coins: user.coins || 0, // Обновление количества монет
+        mana: user.mana || 0, // Обновление манны
+        lives: user.lives || 3, // Обновление количества жизней
+        // Можно добавить другие поля по аналогии, например, дату окончания подписки
+
+        // Обновление подписки
+      },
+    });
+
+    return { message: "Login successful", user: updatedUser };
   }
 
-  function writeUsers(users: any) {
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2), "utf-8");
-  }
-  function readUsers() {
-    if (fs.existsSync(usersFilePath)) {
-      const data = fs.readFileSync(usersFilePath, "utf-8");
-      if (data.trim() === "") {
-        return []; // Если файл пустой, возвращаем пустой массив
-      }
-      return JSON.parse(data); // Парсим данные
-    } else {
-      return []; // Если файл не существует, возвращаем пустой массив
-    }
-  }
+  throw createError({ statusCode: 400, message: "Invalid request type" });
 });

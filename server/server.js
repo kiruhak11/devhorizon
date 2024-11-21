@@ -2,10 +2,12 @@ import { Telegraf } from "telegraf";
 import express from "express";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
+import axios from "axios";
 
 const prisma = new PrismaClient();
 const app = express();
-const bot = new Telegraf("7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8"); // Замените на токен вашего бота
+const botToken = "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8";
+const bot = new Telegraf(botToken); // Замените на токен вашего бота
 app.use(express.json()); // Для парсинга JSON в запросах
 
 let isChangingPassword = {}; // Для отслеживания смены пароля
@@ -30,8 +32,55 @@ bot.start(async (ctx) => {
   ctx.reply("Привет! Чтобы зарегистрироваться, введите пароль.");
 });
 
+// команда /pay, возвращает один товар. С объектом думаю разберешься
+bot.command("pay", (ctx) => {
+  return ctx.replyWithInvoice({
+    chat_id: ctx.chat.id,
+    title: "Test Product",
+    description: "Test description",
+    payload: "{}", // хз что это, надо разбираться
+    provider_token: "", // если пусто, то это звезды
+    currency: "XTR", // звезды
+    prices: [
+      { amount: 1, label: "Test Product" }, // Product variants
+    ],
+  });
+});
+
+// сюда сохраняется список всех покупок в боте, надо будет в БД унести
+const paidUsers = new Map();
+
+// Запрос на возврат средств
+bot.command("refund", async (ctx) => {
+  const userId = ctx.from.id;
+  if (!paidUsers.has(userId)) {
+    return ctx.reply("You have not paid yet, there is nothing to refund");
+  }
+
+  try {
+    // Да-дааа, я сделал это через API телеграма, потому что библиотека пока не умеет в такое
+    const url = `https://api.telegram.org/bot${botToken}/refundStarPayment`;
+    const response = await axios.post(url, {
+      user_id: userId,
+      telegram_payment_charge_id: paidUsers.get(userId), // Параметр payment_id обязателен
+    });
+
+    // Проверяем успешный ответ
+    if (response.data.ok) {
+      // Тут надо будет удалять подписку у юзера
+      paidUsers.delete(userId);
+      console.log("Успешно:", response.data.result);
+      return ctx.reply("Refund successful");
+    } else {
+      console.error("Ошибка от Telegram API:", response.data);
+    }
+  } catch (error) {
+    console.error("Ошибка запроса:", error.response?.data || error.message);
+  }
+});
+
 // Обработка текстовых сообщений
-bot.on("text", async (ctx) => {
+bot.command("text", async (ctx) => {
   const message = ctx.message?.text;
   const user = ctx.message?.from;
 
@@ -149,6 +198,22 @@ bot.on("text", async (ctx) => {
   } catch (error) {
     console.error("Ошибка при обработке сообщения:", error);
     ctx.reply("Произошла ошибка. Попробуйте ещё раз.");
+  }
+});
+
+// хз зачем, но пусть будет
+bot.on("pre_checkout_query", (ctx) => {
+  ctx.answerPreCheckoutQuery(true);
+});
+
+// держи это в самом блять конце иначе команды работать не будут. Эта штука после успешной оплаты записывает покупку в БД
+bot.on("message", (ctx) => {
+  if (ctx.update.message.successful_payment != undefined) {
+    ctx.reply("Thanks for the purchase!");
+    paidUsers.set(
+      ctx.from.id,
+      ctx.message.successful_payment.telegram_payment_charge_id
+    );
   }
 });
 

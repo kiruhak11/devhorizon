@@ -44,7 +44,6 @@ export default defineEventHandler(async (event) => {
     // Получаем пользователя и его подписку
     const user = await prisma.user.findUnique({
       where: { telegramId: Number(telegramId) },
-      include: { subscription: true }, // Включаем информацию о подписке
     });
 
     if (!user) {

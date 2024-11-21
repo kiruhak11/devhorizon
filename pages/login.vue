@@ -130,11 +130,11 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
     });
 
     if (response.data.message.includes("Login successful")) {
-      console.log("Login successful:", response.data.user);
+      console.log("Login successful:", response.data);
 
       // Сохраняем данные пользователя в хранилище Pinia
       const userStore = useUserStore();
-      userStore.setUser(response.data.user); // Сохраняем пользователя в хранилище
+      userStore.setUser(response.data.user, response.data.subscription); // Сохраняем пользователя в хранилище
 
       // Перенаправляем на страницу профиля
       router.push("/profile");

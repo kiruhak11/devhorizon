@@ -13,7 +13,32 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 401, message: "Invalid credentials" });
     }
 
-    return { message: "Login successful", user };
+    const subscription = await prisma.subscription.findUnique({
+      where: { id: Number(user.id) },
+    });
+    return {
+      message: "Login successful",
+      user: user,
+      subscription: subscription,
+    };
+  } else if (type === "telegram" && method === "login") {
+    console.warn("Password login is not implemented yet");
+    const user = await prisma.user.findUnique({
+      where: { telegramId: Number(telegramId) },
+    });
+
+    if (!user) {
+      throw createError({ statusCode: 401, message: "Invalid credentials" });
+    }
+
+    const subscription = await prisma.subscription.findUnique({
+      where: { id: Number(user.id) },
+    });
+    return {
+      message: "Login successful",
+      user: user,
+      subscription: subscription,
+    };
   } else if (type === "telegram" && method === "register") {
     const existingUser = await prisma.user.findUnique({
       where: { telegramId: Number(telegramId) },
@@ -40,41 +65,6 @@ export default defineEventHandler(async (event) => {
     });
 
     return { message: "Login successful", user: newUser };
-  } else if (type === "reload") {
-    // Получаем пользователя и его подписку
-    const user = await prisma.user.findUnique({
-      where: { telegramId: Number(telegramId) },
-      include: { subscription: true }, // Включаем информацию о подписке
-    });
-
-    if (!user) {
-      throw createError({ statusCode: 404, message: "User not found" });
-    }
-
-    // Если подписки нет, создаём новую подписку
-    const subscriptionData = user.subscription?.[0] || {
-      type: 1,
-      end: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Если подписки нет, создаём на 1 год
-    };
-
-    // Обновляем данные пользователя
-    const updatedUser = await prisma.user.update({
-      where: { telegramId: Number(telegramId) },
-      data: {
-        username: user.username || "",
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        phone: user.phone || "", // Если добавляете номер телефона
-        coins: user.coins || 0, // Обновление количества монет
-        mana: user.mana || 0, // Обновление манны
-        lives: user.lives || 3, // Обновление количества жизней
-        // Можно добавить другие поля по аналогии, например, дату окончания подписки
-
-        // Обновление подписки
-      },
-    });
-
-    return { message: "Login successful", user: updatedUser };
   }
 
   throw createError({ statusCode: 400, message: "Invalid request type" });

@@ -22,11 +22,12 @@ onMounted(async () => {
       "Попытка обновления данных пользователя для telegramId:",
       telegramId
     );
-
+    console.log(userStore);
     // Отправляем запрос на сервер для обновления данных
-    const response = await axios.post("/api/login", {
-      telegramId, // Отправляем telegramId
-      type: "reload", // Указываем тип запроса (обновление)
+    const response = await axios.post("/api/updateUser", {
+      userId: userStore.user.id,
+      userData: userStore.user,
+      subscriptionData: userStore.subscription,
     });
 
     // Логирование ответа для проверки
@@ -38,10 +39,14 @@ onMounted(async () => {
       response.data.message.includes("Login successful")
     ) {
       // Обновляем данные пользователя в хранилище
-      userStore.setUser(response.data.user);
+      userStore.setUser(response.data.user, response.data.subscription);
       userStore.loadUserFromLocalStorage(); // Загружаем обновленные данные из localStorage
 
-      console.log("Данные пользователя успешно обновлены:", response.data.user);
+      console.log("Данные пользователя успешно обновлены:", response.data);
+      console.log(
+        "Данные пользователя в хранилище:",
+        response.data.subscription
+      );
     } else {
       console.log(
         "Не удалось обновить данные пользователя:",

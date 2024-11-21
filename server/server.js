@@ -1,7 +1,5 @@
 import { Telegraf } from "telegraf";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import fs from "fs";
+
 import express from "express";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";

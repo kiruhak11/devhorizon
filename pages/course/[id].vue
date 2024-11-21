@@ -17,8 +17,7 @@ const courseId = Number(route.params.id);
 
 const course = courses.find((c) => c.id === courseId);
 
-const isCourseActiv = userStore.user?.subscription == course?.id;
-console.log(isCourseActiv, userStore.user?.subscription, course?.id);
+const isCourseActiv = userStore.subscription.type == course?.id;
 onMounted(() => {});
 </script>
 

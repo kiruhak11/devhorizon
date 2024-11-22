@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@pinia-plugin-persistedstate/nuxt",
     "nuxt-telegram-auth",
+    "frog-modal",
   ],
   telegramAuth: {
     TELEGRAM_TOKEN: "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8", // Замени на токен Telegram-бота

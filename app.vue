@@ -1,54 +1,72 @@
-// Компонент
 <template>
-  <NuxtPage />
-</template>
+  <FrogModal />
 
-<style lang="scss" src="~/assets/styles/index.scss"></style>
+  <div v-if="!isReady" class="loading-screen">
+    <Loader />
+  </div>
+
+  <NuxtPage v-if="isReady" />
+</template>
 
 <script setup lang="ts">
 import axios from "axios";
-import { useUserStore } from "~/stores/userStore"; // Путь к вашему хранилищу
+
+useSeoMeta({
+  titleTemplate: (title) =>
+    title
+      ? `${title} | devHorizon`
+      : "devHorizon - Добро пожаловать в DevHorizon",
+  viewport:
+    'name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"',
+});
+
+const isReady = ref<boolean>(false);
 
 onMounted(async () => {
-  const userStore = useUserStore(); // Получаем доступ к хранилищу пользователя
-  userStore.loadUserFromLocalStorage(); // Загружаем данные пользователя из localStorage
-
-  // Если нет данных о пользователе, выходим
-  if (!userStore.user) return;
+  const userStore = useUserStore();
 
   try {
-    const telegramId = userStore.user.telegramId; // Получаем telegram_id пользователя
-    console.log(
-      "Попытка обновления данных пользователя для telegramId:",
-      telegramId
-    );
-    console.log(userStore);
-    // Отправляем запрос на сервер для обновления данных
+    userStore.loadUserFromLocalStorage();
+    userStore.loadCoursesFromLocalStorage();
+  } catch (error) {
+    console.error("Ошибка при загрузке данных пользователя:", error);
+  }
+
+  try {
+    const coursesResponse = await axios.get("/api/course");
+
+    if (Array.isArray(coursesResponse.data)) {
+      userStore.setCourses(coursesResponse.data);
+    } else {
+      console.error(
+        "Ответ от API имеет неправильный формат:",
+        coursesResponse.data
+      );
+    }
+  } catch (error) {
+    console.error("Ошибка при загрузке курсов:", error);
+  }
+
+  if (!userStore.user) {
+    isReady.value = true;
+    return;
+  }
+
+  try {
     const response = await axios.post("/api/updateUser", {
       userId: userStore.user.id,
       userData: userStore.user,
       subscriptionData: userStore.subscription,
     });
 
-    // Логирование ответа для проверки
-    console.log("Ответ от сервера:", response.data);
-
-    // Проверяем, успешен ли ответ
     if (
       response.data.message &&
       response.data.message.includes("Login successful")
     ) {
-      // Обновляем данные пользователя в хранилище
       userStore.setUser(response.data.user, response.data.subscription);
-      userStore.loadUserFromLocalStorage(); // Загружаем обновленные данные из localStorage
-
-      console.log("Данные пользователя успешно обновлены:", response.data);
-      console.log(
-        "Данные пользователя в хранилище:",
-        response.data.subscription
-      );
+      userStore.loadUserFromLocalStorage();
     } else {
-      console.log(
+      console.error(
         "Не удалось обновить данные пользователя:",
         response.data.message
       );
@@ -56,5 +74,9 @@ onMounted(async () => {
   } catch (error) {
     console.error("Ошибка при обновлении данных пользователя:", error);
   }
+
+  isReady.value = true;
 });
 </script>
+
+<style lang="scss" src="~/assets/styles/index.scss"></style>

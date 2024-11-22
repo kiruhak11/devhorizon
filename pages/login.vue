@@ -4,7 +4,7 @@
       <NuxtParticles
         v-if="isShowParticles"
         id="tsparticles"
-        :options="particlesOptions"
+        :options="ParticlesOptions"
         @load="onLoad"
       />
       <div :class="['bg-overlay', { dark: isDark }]"></div>
@@ -91,6 +91,10 @@ import axios from "axios";
 
 import { useRouter } from "vue-router";
 
+useSeoMeta({
+  title: "Авторизация",
+});
+
 const isLogin = ref(true);
 const telegramId = ref("");
 const password = ref("");
@@ -102,16 +106,40 @@ const isDark = computed(() => colorMode.value === "dark");
 const userStore = useUserStore();
 
 const isShowParticles = ref(true);
-const particlesOptions = computed(() => {
+const ParticlesOptions = computed((): {} => {
   return {
-    fullScreen: { enable: true, zIndex: -1 },
     particles: {
-      color: { value: isDark.value ? "#a3a3a3" : "#333" },
-      number: { value: 150 },
-      shape: { type: "circle" },
-      opacity: { value: 0.8 },
-      size: { value: 3 },
-      move: { enable: true, direction: "bottom", speed: 1 },
+      color: { value: isDark.value ? "#fff" : "#333" },
+      move: {
+        direction: "bottom",
+        enable: true,
+        outModes: "out",
+        speed: 2,
+      },
+      number: {
+        density: {
+          enable: true,
+          area: 800,
+        },
+        value: 400,
+      },
+      opacity: {
+        value: 0.7,
+      },
+      shape: {
+        type: "circle",
+      },
+      size: {
+        value: 10,
+      },
+      wobble: {
+        enable: true,
+        distance: 10,
+        speed: 10,
+      },
+      zIndex: {
+        value: { min: 0, max: 100 },
+      },
     },
   };
 });
@@ -130,8 +158,6 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
     });
 
     if (response.data.message.includes("Login successful")) {
-      console.log("Login successful:", response.data);
-
       // Сохраняем данные пользователя в хранилище Pinia
       const userStore = useUserStore();
       userStore.setUser(response.data.user, response.data.subscription); // Сохраняем пользователя в хранилище
@@ -162,7 +188,7 @@ const testCallback_register = async (user: any) => {
     }
     if (response.data.message.includes("Login successful")) {
       const userStore = useUserStore();
-      userStore.setUser(response.data.user);
+      userStore.setUser(response.data.user, response.data.subscription);
       router.push("/profile"); // Перенаправляем на страницу профиля
     } else {
       error.value = "Login failed:" + response.data.message;
@@ -183,7 +209,7 @@ const testCallback_login = async (user: any) => {
     });
     if (response.data.message.includes("Login successful")) {
       const user = useUserStore();
-      user.setUser(response.data.user); // Сохраняем пользователя в хранилище
+      user.setUser(response.data.user, response.data.subscription); // Сохраняем пользователя в хранилище
 
       router.push("/profile"); // Перенаправляем на страницу профиля
     } else {

@@ -8,7 +8,7 @@
 
       <div class="subscription-container" :theme="'easy'">
         <CourseCard
-          v-for="course in courses"
+          v-for="course in userStore.courses"
           :key="course.id"
           :course="course"
         />
@@ -27,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import { courses } from "~/data/courses";
 const userStore = useUserStore();
 </script>
 

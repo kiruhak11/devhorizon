@@ -69,7 +69,6 @@ bot.command("refund", async (ctx) => {
     if (response.data.ok) {
       // Тут надо будет удалять подписку у юзера
       paidUsers.delete(userId);
-      console.log("Успешно:", response.data.result);
       return ctx.reply("Refund successful");
     } else {
       console.error("Ошибка от Telegram API:", response.data);

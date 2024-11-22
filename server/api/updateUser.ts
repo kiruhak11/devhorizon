@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
         lives: userData.lives || 3,
       },
     });
-    console.warn(subscriptionData);
     const updateSubscribtion = await prisma.subscription.update({
       where: { id: userId },
       data: {
@@ -27,7 +26,6 @@ export default defineEventHandler(async (event) => {
           new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
       },
     });
-    console.warn("Updated user data", updateSubscribtion, updatedUser);
     // Возвращаем обновленные данные пользователя
     return {
       message: "Login successful",
@@ -35,7 +33,7 @@ export default defineEventHandler(async (event) => {
       subscription: updateSubscribtion,
     };
   } catch (error) {
-    console.error("Error updating user data", error);
+    console.warn("Error updating user data", error);
     return { error: "Error updating user data" };
   }
 });

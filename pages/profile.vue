@@ -1,6 +1,6 @@
 <template>
   <NuxtLayout>
-    <div class="profile-container">
+    <div class="container">
       <h3 class="profile-title">Ваш профиль</h3>
 
       <nav class="tabs">
@@ -48,13 +48,9 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
-.profile-container {
-  display: flex;
-  flex-direction: column;
-  max-width: 1290px;
+.container {
   margin: 40px auto;
   padding: 24px;
-  background-color: var(--color-white);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--color-border);

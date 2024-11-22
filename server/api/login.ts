@@ -3,9 +3,7 @@ import bcrypt from "bcrypt";
 
 export default defineEventHandler(async (event) => {
   const { telegramId, password, type, tguser, method } = await readBody(event);
-
   if (type === "password") {
-    console.warn("Password login is not implemented yet");
     const user = await prisma.user.findUnique({
       where: { telegramId: Number(telegramId) },
     });
@@ -16,13 +14,13 @@ export default defineEventHandler(async (event) => {
     const subscription = await prisma.subscription.findUnique({
       where: { id: Number(user.id) },
     });
+
     return {
       message: "Login successful",
       user: user,
       subscription: subscription,
     };
   } else if (type === "telegram" && method === "login") {
-    console.warn("Password login is not implemented yet");
     const user = await prisma.user.findUnique({
       where: { telegramId: Number(telegramId) },
     });

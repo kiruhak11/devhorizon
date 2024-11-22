@@ -29,3 +29,11 @@ model Subscription {
   userId    Int  
   user      User     @relation(fields: [userId], references: [id])
 }
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  price       Int
+  description String
+  theme       String
+  createdAt   DateTime @default(now())
+}

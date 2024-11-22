@@ -4,7 +4,7 @@
       <h2 class="heading">Наши курсы</h2>
       <div class="courses-grid">
         <CourseCard
-          v-for="course in courses"
+          v-for="course in userStore.courses"
           :key="course.id"
           :course="course"
         />
@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { courses } from "~/data/courses";
+const userStore = useUserStore();
 </script>
 
 <style scoped lang="scss">

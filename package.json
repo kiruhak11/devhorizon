@@ -53,6 +53,7 @@
     "@nuxtjs/stylelint-module": "^5.2.0",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
+    "@prisma/client": "^5.22.0",
     "@rushstack/eslint-patch": "^1.10.2",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",

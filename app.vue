@@ -11,6 +11,15 @@
 <script setup lang="ts">
 import axios from "axios";
 
+useSeoMeta({
+  titleTemplate: (title) =>
+    title
+      ? `${title} | devHorizon`
+      : "devHorizon - Добро пожаловать в DevHorizon",
+  viewport:
+    'name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"',
+});
+
 const isReady = ref<boolean>(false);
 
 onMounted(async () => {

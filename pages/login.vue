@@ -91,6 +91,10 @@ import axios from "axios";
 
 import { useRouter } from "vue-router";
 
+useSeoMeta({
+  title: "Авторизация",
+});
+
 const isLogin = ref(true);
 const telegramId = ref("");
 const password = ref("");

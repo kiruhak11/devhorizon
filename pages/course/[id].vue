@@ -1,21 +1,26 @@
 <template>
   <NuxtLayout>
     <div class="container">
-      <h2 class="course-title">{{ course?.title }}</h2>
-      <p class="course-description">{{ course?.description }}</p>
+      <!-- Проверяем, есть ли курс, перед тем как рендерить данные курса -->
+      <h2 v-if="course" class="course-title">{{ course.title }}</h2>
+      <p v-if="course" class="course-description">{{ course.description }}</p>
 
       <div v-if="isCourseActive">
         <UiButton class="full">Начать</UiButton>
       </div>
 
       <div v-else>
-        <p class="course-alert">
+        <p v-if="course" class="course-alert">
           У вас не куплен данный курс. Пожалуйста, купите его за
-          <span class="course-price">{{ course?.price }}₽</span>.
+          <span class="course-price">{{ course.price }}₽</span>.
         </p>
-        <UiButton class="full" @click="userStore.buyCourse(course)"
-          >Купить</UiButton
+        <UiButton
+          v-if="course"
+          class="full"
+          @click="userStore.buyCourse(course)"
         >
+          Купить
+        </UiButton>
       </div>
 
       <NuxtLink to="/course" class="back-link">← Назад к курсам</NuxtLink>
@@ -24,33 +29,46 @@
 </template>
 
 <script setup lang="ts">
-import { courses } from "~/data/courses";
-import { computed } from "vue";
-import { useRoute } from "vue-router";
-
 const userStore = useUserStore();
 const route = useRoute();
 
+// Извлекаем ID курса из параметров маршрута
 const courseId = computed(() => Number(route.params.id));
 
-const course = computed(() => courses.find((c) => c.id === courseId.value));
+// Проверяем, загружены ли данные о курсах, если нет, ждем их загрузки
+const course = computed(() => {
+  // Найдем курс в списке курсов
+  const foundCourse = userStore.courses.find(
+    (c: { id: number }) => c.id === courseId.value
+  );
+  if (!foundCourse) {
+    // В случае отсутствия курса, можно запросить данные с сервера
+    console.error("Курс не найден");
+  }
+  return foundCourse;
+});
 
+// Проверяем, активен ли курс
 const isCourseActive = computed(() => {
+  // Убедимся, что курс существует и что у пользователя есть подписка
   if (course.value && userStore.subscription?.type) {
     return Number(userStore.subscription.type) >= course.value.id;
   }
   return false;
 });
+
+// Добавляем реактивность на изменение параметра ID в маршруте
 watch(
   () => route.params.id,
-  () => {}
+  () => {
+    // Здесь можно добавить логику для повторного запроса или действия
+  }
 );
 </script>
 
 <style scoped lang="scss">
 .container {
   margin: 40px auto;
-
   padding: 40px 20px;
   border: 1px solid var(--color-border);
   border-radius: 16px;

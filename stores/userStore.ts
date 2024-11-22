@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import Modal from "~/components/MyModal.vue";
+import { courses } from "~/data/courses";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: null as any | null,
     subscription: null as any | null,
+    courses: null as any | null,
   }),
   actions: {
     // Функция для открытия модального окна и прочее
@@ -68,19 +70,22 @@ export const useUserStore = defineStore("user", {
       }
     },
     //функция для обновления данных
-    setUser(userData: any, subscriptionData: any) {
+    setUser(userData: any, subscriptionData: any, coursesData: any) {
       this.user = userData;
       this.subscription = subscriptionData;
+      this.courses = coursesData;
       localStorage.setItem("userData", JSON.stringify(userData));
       localStorage.setItem(
         "subscriptionData",
         JSON.stringify(subscriptionData)
       );
+      localStorage.setItem("coursesData", JSON.stringify(coursesData));
     },
 
     loadUserFromLocalStorage() {
       const userData = localStorage.getItem("userData");
       const subscriptionData = localStorage.getItem("subscriptionData");
+      const coursesData = localStorage.getItem("coursesData");
 
       try {
         if (userData) {
@@ -95,6 +100,13 @@ export const useUserStore = defineStore("user", {
           console.log("Subscription data loaded:", this.subscription);
         } else {
           console.warn("No subscription data found in localStorage");
+        }
+
+        if (coursesData) {
+          this.courses = JSON.parse(coursesData);
+          console.log("Courses data loaded:", this.courses);
+        } else {
+          console.warn("No courses data found in localStorage");
         }
       } catch (error) {
         console.error("Ошибка при разборе данных из localStorage:", error);
@@ -117,6 +129,7 @@ export const useUserStore = defineStore("user", {
             userId: this.user.id,
             userData: this.user,
             subscriptionData: this.subscription,
+            coursesData: this.courses,
           });
 
           // Обрабатываем ответ от сервера
@@ -127,7 +140,11 @@ export const useUserStore = defineStore("user", {
             );
           } else {
             // Обновляем данные пользователя в локальном хранилище
-            this.setUser(response.data.user, response.data.subscription);
+            this.setUser(
+              response.data.user,
+              response.data.subscription,
+              response.data.courses
+            );
             console.log("User data updated successfully", response.data);
           }
         }

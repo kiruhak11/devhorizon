@@ -40,7 +40,11 @@ onMounted(async () => {
       response.data.message.includes("Login successful")
     ) {
       // Обновляем данные пользователя в хранилище
-      userStore.setUser(response.data.user, response.data.subscription);
+      userStore.setUser(
+        response.data.user,
+        response.data.subscription,
+        response.data.courses
+      );
       userStore.loadUserFromLocalStorage(); // Загружаем обновленные данные из localStorage
 
       console.log("Данные пользователя успешно обновлены:", response.data);

@@ -27,12 +27,14 @@ export default defineEventHandler(async (event) => {
           new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
       },
     });
+    const updateCourses = await prisma.course.findMany();
     console.warn("Updated user data", updateSubscribtion, updatedUser);
     // Возвращаем обновленные данные пользователя
     return {
       message: "Login successful",
       user: updatedUser,
       subscription: updateSubscribtion,
+      courses: updateCourses,
     };
   } catch (error) {
     console.error("Error updating user data", error);

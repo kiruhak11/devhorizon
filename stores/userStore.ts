@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import Modal from "~/components/MyModal.vue";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
@@ -7,6 +8,66 @@ export const useUserStore = defineStore("user", {
     subscription: null as any | null,
   }),
   actions: {
+    // Функция для открытия модального окна и прочее
+    openModal(
+      modalTitle: string,
+      modalText: string,
+      modalButtonText?: string,
+      onButtonClick?: () => void
+    ) {
+      const [setModal] = useFrogModal({
+        closeOnOverlayClick: false,
+        closeOnEsc: false,
+      });
+      setModal(Modal, {
+        modalTitle: modalTitle,
+        modalText: modalText,
+        modalButtonText: modalButtonText,
+        onButtonClick: onButtonClick || (() => {}),
+      });
+    },
+    buyCourse(course: any) {
+      try {
+        if (course ? this.user?.coins >= course?.price : false) {
+          this.openModal(
+            "Купть курс",
+            "Ваш баланс: " +
+              this.user.coins +
+              " монет. \n" +
+              "Цена: " +
+              course?.price +
+              " монет." +
+              "\n" +
+              "Вы уверены, что хотите купить этот курс?",
+            "Купить",
+            () => this.buyCourseF(course)
+          );
+        } else {
+          this.openModal(
+            "Купть курс",
+            "Ваш баланс: " +
+              this.user.coins +
+              " монет. \n" +
+              "Цена: " +
+              course?.price +
+              " монет." +
+              "\n" +
+              "Недостаточно монет",
+            "Закрыть"
+          );
+        }
+      } catch (error) {
+        console.warn("Ошибка при покупке курса:", error);
+      }
+    },
+    async buyCourseF(course: any) {
+      if (this.user && course ? this.user.coins >= course?.price : false) {
+        this.user.coins -= course ? course?.price : 0;
+        this.subscription.type = course ? course?.id : 0;
+        this.updateUserDataOnServer();
+      }
+    },
+    //функция для обновления данных
     setUser(userData: any, subscriptionData: any) {
       this.user = userData;
       this.subscription = subscriptionData;

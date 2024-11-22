@@ -1,5 +1,6 @@
 // Компонент
 <template>
+  <FrogModal />
   <NuxtPage />
 </template>
 

@@ -7,10 +7,7 @@
         <p class="card-value">{{ userStore.user.coins }} монет</p>
 
         <p class="card-detail">Используя нашего телеграм бота</p>
-        <UiButton
-          class="btn btn-small"
-          to="https://t.me/devhorizon_bot?start=<pay>"
-        >
+        <UiButton class="btn btn-small" @click="openModal">
           Пополнить
         </UiButton>
       </div>
@@ -155,6 +152,18 @@ const getProgressBarColor = (progress: number): string => {
 const renewSubscription = () => {
   userStore.subscription.type += 1;
   userStore.updateUserDataOnServer();
+};
+const openModal = () => {
+  userStore.openModal(
+    "Пополнить кошелек",
+    'Чтобы пополнить кошелек, нажмите кнопку "Пополнить", вас переведет на нашего телеграм бота, который поможет вам пополнить кошелек.',
+    "Пополнить",
+    openTelegramBot
+  );
+};
+const openTelegramBot = () => {
+  const botUrl = "https://t.me/devhorizon_bot";
+  window.open(botUrl, "_blank");
 };
 </script>
 

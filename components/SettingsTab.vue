@@ -24,6 +24,24 @@
           :placeholder="passwordEmpty ? 'Создайте пароль!' : 'Изменить пароль'"
         />
       </div>
+      <div class="form-group">
+        <label for="subscription">subscription</label>
+        <input
+          v-model="PushSubscription"
+          id="subscription"
+          type="text"
+          :placeholder="`Подписка: ${userStore.subscription.type}`"
+        />
+      </div>
+      <div class="form-group">
+        <label for="coins">coins</label>
+        <input
+          v-model="PushCoins"
+          id="Pushcoins"
+          type="text"
+          :placeholder="`coins: ${userStore.user.coins}`"
+        />
+      </div>
       <div class="btns">
         <UiButton @click="updateProfile">Сохранить изменения</UiButton>
         <UiButton theme="danger" @click="deleteAccount"> Выйти </UiButton>
@@ -34,6 +52,7 @@
 
 <script setup lang="ts">
 import { useUserStore } from "@/stores/userStore";
+import e from "express";
 import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
@@ -44,6 +63,8 @@ const lastname = ref<string>(userStore.user?.lastName || "");
 const password = ref<string>();
 const passwordVisible = ref<boolean>(false);
 const passwordEmpty = ref<boolean>(false);
+const PushSubscription = ref<number>(userStore.subscription.type || 0);
+const PushCoins = ref<number>(userStore.user.coins || 0);
 
 const togglePasswordVisibility = () => {
   passwordVisible.value = !passwordVisible.value;
@@ -53,10 +74,36 @@ const updateProfile = () => {
     userStore.user.firstName = name.value;
     userStore.user.lastName = lastname.value;
     userStore.user.password = password.value;
+    if (Number(PushSubscription.value)) {
+      userStore.subscription.type = Number(PushSubscription.value);
+    } else {
+      userStore.openModal(
+        `Ошибка`,
+        `Подписка должна быть числом от 0 до 3, а не ${PushSubscription.value}`
+      );
+      return;
+    }
+    if (Number(PushCoins.value)) {
+      userStore.user.coins = Number(PushCoins.value);
+    } else {
+      userStore.openModal(
+        `Ошибка`,
+        `coins должны быть числом, а не ${PushCoins.value}`
+      );
+      return;
+    }
     userStore.updateUserDataOnServer();
     handlePassword();
-    alert(
-      `Ваши данные обновлены успешно: ${userStore.user.firstName} ${userStore.user.lastName}`
+    userStore.openModal(
+      `Обновление данных`,
+      `
+    Ваши данные обновлены успешно:
+    Имя: ${userStore.user.firstName}
+    Фамилия: ${userStore.user.lastName}
+    Подписка: ${userStore.subscription.type}
+    coins: ${userStore.user.coins}
+    ${password.value ? "Пароль был успешно обновлён: " + password.value : ""}
+  `.trim()
     );
   }
 };

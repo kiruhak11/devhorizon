@@ -1,4 +1,5 @@
 version: "3"
+
 services:
   # Nuxt NODE process
   dev-horizon-node:
@@ -11,9 +12,9 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     environment:
-      DATABASE_URL: "file:./prisma/dev.db" # Убедитесь, что путь соответствует рабочей директории контейнера
+      DATABASE_URL: "file:/data/dev.db" # Путь к dev.db внутри контейнера
     volumes:
-      - ./prisma:./prisma # Монтируем папку prisma в контейнер
+      - ./prisma:/data # Монтируем локальную папку prisma в /data контейнера
     depends_on:
       - db
 
@@ -21,7 +22,7 @@ services:
     image: nouchka/sqlite3
     container_name: sqlite
     volumes:
-      - ./prisma:/data # Монтируем ту же папку для доступа к dev.db
+      - ./prisma:/data # Монтируем ту же папку для обеспечения доступа
     networks:
       - app-network
 

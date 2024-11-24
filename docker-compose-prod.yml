@@ -12,3 +12,19 @@ services:
       - "${PORT:-3000}:3000"
     environment:
       DATABASE_URL: "file:./dev.db"
+    command: npm run dev
+    depends_on:
+      - db
+
+  db:
+    image: nouchka/sqlite3
+    container_name: sqlite
+    volumes:
+      - ./data:/data
+    command: ["sqlite3", "/data/dev.db"]
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

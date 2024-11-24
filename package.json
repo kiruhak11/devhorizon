@@ -9,6 +9,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "migrate:dev": "npx prisma migrate dev",
+    "migrate:deploy": "npx prisma migrate deploy",
     "deploy": "scp -r .output/* j53779400@c64869e17b97.hosting.myjino.ru:~/domains/devhorizon.kiruhak11.ru/ && ssh j53779400@c64869e17b97.hosting.myjino.ru \"chmod -R 0777 ~/domains/devhorizon.kiruhak11.ru && mkdir -p ~/domains/devhorizon.kiruhak11.ru/tmp && touch ~/domains/devhorizon.kiruhak11.ru/tmp/restart.txt\""
   },
   "dependencies": {

@@ -11,9 +11,9 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     environment:
-      DATABASE_URL: "file:/app/prisma/dev.db" # Убедитесь, что путь соответствует рабочей директории контейнера
+      DATABASE_URL: "file:./prisma/dev.db" # Убедитесь, что путь соответствует рабочей директории контейнера
     volumes:
-      - ./prisma:/app/prisma # Монтируем папку prisma в контейнер
+      - ./prisma:./prisma # Монтируем папку prisma в контейнер
     depends_on:
       - db
 

@@ -28,4 +28,6 @@ ENV PORT=$PORT
 
 COPY --from=build /app /app
 
+RUN npx prisma db push
+
 CMD [ "node", ".output/server/index.mjs" ]

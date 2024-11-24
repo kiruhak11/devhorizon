@@ -1,32 +1,26 @@
-ARG NODE_VERSION=18.14.2
+# Установка Node.js
+FROM node:20-alpine
 
-FROM node:${NODE_VERSION}-slim as base
-
-ARG PORT=3000
-
-ENV NODE_ENV=production
-
+# Установка рабочей директории
 WORKDIR /app
 
-# Build
-FROM base as build
-
+# Копируем package.json и package-lock.json
 COPY package*.json ./
 
-RUN npm install --production=false
+# Устанавливаем зависимости
+RUN npm install
 
+# Копируем весь проект
 COPY . .
 
-RUN npm run build
+# Убедитесь, что файл dev.db и prisma/schema.prisma добавлены
 COPY prisma ./prisma
-RUN npm prune
 
-# Run
-FROM base
+# Сборка проекта
+RUN npm run build
 
-ENV PORT=$PORT
+# Открываем порт
+EXPOSE 3000
 
-COPY --from=build /app /app
-
-
-CMD [ "node", ".output/server/index.mjs" ]
+# Запуск Nuxt.js в production-режиме
+CMD ["npm", "run", "start"]

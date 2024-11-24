@@ -1,17 +1,14 @@
-version: "3"
+version: "3.8"
 services:
-  # Nuxt NODE process
-  dev-horizon-node:
-    container_name: dev-horizon-node
+  app:
     build:
       context: .
-      dockerfile: ./Dockerfile
-    image: dev-horizon-node
-    restart: always
+      dockerfile: Dockerfile
+    container_name: nuxt-app
     ports:
-      - "${PORT:-3000}:3000"
-    environment:
-      DATABASE_URL: "file:./dev.db"
+      - "3000:3000"
     volumes:
       - .:/app
       - /app/node_modules
+    environment:
+      DATABASE_URL: "file:./dev.db" # Указываем путь к базе данных

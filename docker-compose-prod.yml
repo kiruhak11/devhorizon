@@ -11,7 +11,7 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     environment:
-      DATABASE_URL: "file:./dev.db"
+      DATABASE_URL: "file:./prisma/dev.db"
     depends_on:
       - db
 
@@ -20,7 +20,7 @@ services:
     container_name: sqlite
     volumes:
       - ./data:/data
-    command: ["sqlite3", "/data/dev.db"]
+    command: ["sqlite3", "/prisma/dev.db"]
     networks:
       - app-network
 

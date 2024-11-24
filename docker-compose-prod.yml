@@ -12,7 +12,6 @@ services:
       - "${PORT:-3000}:3000"
     environment:
       DATABASE_URL: "file:./dev.db"
-    command: npm run dev
     depends_on:
       - db
 

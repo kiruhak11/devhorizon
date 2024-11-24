@@ -1,14 +1,17 @@
-version: '3'
+version: "3"
 services:
-    # Nuxt NODE process
-    dev-horizon-node:
-        container_name: dev-horizon-node
-        build:
-            context: .
-            dockerfile: ./Dockerfile
-        image: dev-horizon-node
-        restart: always
-        ports:
-            - '${PORT:-3000}:3000'
-        environment:
-            NODE_ENV: production
+  # Nuxt NODE process
+  dev-horizon-node:
+    container_name: dev-horizon-node
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: dev-horizon-node
+    restart: always
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: "file:./prisma/dev.db"
+    volumes:
+      - .:/app
+      - /app/node_modules

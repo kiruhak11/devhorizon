@@ -18,6 +18,7 @@ RUN npm install --production=false
 COPY . .
 
 RUN npm run build
+COPY prisma ./prisma
 RUN npm prune
 
 # Run

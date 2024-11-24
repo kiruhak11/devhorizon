@@ -11,4 +11,4 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     environment:
-      DATABASE_URL: "file:./dev.db" # Указываем путь к базе данных
+      DATABASE_URL: "file:./dev.db"

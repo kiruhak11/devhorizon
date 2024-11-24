@@ -15,7 +15,7 @@ useSeoMeta({
   titleTemplate: (title) =>
     title
       ? `${title} | devHorizon`
-      : "devHorizon - Добро пожаловать в DevHorizon",
+      : "devHorizon  - Добро пожаловать в DevHorizon",
   viewport:
     'name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"',
 });

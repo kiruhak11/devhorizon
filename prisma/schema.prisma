@@ -3,10 +3,11 @@
    binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
  }
 
- datasource db {
-   provider = "sqlite"
-   url      = "file:./dev.db"
- }
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
 
 model User {
   id           Int          @id @default(autoincrement())

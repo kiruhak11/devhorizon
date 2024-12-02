@@ -1,29 +1,26 @@
 version: "3.9"
 
 services:
-  dev-horizon-node:
-    container_name: dev-horizon-node
+  app:
+    container_name: dev-horizon-app
     build:
       context: .
       dockerfile: ./Dockerfile
-    image: dev-horizon-node
-    restart: always
     ports:
       - "${PORT:-3000}:3000"
     environment:
-      DATABASE_URL: "sqlite:/data/dev.db" # Строка подключения SQLite
+      DATABASE_URL: "file:/app/prisma/dev.db"
     volumes:
-      - ./prisma:/data # Монтируем локальную папку prisma в /data контейнера
+      - ./prisma:/app/prisma
     depends_on:
       - db
-    networks:
-      - app-network
+    restart: always
 
   db:
     image: nouchka/sqlite3
-    container_name: sqlite
+    container_name: dev-horizon-db
     volumes:
-      - ./prisma:/data # Монтируем ту же папку для доступа к dev.db
+      - ./prisma:/data
     networks:
       - app-network
 

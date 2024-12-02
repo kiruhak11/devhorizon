@@ -1,31 +1,23 @@
-ARG NODE_VERSION=18.14.2
+ARG NODE_VERSION=18.18.2
 
 FROM node:${NODE_VERSION}-slim as base
 
+ARG PORT=3000
 ENV NODE_ENV=production
-
 WORKDIR /app
 
-# Build stage
+# Build
 FROM base as build
-
 COPY package*.json ./
 RUN npm install --production=false
-
 COPY . .
-
 COPY prisma ./prisma
 RUN npx prisma generate
-
 RUN npm run build
-RUN npm prune --production
+RUN npm prune
 
-# Run stage
+# Run
 FROM base
-
-WORKDIR /app
+ENV PORT=$PORT
 COPY --from=build /app /app
-
-ENV DATABASE_URL="sqlite:/data/dev.db"
-EXPOSE 3000
-CMD ["node", ".output/server/index.mjs"]
+CMD [ "node", ".output/server/index.mjs" ]

@@ -5,7 +5,8 @@ FROM node:${NODE_VERSION}-slim as base
 WORKDIR /app
 
 # Устанавливаем OpenSSL
-RUN apt-get update -y && apt-get install -y openssl libssl-dev
+RUN apt-get update -y && apt-get install -y openssl=1.1.1n-0+deb10u4 libssl-dev
+
 
 
 # Install dependencies

@@ -7,6 +7,7 @@ WORKDIR /app
 # Устанавливаем OpenSSL
 RUN apt-get update -y && apt-get install -y openssl
 
+
 # Install dependencies
 COPY package*.json ./
 RUN npm install

@@ -1,5 +1,5 @@
-# Base image with specified Node.js version
-ARG NODE_VERSION=18.14.2
+# Base image with updated Node.js version
+ARG NODE_VERSION=18.18.2
 FROM node:${NODE_VERSION}-slim as base
 
 WORKDIR /app

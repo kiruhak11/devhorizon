@@ -2,10 +2,10 @@ ARG NODE_VERSION=18.18.2
 
 FROM node:${NODE_VERSION}-slim as base
 
-# Устанавливаем OpenSSL 1.1 для поддержки старых библиотек (если требуется)
+# Обновляем OpenSSL, если нужно
 RUN apt-get update && apt-get install -y \
-  openssl=1.1.1n-0+deb10u8 \
-  libssl1.1=1.1.1n-0+deb10u8
+  openssl \
+  libssl-dev
 
 ARG PORT=3000
 

@@ -1,31 +1,23 @@
-# Base image with updated Node.js version
-ARG NODE_VERSION=18.18.2
-FROM node:${NODE_VERSION}-slim as base
+# Устанавливаем базовый образ Node.js
+FROM node:18.18.2-slim as base
 
 WORKDIR /app
 
-# Устанавливаем OpenSSL
-RUN apt-get update -y && apt-get install -y openssl=1.1.1n-0+deb10u4 libssl-dev
+# Устанавливаем переменные окружения
+ARG PORT=3000
+ENV PORT=$PORT
+ENV NODE_ENV=production
 
-
-
-# Install dependencies
+# Устанавливаем зависимости
 COPY package*.json ./
-RUN npm install
+RUN npm install --production
 
-# Copy all files and generate Prisma client
+# Копируем исходный код
 COPY . .
 RUN npx prisma generate
 
-# Build project
+# Собираем проект
 RUN npm run build
 
-# Final image for production
-FROM node:${NODE_VERSION}-slim
-
-WORKDIR /app
-
-COPY --from=base /app ./
-
-ENV PORT=3000
+# Финальный образ для запуска
 CMD ["node", ".output/server/index.mjs"]

@@ -2,17 +2,16 @@ ARG NODE_VERSION=18.18.2
 
 FROM node:${NODE_VERSION}-slim as base
 
+# Устанавливаем OpenSSL 1.1 для поддержки старых библиотек (если требуется)
+RUN apt-get update && apt-get install -y \
+  openssl=1.1.1n-0+deb10u8 \
+  libssl1.1=1.1.1n-0+deb10u8
+
 ARG PORT=3000
 
 ENV NODE_ENV=production
 
 WORKDIR /app
-
-# Установка OpenSSL 1.1.x
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl=1.1.* \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 
 # Build
 FROM base as build
@@ -27,7 +26,7 @@ COPY prisma ./prisma
 RUN npx prisma generate
 
 RUN npm run build
-RUN npm prune --production
+RUN npm prune
 
 # Run
 FROM base

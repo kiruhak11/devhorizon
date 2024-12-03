@@ -10,7 +10,8 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     environment:
-      DATABASE_URL: "file:/data/dev.db" # Путь к dev.db внутри контейнера
+      # Обновленный путь к базе данных в контейнере
+      DATABASE_URL: "file:/app/prisma/dev.db" # Путь к dev.db внутри контейнера
     volumes:
       - ./prisma:/data # Монтируем локальную папку prisma в /data контейнера
     depends_on:

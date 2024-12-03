@@ -11,20 +11,4 @@ services:
       - "${PORT:-3000}:3000"
     environment:
       # Обновленный путь к базе данных в контейнере
-      DATABASE_URL: "file:/app/prisma/dev.db" # Путь к dev.db внутри контейнера
-    volumes:
-      - ./prisma:/data # Монтируем локальную папку prisma в /data контейнера
-    depends_on:
-      - db
-
-  db:
-    image: nouchka/sqlite3
-    container_name: sqlite
-    volumes:
-      - ./prisma:/data # Монтируем ту же папку для обеспечения доступа
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+      DATABASE_URL: "file:/prisma/dev.db" # Путь к dev.db внутри контейнера

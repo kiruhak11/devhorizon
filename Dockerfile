@@ -8,6 +8,12 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
+# Установка OpenSSL 1.1.x
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl=1.1.* \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Build
 FROM base as build
 
@@ -21,7 +27,7 @@ COPY prisma ./prisma
 RUN npx prisma generate
 
 RUN npm run build
-RUN npm prune
+RUN npm prune --production
 
 # Run
 FROM base

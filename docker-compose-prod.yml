@@ -1,28 +1,26 @@
-version: "3.8"
-
 services:
-  # Nuxt.js сервер
+  # Nuxt NODE process
   dev-horizon-node:
     container_name: dev-horizon-node
     build:
       context: .
+      dockerfile: ./Dockerfile
     image: dev-horizon-node
     restart: always
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:3000"
     environment:
-      DATABASE_URL: "file:/data/dev.db"
+      DATABASE_URL: "file:/data/dev.db" # Путь к dev.db внутри контейнера
     volumes:
-      - ./prisma:/data
+      - ./prisma:/data # Монтируем локальную папку prisma в /data контейнера
     depends_on:
       - db
 
-  # SQLite база данных
   db:
     image: nouchka/sqlite3
     container_name: sqlite
     volumes:
-      - ./prisma:/data
+      - ./prisma:/data # Монтируем ту же папку для обеспечения доступа
     networks:
       - app-network
 

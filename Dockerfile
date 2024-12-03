@@ -1,26 +1,33 @@
-# Базовый образ
-FROM node:18.18.2-slim
+ARG NODE_VERSION=18.14.2
 
-# Рабочая директория
+FROM node:${NODE_VERSION}-slim as base
+
+ARG PORT=3000
+
+ENV NODE_ENV=production
+
 WORKDIR /app
 
-# Копирование зависимостей
+# Build
+FROM base as build
+
 COPY package*.json ./
 
-# Установка зависимостей
-RUN npm install
+RUN npm install --production=false
 
-# Копирование всех файлов
 COPY . .
 
-# Установка Prisma CLI
-RUN npm install prisma --save-dev
-
-# Генерация Prisma
+COPY prisma ./prisma
 RUN npx prisma generate
 
-# Сборка проекта
 RUN npm run build
+RUN npm prune
 
-# Запуск приложения
-CMD ["npm", "start"]
+# Run
+FROM base
+
+ENV PORT=$PORT
+
+COPY --from=build /app /app
+
+CMD [ "node", ".output/server/index.mjs" ]

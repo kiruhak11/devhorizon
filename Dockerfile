@@ -1,23 +1,26 @@
-# Устанавливаем базовый образ Node.js
-FROM node:18.14.2-slim as base
+# Базовый образ
+FROM node:18.18.2-slim
 
+# Рабочая директория
 WORKDIR /app
 
-# Устанавливаем переменные окружения
-ARG PORT=3000
-ENV PORT=$PORT
-ENV NODE_ENV=production
-
-# Устанавливаем зависимости
+# Копирование зависимостей
 COPY package*.json ./
-RUN npm install --production
 
-# Копируем исходный код
+# Установка зависимостей
+RUN npm install
+
+# Копирование всех файлов
 COPY . .
+
+# Установка Prisma CLI
+RUN npm install prisma --save-dev
+
+# Генерация Prisma
 RUN npx prisma generate
 
-# Собираем проект
+# Сборка проекта
 RUN npm run build
 
-# Финальный образ для запуска
-CMD ["node", ".output/server/index.mjs"]
+# Запуск приложения
+CMD ["npm", "start"]

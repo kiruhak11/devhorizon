@@ -1,5 +1,5 @@
 # Устанавливаем базовый образ Node.js
-FROM node:18.18.2-slim as base
+FROM node:18.14.2-slim as base
 
 WORKDIR /app
 

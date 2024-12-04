@@ -97,6 +97,9 @@ export const useUserStore = defineStore("user", {
       const subscriptionData = localStorage.getItem("subscriptionData");
 
       try {
+        if (!userData) {
+          return;
+        }
         if (userData) {
           this.user = JSON.parse(userData);
         } else {

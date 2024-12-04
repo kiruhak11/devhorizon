@@ -5,20 +5,18 @@
     <Loader />
   </div>
 
-  <NuxtPage v-if="isReady" />
+  <NuxtPage v-else />
 </template>
 
 <script setup lang="ts">
 import axios from "axios";
 
-// useSeoMeta({
-//   titleTemplate: (title) =>
-//     title
-//       ? `${title} | devHorizon`
-//       : "devHorizon  - Добро пожаловать в DevHorizon",
-//   viewport:
-//     'name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"',
-// });
+useSeoMeta({
+  titleTemplate: (title) =>
+    title
+      ? `${title} | devHorizon`
+      : "devHorizon  - Добро пожаловать в DevHorizon",
+});
 
 const isReady = ref<boolean>(false);
 

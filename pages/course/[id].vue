@@ -4,28 +4,38 @@
       <h2 class="course-title">{{ course?.title }}</h2>
       <p class="course-description">{{ course?.description }}</p>
 
-      <div v-if="isCourseActive">
-        <UiButton class="full">Начать</UiButton>
+      <div v-if="!isCourseStarted">
+        <div v-if="isCourseActive">
+          <UiButton class="full" @click="startCourse">Начать</UiButton>
+        </div>
+
+        <div v-else>
+          <p class="course-alert">
+            У вас не куплен данный курс. Пожалуйста, купите его за
+            <span class="course-price">{{ course?.price }}₽</span>.
+          </p>
+          <UiButton class="full" @click="userStore.buyCourse(course)">
+            Купить
+          </UiButton>
+        </div>
+
+        <NuxtLink to="/course" class="back-link">← Назад к курсам</NuxtLink>
       </div>
 
-      <div v-else>
-        <p class="course-alert">
-          У вас не куплен данный курс. Пожалуйста, купите его за
-          <span class="course-price">{{ course?.price }}₽</span>.
-        </p>
-        <UiButton class="full" @click="userStore.buyCourse(course)"
-          >Купить</UiButton
-        >
-      </div>
-
-      <NuxtLink to="/course" class="back-link">← Назад к курсам</NuxtLink>
+      <!-- Динамическое отображение курса -->
+      <transition name="fade">
+        <coursesCourse1 v-if="isCourseStarted" class="course-content" />
+      </transition>
     </div>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
+import { ref, watch, computed } from "vue";
+
 const userStore = useUserStore();
 const route = useRoute();
+const isCourseStarted = ref(false);
 
 const courseId = computed(() => Number(route.params.id));
 
@@ -39,10 +49,16 @@ const isCourseActive = computed(() => {
   }
   return false;
 });
+
+const startCourse = () => {
+  isCourseStarted.value = true;
+};
+
 watch(
   () => route.params.id,
   () => {
-    userStore.loadCoursesFromLocalStorage(); // Загружаем данные курсов из localStorage
+    userStore.loadCoursesFromLocalStorage();
+    isCourseStarted.value = false;
   }
 );
 </script>
@@ -50,7 +66,6 @@ watch(
 <style scoped lang="scss">
 .container {
   margin: 40px auto;
-
   padding: 40px 20px;
   border: 1px solid var(--color-border);
   border-radius: 16px;
@@ -104,5 +119,20 @@ watch(
 
 .back-link:hover {
   color: var(--color-primary);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.course-content {
+  margin-top: 20px;
+  text-align: left;
 }
 </style>

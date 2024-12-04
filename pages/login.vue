@@ -33,6 +33,7 @@
             <input
               type="text"
               id="telegram_id"
+              autocomplete="username"
               v-model="telegramId"
               class="input-field"
               required
@@ -45,6 +46,7 @@
               id="password_login"
               v-model="password_login"
               class="input-field"
+              autocomplete="current-password"
               required
             />
           </div>
@@ -65,6 +67,7 @@
               id="password"
               v-model="password"
               class="input-field"
+              autocomplete="current-password"
               required
             />
           </div>
@@ -168,8 +171,7 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
       error.value = "Login failed: " + response.data.message; // В случае ошибки логина
     }
   } catch (er) {
-    error.value = "Login failed catch: " + er; // Обрабатываем ошибки запроса
-    console.error("Login failed catch:", er);
+    error.value = "Неверный пароль";
   }
 };
 

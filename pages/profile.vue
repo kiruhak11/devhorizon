@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+  <NuxtLayout name="default">
     <div class="container">
       <h3 class="profile-title">Ваш профиль</h3>
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="tab-title">Настройки профиля</h3>
-    <div>
+    <div v-if="userStore.user">
       <div class="form-group">
         <label for="name">Имя</label>
         <input v-model="name" id="name" type="text" placeholder="Ваше имя" />
@@ -15,15 +15,25 @@
           placeholder="Ваш lastname"
         />
       </div>
-      <div class="form-group">
+
+      <form class="form-group">
+        <input
+          type="text"
+          name="username"
+          id="username"
+          style="display: none"
+          autocomplete="username"
+        />
         <label for="password">Password</label>
         <input
           v-model="password"
           id="password"
           :type="passwordVisible ? 'text' : 'password'"
           :placeholder="passwordEmpty ? 'Создайте пароль!' : 'Изменить пароль'"
+          autocomplete="new-password"
         />
-      </div>
+      </form>
+
       <div class="form-group">
         <label for="subscription">subscription</label>
         <input

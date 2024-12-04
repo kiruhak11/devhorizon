@@ -1,5 +1,5 @@
 import prisma from "../prisma"; // Подключаем Prisma
-
+import bcrypt from "bcrypt";
 export default defineEventHandler(async (event) => {
   const { userId, userData, subscriptionData } = await readBody(event); // Получаем данные из запроса
 
@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
         phone: userData.phone || "",
         coins: userData.coins || 0,
         mana: userData.mana || 0,
+        password: (await bcrypt.hash(userData.password, 10)) || "",
         lives: userData.lives || 3,
       },
     });

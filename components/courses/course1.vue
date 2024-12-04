@@ -30,7 +30,6 @@
       <UiButton :disabled="currentStepIndex === 0" @click="goToPreviousStep"
         >Назад</UiButton
       >
-      <!-- Кнопка вперед активируется только если ответ верный -->
       <UiButton
         :disabled="isCorrect !== true && currentStep?.type === 'task'"
         @click="goToNextStep"
@@ -47,7 +46,6 @@ const userStore = useUserStore();
 
 const lastChar = Number(window.location.href.slice(-1));
 
-// Создаем уникальный ключ для каждого курса
 const userProgressKey = `userCourseProgress_${lastChar}`;
 
 const currentStepIndex = ref(
@@ -60,7 +58,7 @@ const currentSteps = computed(() => {
   } else if (lastChar === 2) {
     return steps2;
   } else {
-    return steps1; // По умолчанию steps1
+    return steps1;
   }
 });
 
@@ -69,7 +67,6 @@ const isLastStep = computed(
   () => currentStepIndex.value === currentSteps.value.length - 1
 );
 
-// Ответ пользователя и проверка
 const userAnswer = ref("");
 const isCorrect = ref<boolean | null>(null);
 
@@ -77,7 +74,7 @@ const goToNextStep = () => {
   if (!isLastStep.value) {
     currentStepIndex.value++;
     saveProgress();
-    clearAnswerAndError(); // Очистить ошибку и текст при переходе
+    clearAnswerAndError();
   }
 };
 
@@ -85,13 +82,12 @@ const goToPreviousStep = () => {
   if (currentStepIndex.value > 0) {
     currentStepIndex.value--;
     saveProgress();
-    clearAnswerAndError(); // Очистить ошибку и текст при переходе
+    clearAnswerAndError();
   }
 };
 
 const checkAnswer = () => {
   if (currentStep.value?.type === "task") {
-    // Нормализуем ответ пользователя
     const normalizeAnswer = (answer: string) =>
       answer.trim().toLowerCase().replace(/['"`]/g, '"');
 
@@ -99,7 +95,6 @@ const checkAnswer = () => {
       .split("\n")
       .map(normalizeAnswer);
 
-    // Убедимся, что correctAnswer существует и является массивом
     const normalizedCorrectAnswer = Array.isArray(
       currentStep.value.correctAnswer
     )
@@ -113,8 +108,6 @@ const checkAnswer = () => {
       isCorrect.value = true;
     } else {
       isCorrect.value = false;
-
-      // Подробное сообщение об ошибке
       let errorMessage = "";
       const longest = Math.max(
         normalizedUserAnswer.length,
@@ -132,7 +125,6 @@ const checkAnswer = () => {
         }
       }
 
-      // Открываем модальное окно с ошибкой
       userStore.openModal(
         "Ошибка",
         `Ваш ответ неверен. Пожалуйста, обратите внимание на следующие моменты:
@@ -147,13 +139,11 @@ const saveProgress = () => {
   localStorage.setItem(userProgressKey, String(currentStepIndex.value));
 };
 
-// Очистить ответ и ошибку при переходе
 const clearAnswerAndError = () => {
   userAnswer.value = "";
   isCorrect.value = null;
 };
 
-// Следим за прогрессом
 watch(currentStepIndex, saveProgress);
 </script>
 

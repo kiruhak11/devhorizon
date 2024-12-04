@@ -22,7 +22,6 @@
         <NuxtLink to="/course" class="back-link">← Назад к курсам</NuxtLink>
       </div>
 
-      <!-- Динамическое отображение курса -->
       <transition name="fade">
         <coursesCourse1 v-if="isCourseStarted" class="course-content" />
       </transition>

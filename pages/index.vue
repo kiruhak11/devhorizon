@@ -23,11 +23,30 @@
         <UiButton theme="danger" @click="userStore.clearUser">Выход</UiButton>
       </div>
     </div>
+    <button @click="migrateData">Мигрировать данные</button>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 const userStore = useUserStore();
+const migrateData = async () => {
+  try {
+    const response = await fetch("/api/migration", {
+      method: "POST",
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(data.message || "Миграция данных успешна!");
+    } else {
+      alert("Ошибка миграции данных: " + (data.error || "Неизвестная ошибка"));
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Ошибка при отправке запроса на сервер");
+  }
+};
 </script>
 
 <style scoped lang="scss">

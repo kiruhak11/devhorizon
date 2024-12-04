@@ -2,7 +2,6 @@ ARG NODE_VERSION=18.18.2
 
 FROM node:${NODE_VERSION}-slim as base
 
-# Обновляем OpenSSL, если нужно
 RUN apt-get update && apt-get install -y \
   openssl \
   libssl-dev
@@ -35,4 +34,5 @@ ENV PORT=$PORT
 
 COPY --from=build /app /app
 
-CMD [ "node", ".output/server/index.mjs" ]
+# Применение миграций при запуске контейнера
+CMD ["sh", "-c", "npx prisma migrate deploy && node .output/server/index.mjs"]

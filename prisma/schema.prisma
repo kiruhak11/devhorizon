@@ -4,10 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
-
 
 model User {
   id           Int          @id @default(autoincrement())
@@ -31,6 +30,7 @@ model Subscription {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
 }
+
 model Course {
   id          Int      @id @default(autoincrement())
   title       String

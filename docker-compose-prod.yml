@@ -14,8 +14,6 @@ services:
       - db
     networks:
       - app-network
-    entrypoint: >
-      sh -c "sleep 10 && npx prisma migrate deploy && npm run start"
 
   db:
     image: mysql:8.0

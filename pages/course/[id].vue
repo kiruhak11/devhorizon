@@ -53,7 +53,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
+import { useWindowFocus } from "@vueuse/core";
 
+const focused = useWindowFocus();
 const userStore = useUserStore();
 const route = useRoute();
 const isCourseStarted = ref(false);
@@ -108,6 +110,10 @@ const continueCourse = () => {
     userStore.updateUserDataOnServer(false);
   }
 };
+
+watch(focused, () => {
+  isCourseStarted.value = false;
+});
 watch(
   () => userStore.user.lives,
   () => {

@@ -48,8 +48,8 @@
 <script setup lang="ts">
 import { steps1, steps2 } from "~/data/steps";
 import { ref, computed, watch } from "vue";
-const userStore = useUserStore();
 
+const userStore = useUserStore();
 const lastChar = Number(window.location.href.slice(-1));
 const userProgressKey = `userCourseProgress_${lastChar}`;
 
@@ -155,7 +155,6 @@ const clearAnswerAndError = () => {
   userAnswer.value = "";
   isCorrect.value = null;
 };
-
 watch(currentStepIndex, saveProgress);
 </script>
 

@@ -32,12 +32,17 @@ export default defineEventHandler(async (event) => {
     const subscription = await prisma.subscription.findUnique({
       where: { id: Number(user.id) },
     });
+    console.warn(subscription, user);
     return {
       message: "Login successful",
       user: user,
       subscription: subscription,
     };
   } else if (type === "telegram" && method === "register") {
+    if (!telegramId || isNaN(Number(telegramId))) {
+      throw new Error("Invalid Telegram ID");
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { telegramId: Number(telegramId) },
     });
@@ -46,23 +51,35 @@ export default defineEventHandler(async (event) => {
       return { message: "User already exists" };
     }
 
+    const username = tguser.username || "";
+    const firstName = tguser.first_name || "";
+    const lastName = tguser.last_name || "";
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : ""; // Или null, если пароль необязательный
+
     const newUser = await prisma.user.create({
       data: {
-        telegramId,
-        username: tguser.username || "",
-        firstName: tguser.first_name || "",
-        lastName: tguser.last_name || "",
-        password: password ? await bcrypt.hash(password, 10) : "",
-        subscription: {
-          create: {
-            type: 1, // Тип подписки
-            end: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Годовая подписка
-          },
-        },
+        telegramId: Number(telegramId),
+        username,
+        firstName,
+        lastName,
+        password: hashedPassword,
       },
     });
 
-    return { message: "Login successful", user: newUser };
+    const newSubscription = await prisma.subscription.create({
+      data: {
+        id: newUser.id,
+        type: 1,
+        userId: newUser.id,
+        end: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+      },
+    });
+
+    return {
+      message: "Login successful",
+      user: newUser,
+      subscription: newSubscription,
+    };
   }
 
   throw createError({ statusCode: 400, message: "Invalid request type" });

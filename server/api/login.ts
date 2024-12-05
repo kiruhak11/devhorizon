@@ -39,6 +39,7 @@ export default defineEventHandler(async (event) => {
       subscription: subscription,
     };
   } else if (type === "telegram" && method === "register") {
+    console.warn(tguser);
     if (!telegramId || isNaN(Number(telegramId))) {
       throw new Error("Invalid Telegram ID");
     }

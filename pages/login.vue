@@ -174,17 +174,39 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
     error.value = "Неверный пароль";
   }
 };
+const encodeBase64 = (str: string) => {
+  try {
+    // Используем TextEncoder для работы с Unicode символами
+    const encoder = new TextEncoder();
+    const uint8Array = encoder.encode(str);
+
+    // Преобразуем результат в base64
+    let base64String = "";
+    for (let i = 0; i < uint8Array.length; i++) {
+      base64String += String.fromCharCode(uint8Array[i]);
+    }
+    return window.btoa(base64String);
+  } catch (e) {
+    console.error("Error encoding to base64", e);
+    return "";
+  }
+};
 
 const testCallback_register = async (user: any) => {
+  console.log("a", user);
   error.value = "";
   try {
+    // Преобразуем имя пользователя в безопасный для base64 формат
+    const encodedUserName = encodeBase64(user.username);
+
     const response = await axios.post("/api/login", {
       telegramId: user.id,
       password: password.value,
       type: "telegram",
       method: "register",
-      tguser: user,
+      tguser: { ...user, username: encodedUserName }, // отправляем закодированное имя
     });
+
     if (response.data.message.includes("User already exists")) {
       error.value = "Такой пользователь уже существует.";
     }
@@ -199,6 +221,7 @@ const testCallback_register = async (user: any) => {
     error.value = "Login failed:" + er;
   }
 };
+
 const testCallback_login = async (user: any) => {
   error.value = "";
   try {

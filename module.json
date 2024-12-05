@@ -1,0 +1,9 @@
+{
+  "name": "nuxt-telegram-auth",
+  "configKey": "telegramAuth",
+  "version": "1.2.0",
+  "builder": {
+    "@nuxt/module-builder": "0.8.1",
+    "unbuild": "2.0.0"
+  }
+}

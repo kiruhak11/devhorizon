@@ -7,12 +7,8 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxt/ui",
     "@pinia-plugin-persistedstate/nuxt",
-    "nuxt-telegram-auth",
     "frog-modal",
   ],
-  telegramAuth: {
-    TELEGRAM_TOKEN: "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8", // Замени на токен Telegram-бота
-  },
   piniaPersistedstate: {
     cookieOptions: {
       sameSite: "strict",

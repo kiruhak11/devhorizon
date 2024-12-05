@@ -23,7 +23,6 @@ COPY . .
 
 COPY prisma ./prisma
 RUN npx prisma generate
-RUN npx prisma migrate deploy
 RUN npm run build
 RUN npm prune
 

@@ -35,7 +35,11 @@
         >
           {{ userStore.user.firstName + " " + userStore.user.lastName }}
         </NuxtLink>
+
         <Switcher class="switcher" />
+        <div v-if="userStore.user" :class="giftStatusClass">
+          <Reward @click="getPresent"> Получить подарок </Reward>
+        </div>
       </div>
     </nav>
   </header>
@@ -47,6 +51,38 @@ import { useRoute } from "vue-router";
 const userStore = useUserStore();
 const route = useRoute();
 const isLoginPage = computed(() => route.path === "/login");
+
+const getPresent = () => {
+  const currentDate = new Date();
+
+  if (!userStore.user.gift || new Date(userStore.user.gift) < currentDate) {
+    userStore.user.gift = new Date(
+      currentDate.setUTCHours(currentDate.getUTCHours() + 24)
+    );
+    userStore.user.coins += 10;
+    userStore.user.lives += 3;
+    userStore.user.mana += 30;
+
+    userStore.openModal(
+      "Подарок получен",
+      "Вы получили 10 монет, 3 жизни и 30 маны"
+    );
+    userStore.updateUserDataOnServer(false);
+  } else {
+    const nextGiftTime = new Date(userStore.user.gift).toLocaleString();
+    userStore.openModal(
+      "Подарок не доступен",
+      `Подарок доступен ${nextGiftTime}`
+    );
+  }
+};
+
+const giftStatusClass = computed(() => {
+  const currentDate = new Date();
+  return new Date(userStore.user.gift) < currentDate || !userStore.user.gift
+    ? "gift-button-wrapper available"
+    : "gift-button-wrapper not-available";
+});
 </script>
 
 <style scoped lang="scss">
@@ -105,6 +141,31 @@ const isLoginPage = computed(() => route.path === "/login");
 
 .nav-link.active-link {
   color: #fbbf24;
+}
+
+.gift-button-wrapper {
+  border-radius: 24px;
+  &.available {
+    border: 2px solid var(--color-success);
+    box-shadow: 0 0 8px var(--color-success);
+  }
+
+  &.not-available {
+    border: 2px solid var(--color-danger);
+    box-shadow: 0 0 8px var(--color-danger);
+  }
+}
+
+.reset-gift-btn {
+  margin-top: 10px;
+
+  UiButton {
+    background-color: #fbbf24;
+    color: #fff;
+    &:hover {
+      background-color: #f59e0b;
+    }
+  }
 }
 
 @media (max-width: 768px) {

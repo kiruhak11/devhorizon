@@ -21,6 +21,7 @@ model User {
   lives        Int          @default(3)
   subscription Subscription[]
   password     String
+  gift         DateTime?
   createdAt    DateTime     @default(now())
 }
 

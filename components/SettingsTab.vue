@@ -52,6 +52,20 @@
           :placeholder="`coins: ${userStore.user.coins}`"
         />
       </div>
+      <div class="form-group">
+        <label for="lives">lives</label>
+        <input
+          v-model="PushLives"
+          id="PushLives"
+          type="text"
+          :placeholder="`Lives: ${userStore.user.lives}`"
+        />
+      </div>
+      <div class="form-group">
+        <UiButton class="full" @click="resetGiftTimer"
+          >Сбросить таймер подарка</UiButton
+        >
+      </div>
       <div class="btns">
         <UiButton @click="updateProfile">Сохранить изменения</UiButton>
         <UiButton theme="danger" @click="deleteAccount"> Выйти </UiButton>
@@ -74,6 +88,7 @@ const passwordVisible = ref<boolean>(false);
 const passwordEmpty = ref<boolean>(false);
 const PushSubscription = ref<number>(userStore.subscription.type || 0);
 const PushCoins = ref<number>(userStore.user.coins || 0);
+const PushLives = ref<number>(userStore.user.lives || 0);
 
 const togglePasswordVisibility = () => {
   passwordVisible.value = !passwordVisible.value;
@@ -83,6 +98,15 @@ const updateProfile = () => {
     userStore.user.firstName = name.value;
     userStore.user.lastName = lastname.value;
     userStore.user.password = password.value;
+    if (Number(PushLives.value)) {
+      userStore.user.lives = Number(PushLives.value);
+    } else {
+      userStore.openModal(
+        `Ошибка`,
+        `Lives должны быть числом, а не ${PushLives.value}`
+      );
+      return;
+    }
     if (Number(PushSubscription.value)) {
       userStore.subscription.type = Number(PushSubscription.value);
     } else {
@@ -115,12 +139,16 @@ const updateProfile = () => {
     Фамилия: ${userStore.user.lastName}
     Подписка: ${userStore.subscription.type}
     coins: ${userStore.user.coins}
+    lives: ${userStore.user.lives}
     ${password.value ? "Пароль был успешно обновлён: " + password.value : ""}
   `.trim()
     );
   }
 };
-
+const resetGiftTimer = () => {
+  userStore.user.gift = new Date(); // Сбрасываем подарок на 24 часа вперед
+  userStore.updateUserDataOnServer(false); // Обновляем данные на сервере
+};
 const deleteAccount = () => {
   userStore.clearUser();
   router.push("/");

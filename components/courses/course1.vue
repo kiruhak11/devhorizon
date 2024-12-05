@@ -129,10 +129,17 @@ const checkAnswer = () => {
           }: Ваш ответ: "${userPart}", \n правильный ответ: \n- ${correctPart}`;
         }
       }
-
+      if (userStore.user.lives > 0) {
+        userStore.user.lives--;
+        userStore.updateUserDataOnServer(false);
+      } else {
+        userStore.openModal("Ошибка", "У вас нет жизни");
+        return;
+      }
       userStore.openModal(
         "Ошибка",
-        `Ваш ответ неверен. Пожалуйста, обратите внимание на следующие моменты:
+        `Ваш ответ неверен. У вас осталось: ${userStore.user.lives} жизней. 
+        Пожалуйста, обратите внимание на следующие моменты:
             ${errorMessage.trim()}
           `
       );

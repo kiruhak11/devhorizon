@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     const subscription = await prisma.subscription.findUnique({
       where: { id: Number(user.id) },
     });
-    console.warn(subscription, user);
+
     return {
       message: "Login successful",
       user: user,
@@ -54,7 +54,10 @@ export default defineEventHandler(async (event) => {
     const username = tguser.username || "";
     const firstName = tguser.first_name || "";
     const lastName = tguser.last_name || "";
-    const hashedPassword = password ? await bcrypt.hash(password, 10) : ""; // Или null, если пароль необязательный
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : "";
+    const gift = new Date(
+      new Date().setUTCHours(new Date().getUTCHours() - 24)
+    );
 
     const newUser = await prisma.user.create({
       data: {
@@ -63,6 +66,7 @@ export default defineEventHandler(async (event) => {
         firstName,
         lastName,
         password: hashedPassword,
+        gift,
       },
     });
 

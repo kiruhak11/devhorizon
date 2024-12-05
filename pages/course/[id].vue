@@ -74,7 +74,9 @@ const isCourseActive = computed(() => {
 const showInfo = () => {
   userStore.openModal(
     "Информация",
-    `При каждом неправильном ответе будет отниматься одна жизнь. Когда жизни закончатся, курс начнется заново. Также каждый перезаход на страницу будет тратить 10 маны. Если маны нет, будут отниматься жизни.`
+    `При каждом неправильном ответе будет отниматься одна жизнь. Когда жизни закончатся, курс начнется заново. Также каждый перезаход на страницу будет тратить ${
+      courseId.value * 10
+    } маны. Если маны нет, будут отниматься жизни.`
   );
 };
 const getCourseUsedStatus = (courseId: number) => {
@@ -88,6 +90,13 @@ const startCourse = () => {
   localStorage.setItem(`isCourseUsed-${courseId.value}`, "true");
 };
 const continueCourse = () => {
+  if (userStore.user.lives < 1) {
+    userStore.openModal(
+      "Ошибка",
+      "Недостаточно жизней. Пожалуйста, покупите жизнь."
+    );
+    return;
+  }
   if (userStore.user.mana < courseId.value * 10) {
     userStore.openModal(
       "Ошибка",
@@ -99,6 +108,14 @@ const continueCourse = () => {
     userStore.updateUserDataOnServer(false);
   }
 };
+watch(
+  () => userStore.user.lives,
+  () => {
+    if (userStore.user.lives < 1) {
+      isCourseStarted.value = false;
+    }
+  }
+);
 watch(
   () => route.params.id,
   () => {

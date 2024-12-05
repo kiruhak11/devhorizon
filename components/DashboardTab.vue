@@ -119,7 +119,7 @@ const userCourses = [
 const buyMana = async () => {
   if (userStore.user) {
     userStore.user.mana += 5;
-    userStore.updateUserDataOnServer();
+    userStore.updateUserDataOnServer(false);
   } else {
     console.error("User data not found");
   }
@@ -127,7 +127,7 @@ const buyMana = async () => {
 const buyLife = async () => {
   if (userStore.user) {
     userStore.user.lives += 5;
-    userStore.updateUserDataOnServer();
+    userStore.updateUserDataOnServer(false);
   } else {
     console.error("User data not found");
   }
@@ -151,7 +151,7 @@ const getProgressBarColor = (progress: number): string => {
 // Функция для продления подписки
 const renewSubscription = () => {
   userStore.subscription.type += 1;
-  userStore.updateUserDataOnServer();
+  userStore.updateUserDataOnServer(false);
 };
 const openModal = () => {
   userStore.openModal(

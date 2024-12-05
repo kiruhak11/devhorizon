@@ -1,9 +1,13 @@
-import prisma from "../prisma"; // Подключаем Prisma
+import prisma from "../prisma";
 import bcrypt from "bcrypt";
 export default defineEventHandler(async (event) => {
-  const { userId, userData, subscriptionData } = await readBody(event); // Получаем данные из запроса
-
+  const { userId, userData, subscriptionData, isPassword } = await readBody(
+    event
+  ); // Получаем данные из запроса
   try {
+    if (isPassword) {
+      userData.password = await bcrypt.hash(userData.password, 10);
+    }
     // Обновление данных пользователя
     const updatedUser = await prisma.user.update({
       where: { id: userId }, // Используем уникальный ID пользователя
@@ -14,7 +18,7 @@ export default defineEventHandler(async (event) => {
         phone: userData.phone || "",
         coins: userData.coins || 0,
         mana: userData.mana || 0,
-        password: (await bcrypt.hash(userData.password, 10)) || "",
+        password: userData.password || "",
         lives: userData.lives || 3,
       },
     });

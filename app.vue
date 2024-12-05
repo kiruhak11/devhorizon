@@ -1,11 +1,13 @@
 <template>
-  <FrogModal />
-
-  <div v-if="!isReady" class="loading-screen">
-    <Loader />
-  </div>
-
-  <NuxtPage v-else />
+  <ClientOnly fallback-tag="div">
+    <div>
+      <div v-if="!isReady">
+        <Loader />
+      </div>
+      <NuxtPage />
+      <FrogModal />
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">

@@ -4,7 +4,7 @@ export const steps1 = [
     type: "info",
     title: "Что такое HTML?",
     content: `
-        HTML отвечает за структуру веб-страницы. Неверно закрытые теги могут нарушить верстку.
+        HTML (HyperText Markup Language) — это язык разметки, который используется для создания веб-страниц. Он описывает структуру веб-документа с помощью тегов. Теги HTML задают основные элементы страницы, такие как заголовки, абзацы, ссылки и изображения.
         Подробнее: <a href="https://developer.mozilla.org/ru/docs/Learn/Getting_started_with_the_web/HTML_basics" target="_blank">MDN HTML Basics</a>.
       `,
   },
@@ -13,8 +13,8 @@ export const steps1 = [
     type: "info",
     title: "Блоки: div",
     content: `
-        <strong>div</strong> — блочный элемент. Он занимает всю ширину. Подробнее: 
-        <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/div" target="_blank">MDN div</a>.
+        <strong>div</strong> — блочный элемент, который используется для группировки других элементов. Он занимает всю доступную ширину контейнера. В основном используется для организации макета страницы.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/div" target="_blank">MDN div</a>.
       `,
   },
   {
@@ -22,8 +22,8 @@ export const steps1 = [
     type: "info",
     title: "Элементы inline: span",
     content: `
-        <strong>span</strong> — строчный элемент. Занимает ровно столько места, сколько нужно. Подробнее:
-        <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/span" target="_blank">MDN span</a>.
+        <strong>span</strong> — строчный элемент, который не влияет на расположение других элементов на странице. Обычно используется для стилизации или выделения текста внутри других элементов.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/span" target="_blank">MDN span</a>.
       `,
   },
   {
@@ -43,8 +43,8 @@ export const steps1 = [
     type: "info",
     title: "CSS: стилизация текста",
     content: `
-        CSS позволяет изменять вид текста. Пример: 
-        <code>color: red;</code> изменит цвет текста на красный.
+        CSS (Cascading Style Sheets) — это язык стилей, который используется для задания внешнего вида элементов HTML. Пример использования: <code>color: red;</code> изменяет цвет текста на красный.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/CSS/color" target="_blank">MDN CSS Color</a>.
       `,
   },
   {
@@ -64,7 +64,7 @@ export const steps1 = [
     type: "info",
     title: "CSS: отступы и поля",
     content: `
-        Отступы (margin) создают расстояние вокруг элемента. Поля (padding) увеличивают внутреннее пространство. 
+        <strong>margin</strong> — это внешние отступы, которые создают пространство вокруг элемента. <strong>padding</strong> — это внутренние отступы, которые увеличивают расстояние внутри элемента.
         Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/CSS/margin" target="_blank">MDN margin</a>.
       `,
   },
@@ -81,49 +81,58 @@ export const steps1 = [
   {
     id: 9,
     type: "info",
-    title: "JavaScript: переменные",
+    title: "CSS: позиционирование элементов",
     content: `
-        Переменные хранят данные. Пример: 
-        <code>let name = "Иван";</code>
-        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/JavaScript/Guide/Grammar_and_types" target="_blank">MDN JavaScript Basics</a>.
+        Позиционирование элементов в CSS можно осуществлять с помощью свойств: <code>position</code>, <code>top</code>, <code>left</code>, <code>right</code> и <code>bottom</code>.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/CSS/position" target="_blank">MDN Positioning</a>.
       `,
   },
   {
     id: 10,
     type: "task",
-    title: "Практика: создаем переменную",
-    task: "Создайте переменную с именем 'userName' и значением 'Александр':",
+    title: "Практика: позиционирование",
+    task: "Разместите элемент в правом верхнем углу:",
     code: `
-        // Ваш код здесь
+        <div>Этот элемент должен быть в правом верхнем углу</div>
       `,
-    correctAnswer: ["let userName = 'Александр';"],
+    correctAnswer: [
+      '<div style="position: absolute; top: 0; right: 0;">Этот элемент должен быть в правом верхнем углу</div>',
+    ],
   },
   {
     id: 11,
     type: "info",
-    title: "JavaScript: функции",
+    title: "CSS: Flexbox",
     content: `
-        Функции выполняют действия. Пример:
-        <code>function greet() { console.log("Привет!"); }</code>
+        Flexbox позволяет выравнивать элементы внутри контейнера. Основные свойства: <code>display: flex;</code>, <code>justify-content</code>, <code>align-items</code>.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/CSS/CSS_Flexible_Box_Layout/Basic_Concepts_of_Flexbox" target="_blank">MDN Flexbox</a>.
       `,
   },
   {
     id: 12,
     type: "task",
-    title: "Практика: создаем функцию",
-    task: "Создайте функцию, которая возвращает 'Hello, world!':",
+    title: "Практика: Flexbox",
+    task: "Сделайте элементы выровненными по центру:",
     code: `
-        // Ваш код здесь
+        <div style="">
+          <div>Элемент 1</div>
+          <div>Элемент 2</div>
+        </div>
       `,
-    correctAnswer: ["function sayHello() { return 'Hello, world!'; }"],
+    correctAnswer: [
+      '<div style="display: flex; justify-content: center; align-items: center;">',
+      "  <div>Элемент 1</div>",
+      "  <div>Элемент 2</div>",
+      "</div>",
+    ],
   },
   {
     id: 13,
     type: "info",
     title: "HTML: списки",
     content: `
-        HTML поддерживает упорядоченные (ol) и неупорядоченные (ul) списки. Подробнее:
-        <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/ul" target="_blank">MDN ul</a>.
+        HTML поддерживает два типа списков: упорядоченные (<code>&lt;ol&gt;</code>) и неупорядоченные (<code>&lt;ul&gt;</code>). Элементы списка — это <code>&lt;li&gt;</code>.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/ul" target="_blank">MDN ul</a>.
       `,
   },
   {
@@ -145,64 +154,35 @@ export const steps1 = [
   {
     id: 15,
     type: "info",
-    title: "CSS: Flexbox",
+    title: "HTML: изображения",
     content: `
-        Flexbox помогает выравнивать элементы. Пример:
-        <code>display: flex;</code>. Подробнее:
-        <a href="https://developer.mozilla.org/ru/docs/Web/CSS/CSS_Flexible_Box_Layout/Basic_Concepts_of_Flexbox" target="_blank">MDN Flexbox</a>.
+        Для добавления изображений в HTML используется тег <code>&lt;img&gt;</code>, который требует атрибута <code>src</code> для указания пути к изображению.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/img" target="_blank">MDN img</a>.
       `,
   },
   {
     id: 16,
     type: "task",
-    title: "Практика: Flexbox",
-    task: "Сделайте элементы выровненными по центру:",
+    title: "Практика: вставка изображения",
+    task: "Вставьте изображение с URL:",
     code: `
-        <div style="">
-          <div>Элемент 1</div>
-          <div>Элемент 2</div>
-        </div>
+        <img src="https://example.com/image.jpg" alt="Пример изображения">
       `,
     correctAnswer: [
-      '<div style="display: flex; justify-content: center; align-items: center;">',
-      "  <div>Элемент 1</div>",
-      "  <div>Элемент 2</div>",
-      "</div>",
+      '<img src="https://example.com/image.jpg" alt="Пример изображения">',
     ],
   },
   {
     id: 17,
     type: "info",
-    title: "JavaScript: события",
+    title: "HTML: формы",
     content: `
-        События позволяют реагировать на действия. Пример:
-        <code>element.addEventListener('click', function() { ... })</code>
+        Формы позволяют собирать данные от пользователей. Тег <code>&lt;form&gt;</code> используется для создания формы, а поля ввода для сбора информации — через <code>&lt;input&gt;</code>.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/form" target="_blank">MDN Forms</a>.
       `,
   },
   {
     id: 18,
-    type: "task",
-    title: "Практика: обработчик событий",
-    task: "Добавьте обработчик клика, который выводит 'Кнопка нажата':",
-    code: `
-        <button>Кликни меня</button>
-      `,
-    correctAnswer: [
-      "<button onclick=\"alert('Кнопка нажата')\">Кликни меня</button>",
-    ],
-  },
-  {
-    id: 19,
-    type: "info",
-    title: "HTML: формы",
-    content: `
-        Формы позволяют отправлять данные. Пример:
-        <code>&lt;form&gt;&lt;input&gt;&lt;/form&gt;</code>. Подробнее:
-        <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/form" target="_blank">MDN Forms</a>.
-      `,
-  },
-  {
-    id: 20,
     type: "task",
     title: "Практика: создаем форму",
     task: "Создайте форму с текстовым полем и кнопкой отправки:",
@@ -215,6 +195,84 @@ export const steps1 = [
       '  <button type="submit">Отправить</button>',
       "</form>",
     ],
+  },
+  {
+    id: 19,
+    type: "info",
+    title: "CSS: Grid",
+    content: `
+        Grid — это мощный инструмент для создания макетов. С помощью свойств <code>grid-template-columns</code>, <code>grid-template-rows</code> можно задавать структуру сетки.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/CSS/CSS_Grid_Layout" target="_blank">MDN Grid</a>.
+      `,
+  },
+  {
+    id: 20,
+    type: "task",
+    title: "Практика: создаем сетку",
+    task: "Создайте два элемента в одном ряду:",
+    code: `
+        <div class="grid">
+          <div>Элемент 1</div>
+          <div>Элемент 2</div>
+        </div>
+      `,
+    correctAnswer: [
+      '<div class="grid" style="display: grid; grid-template-columns: 1fr 1fr;">',
+      "  <div>Элемент 1</div>",
+      "  <div>Элемент 2</div>",
+      "</div>",
+    ],
+  },
+  {
+    id: 21,
+    type: "info",
+    title: "CSS: адаптивность",
+    content: `
+        Для создания адаптивных макетов можно использовать медиа-запросы. Например, <code>@media screen and (max-width: 600px)</code> позволяет задать стили для устройств с шириной экрана до 600px.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/CSS/Media_Queries/Using_media_queries" target="_blank">MDN Media Queries</a>.
+      `,
+  },
+  {
+    id: 22,
+    type: "task",
+    title: "Практика: медиа-запросы",
+    task: "Добавьте медиа-запрос для мобильных устройств (max-width: 600px), чтобы изменить цвет фона на красный.",
+    code: `
+        // Ваш CSS здесь
+      `,
+    correctAnswer: [
+      "@media screen and (max-width: 600px) {",
+      "  body { background-color: red; }",
+      "}",
+    ],
+  },
+  {
+    id: 23,
+    type: "info",
+    title: "HTML: ссылки",
+    content: `
+        Для создания гиперссылок используется тег <code>&lt;a&gt;</code> с атрибутом <code>href</code>.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Element/a" target="_blank">MDN a</a>.
+      `,
+  },
+  {
+    id: 24,
+    type: "task",
+    title: "Практика: создание ссылки",
+    task: "Создайте ссылку на сайт:",
+    code: `
+        <a href="https://example.com">Перейти на сайт</a>
+      `,
+    correctAnswer: ['<a href="https://example.com">Перейти на сайт</a>'],
+  },
+  {
+    id: 25,
+    type: "info",
+    title: "CSS: анимации",
+    content: `
+        Анимации в CSS создаются с помощью @keyframes и свойств <code>animation</code>, <code>transition</code>.
+        Подробнее: <a href="https://developer.mozilla.org/ru/docs/Web/CSS/animation" target="_blank">MDN Animations</a>.
+      `,
   },
 ];
 

@@ -64,7 +64,7 @@ export const useUserStore = defineStore("user", {
       if (this.user && course ? this.user.coins >= course?.price : false) {
         this.user.coins -= course ? course?.price : 0;
         this.subscription.type = course ? course?.id : 0;
-        this.updateUserDataOnServer();
+        this.updateUserDataOnServer(false);
       }
     },
     setCourses(courses: any) {
@@ -121,7 +121,7 @@ export const useUserStore = defineStore("user", {
       localStorage.removeItem("subscriptionData");
       localStorage.removeItem("userData");
     },
-    async updateUserDataOnServer() {
+    async updateUserDataOnServer(password: boolean) {
       try {
         if (this.user?.id) {
           // Отправляем запрос на серверный API для обновления данных пользователя
@@ -129,6 +129,7 @@ export const useUserStore = defineStore("user", {
             userId: this.user.id,
             userData: this.user,
             subscriptionData: this.subscription,
+            isPassword: password,
           });
 
           // Обрабатываем ответ от сервера

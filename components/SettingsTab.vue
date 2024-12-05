@@ -62,7 +62,6 @@
 
 <script setup lang="ts">
 import { useUserStore } from "@/stores/userStore";
-import e from "express";
 import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
@@ -102,7 +101,11 @@ const updateProfile = () => {
       );
       return;
     }
-    userStore.updateUserDataOnServer();
+    if (password.value != null) {
+      userStore.updateUserDataOnServer(true);
+    } else {
+      userStore.updateUserDataOnServer(false);
+    }
     handlePassword();
     userStore.openModal(
       `Обновление данных`,

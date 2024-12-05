@@ -23,7 +23,19 @@
       </div>
       <div class="card">
         <p class="card-title">Подписка</p>
-        <p class="card-value">{{ userStore.subscription.type }}</p>
+        <p class="card-value">
+          {{
+            userStore.subscription.type === 1
+              ? "Базовая"
+              : userStore.subscription.type === 2
+              ? "Премиум"
+              : userStore.subscription.type === 3
+              ? "Эксперт"
+              : userStore.subscription.type === 4
+              ? "Эксперт+"
+              : userStore.subscription.type
+          }}
+        </p>
         <div v-if="remainingTime != 'Срок истёк'" class="card-detail">
           <p>Осталось: {{ remainingTime }}</p>
           <UiButton class="btn btn-small" @click="renewSubscription">

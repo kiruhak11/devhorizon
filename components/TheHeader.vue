@@ -1,13 +1,9 @@
 <template>
   <header class="container header">
     <nav class="nav container">
-      <NuxtLink v-if="!isLoginPage" to="/" class="logo"> DevHorizon </NuxtLink>
+      <NuxtLink to="/" class="logo"> DevHorizon </NuxtLink>
 
-      <div v-if="isLoginPage" class="welcome-text">
-        <NuxtLink to="/"> Добро пожаловать в DevHorizon</NuxtLink>
-      </div>
-
-      <div v-else class="nav-links">
+      <div class="nav-links">
         <NuxtLink to="/" class="nav-link" exact-active-class="active-link">
           Главная
         </NuxtLink>
@@ -35,22 +31,17 @@
         >
           {{ userStore.user.firstName + " " + userStore.user.lastName }}
         </NuxtLink>
-
-        <Switcher class="switcher" />
         <div v-if="userStore.user" :class="giftStatusClass">
           <Reward @click="getPresent"> Получить подарок </Reward>
         </div>
+        <Switcher class="switcher" />
       </div>
     </nav>
   </header>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
-// @ts-ignore
 const userStore = useUserStore();
-const route = useRoute();
-const isLoginPage = computed(() => route.path === "/login");
 
 const getPresent = () => {
   const currentDate = new Date();
@@ -92,7 +83,6 @@ const giftStatusClass = computed(() => {
 .header {
   background: var(--color-header-background);
   color: white;
-  position: sticky;
   top: 0;
   z-index: 10;
   box-shadow: 0 4px 6px var(--color-shadow);
@@ -165,19 +155,6 @@ const giftStatusClass = computed(() => {
     &:hover {
       background-color: #f59e0b;
     }
-  }
-}
-
-@media (max-width: 768px) {
-  .nav {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .nav-links {
-    flex-direction: column;
-    gap: 16px;
-    width: 100%;
   }
 }
 </style>

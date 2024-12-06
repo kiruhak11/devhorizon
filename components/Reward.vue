@@ -7,6 +7,10 @@
     </span>
   </button>
 </template>
+<script lang="ts" setup>
+const { isMobile } = useDevice();
+</script>
+
 <style lang="scss" scoped>
 /* From Uiverse.io by vinodjangid07 */
 .reward-btn {
@@ -22,8 +26,6 @@
   transition: all 0.3s;
 }
 .IconContainer {
-  width: 40px;
-  height: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -79,9 +79,7 @@
           </div>
         </form>
         <a class="error-message">{{ error }}</a>
-        <div class="auth-box__back">
-          <ButtonBack />
-        </div>
+        <div class="auth-box__back"></div>
       </div>
     </div>
   </NuxtLayout>
@@ -271,7 +269,32 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  padding: 10px;
 }
+@media (max-width: 768px) {
+  .auth-box {
+    max-width: 100%;
+    padding: 15px;
+  }
+  .auth-title {
+    font-size: 20px;
+  }
+  .toggle-button {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+  .submit-button {
+    font-size: 14px;
+  }
+}
+.bg-overlay {
+  @media (max-width: 768px) {
+    width: 300px;
+    height: 300px;
+    filter: blur(40px);
+  }
+}
+
 .error-message {
   display: flex;
   justify-content: center;
@@ -367,8 +390,10 @@ onMounted(() => {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    transition: transform 0.2s;
 
     &:hover {
+      transform: scale(1.01);
       background-color: #2980b9;
     }
   }

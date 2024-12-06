@@ -34,7 +34,10 @@ const userStore = useUserStore();
 
 .courses-grid {
   display: flex;
-  gap: 2rem;
+  gap: 32px;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
 .course-card {

@@ -8,6 +8,8 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@pinia-plugin-persistedstate/nuxt",
     "frog-modal",
+    "@nuxtjs/device",
+    "nuxt-swiper",
   ],
   piniaPersistedstate: {
     cookieOptions: {

@@ -12,6 +12,9 @@
 
 <style scoped lang="scss">
 .footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: var(--color-header-background); /* Градиентный фон */
   color: white;
   position: sticky;
@@ -21,13 +24,10 @@
   border-radius: 24px 24px 0 0;
 }
 
-.footer-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .footer-text {
   font-weight: 600; /* Эмулирует font-semibold */
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 }
 </style>

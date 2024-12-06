@@ -22,9 +22,6 @@ p {
 }
 
 .untouchable {
-  -webkit-touch-callout: none; /* iOS Safari */
-  user-select: none; /* Chrome/Safari/Opera */
-  user-select: none; /* Konqueror */
-  user-select: none; /* Firefox */
+  -webkit-touch-callout: none; /* iOS Safari */ /* Chrome/Safari/Opera */ /* Konqueror */ /* Firefox */
   user-select: none; /* Internet Explorer/Edge */
 }

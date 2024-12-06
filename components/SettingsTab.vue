@@ -67,8 +67,16 @@
         >
       </div>
       <div class="btns">
-        <UiButton @click="updateProfile">Сохранить изменения</UiButton>
-        <UiButton theme="danger" @click="deleteAccount"> Выйти </UiButton>
+        <UiButton :class="isMobile ? 'full' : ''" @click="updateProfile"
+          >Сохранить изменения</UiButton
+        >
+        <UiButton
+          :class="isMobile ? 'full' : ''"
+          theme="danger"
+          @click="deleteAccount"
+        >
+          Выйти
+        </UiButton>
       </div>
     </div>
   </div>
@@ -78,6 +86,7 @@
 import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
 
+const { isMobile } = useDevice();
 const userStore = useUserStore();
 const router = useRouter();
 
@@ -198,5 +207,8 @@ onMounted(() => {
 .btns {
   display: flex;
   gap: 16px;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 </style>

@@ -4,6 +4,7 @@
       <div v-if="!isReady">
         <Loader />
       </div>
+      <Toast />
       <NuxtPage />
       <FrogModal />
     </div>

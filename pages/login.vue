@@ -89,9 +89,8 @@
 //@ts-ignore
 import { Container } from "tsparticles-engine";
 import axios from "axios";
-
 import { useRouter } from "vue-router";
-
+import { useColorMode } from "@vueuse/core";
 useSeoMeta({
   title: "Авторизация",
 });
@@ -144,6 +143,7 @@ const ParticlesOptions = computed((): {} => {
     },
   };
 });
+
 const handleLogin = async (event: { preventDefault: () => void }) => {
   event.preventDefault();
   error.value = ""; // Сброс ошибок
@@ -165,12 +165,28 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
 
       // Перенаправляем на страницу профиля
       router.push("/profile");
+
+      toast("Успешная авторизация!", "success", 6000);
     } else {
       error.value = "Login failed: " + response.data.message; // В случае ошибки логина
     }
   } catch (er) {
     error.value = "Неверный пароль";
   }
+};
+const options = {
+  // Настройки toast-сообщений
+  position: "top-right",
+  timeout: 5000,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  draggablePercent: 0.6,
+  showCloseButtonOnHover: false,
+  hideProgressBar: false,
+  closeButton: "button",
+  icon: true,
+  rtl: false,
 };
 const encodeBase64 = (str: string) => {
   try {

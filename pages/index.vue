@@ -9,7 +9,6 @@
         предлагаем курсы, которые помогут вам развивать навыки шаг за шагом,
         независимо от вашего начального уровня.
       </p>
-
       <div class="subscription-container" :theme="'easy'" v-if="isMobile">
         <h2 class="subscription-title">Самый популярный курс:</h2>
         <CourseCard :key="1" :course="userStore.courses[0]" />

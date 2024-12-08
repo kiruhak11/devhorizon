@@ -124,6 +124,14 @@ export const useUserStore = defineStore("user", {
     async updateUserDataOnServer(password: boolean) {
       try {
         if (this.user?.id) {
+          // Сохраняем старые данные пользователя перед отправкой
+          const oldUserData = JSON.parse(
+            localStorage.getItem("userData") || "{}"
+          );
+          const oldSubscriptionData = JSON.parse(
+            localStorage.getItem("subscriptionData") || "{}"
+          );
+
           // Отправляем запрос на серверный API для обновления данных пользователя
           const response = await axios.post("/api/updateUser", {
             userId: this.user.id,
@@ -141,6 +149,38 @@ export const useUserStore = defineStore("user", {
           } else {
             // Обновляем данные пользователя в локальном хранилище
             this.setUser(response.data.user, response.data.subscription);
+
+            // Сравниваем старые и новые данные
+            const changedFields = [];
+
+            // Сравниваем поля user
+            for (const key in this.user) {
+              if (this.user[key] !== oldUserData[key]) {
+                changedFields.push(
+                  `User's ${key}: changed from ${oldUserData[key]} to ${this.user[key]}`
+                );
+              }
+            }
+
+            // Сравниваем поля subscription
+            for (const key in this.subscription) {
+              if (this.subscription[key] !== oldSubscriptionData[key]) {
+                changedFields.push(
+                  `Subscription's ${key}: changed from ${oldSubscriptionData[key]} to ${this.subscription[key]}`
+                );
+              }
+            }
+
+            // Формируем сообщение для тоста
+            if (changedFields.length > 0) {
+              toast(
+                `Изменения сохранены: \n${changedFields.join("\n")}`,
+                "success",
+                3000
+              );
+            } else {
+              toast("Нет изменений для сохранения", "info", 3000);
+            }
           }
         }
       } catch (error) {

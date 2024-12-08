@@ -106,7 +106,9 @@ const updateProfile = () => {
   if (userStore.user) {
     userStore.user.firstName = name.value;
     userStore.user.lastName = lastname.value;
-    userStore.user.password = password.value;
+    if (password.value != null) {
+      userStore.user.password = password.value;
+    }
     if (Number(PushLives.value)) {
       userStore.user.lives = Number(PushLives.value);
     } else {

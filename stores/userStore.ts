@@ -124,7 +124,6 @@ export const useUserStore = defineStore("user", {
     async updateUserDataOnServer(password: boolean) {
       try {
         if (this.user?.id) {
-          // Сохраняем старые данные пользователя перед отправкой
           const oldUserData = JSON.parse(
             localStorage.getItem("userData") || "{}"
           );
@@ -132,7 +131,6 @@ export const useUserStore = defineStore("user", {
             localStorage.getItem("subscriptionData") || "{}"
           );
 
-          // Отправляем запрос на серверный API для обновления данных пользователя
           const response = await axios.post("/api/updateUser", {
             userId: this.user.id,
             userData: this.user,
@@ -140,46 +138,93 @@ export const useUserStore = defineStore("user", {
             isPassword: password,
           });
 
-          // Обрабатываем ответ от сервера
           if (response?.data?.error) {
             console.error(
               "Error updating user data on server",
               response.data.error
             );
           } else {
-            // Обновляем данные пользователя в локальном хранилище
             this.setUser(response.data.user, response.data.subscription);
 
-            // Сравниваем старые и новые данные
             const changedFields = [];
+            const subscriptionTypes: Record<string, string> = {
+              1: "Базовая",
+              2: "Премиум",
+              3: "Элита",
+              4: "Элита+",
+            };
 
-            // Сравниваем поля user
+            const userFieldDescriptions: Record<string, string> = {
+              username: "Имя пользователя",
+              firstName: "Имя",
+              lastName: "Фамилия",
+              phone: "Телефон",
+              coins: "Монеты",
+              mana: "Мана",
+              lives: "Жизни",
+              gift: "Подарок",
+              createdAt: "Дата создания",
+            };
+
             for (const key in this.user) {
               if (this.user[key] !== oldUserData[key]) {
-                changedFields.push(
-                  `User's ${key}: changed from ${oldUserData[key]} to ${this.user[key]}`
-                );
+                const description = userFieldDescriptions[key] || key;
+
+                if (key === "password") {
+                  changedFields.push(`Пароль был изменён.`);
+                } else if (key === "gift" || key === "createdAt") {
+                  const oldDate = oldUserData[key]
+                    ? new Date(oldUserData[key]).toLocaleDateString()
+                    : "не задана";
+                  const newDate = this.user[key]
+                    ? new Date(this.user[key]).toLocaleDateString()
+                    : "не задана";
+                  changedFields.push(
+                    `${description}: ${oldDate} → ${newDate} \n`
+                  );
+                } else {
+                  changedFields.push(
+                    `${description}: ${oldUserData[key]} → ${this.user[key]} \n`
+                  );
+                }
               }
             }
 
-            // Сравниваем поля subscription
             for (const key in this.subscription) {
               if (this.subscription[key] !== oldSubscriptionData[key]) {
-                changedFields.push(
-                  `Subscription's ${key}: changed from ${oldSubscriptionData[key]} to ${this.subscription[key]}`
-                );
+                if (key === "type") {
+                  const oldTypeName =
+                    subscriptionTypes[
+                      oldSubscriptionData[key] as keyof typeof subscriptionTypes
+                    ] || "Неизвестная";
+                  const newTypeName =
+                    subscriptionTypes[
+                      this.subscription[key] as keyof typeof subscriptionTypes
+                    ] || "Неизвестная";
+                  changedFields.push(
+                    `Подписка: \n"${oldTypeName}" → "${newTypeName}"`
+                  );
+                } else if (key === "end") {
+                  const newEndDate = new Date(
+                    this.subscription[key]
+                  ).toLocaleDateString();
+                  changedFields.push(
+                    `Подписка теперь действительна до ${newEndDate}`
+                  );
+                } else {
+                  changedFields.push(
+                    `Подписка ${key}: ${this.subscription[key]}`
+                  );
+                }
               }
             }
 
-            // Формируем сообщение для тоста
             if (changedFields.length > 0) {
-              toast(
-                `Изменения сохранены: \n${changedFields.join("\n")}`,
-                "success",
-                3000
-              );
+              changedFields.forEach((message) => {
+                toast(message, "success", 3500);
+              });
             } else {
-              toast("Нет изменений для сохранения", "info", 3000);
+              toast("Нет изменений для сохранения", "info", 3500);
             }
           }
         }

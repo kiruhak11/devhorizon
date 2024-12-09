@@ -15,6 +15,9 @@
         >
           Курсы
         </NuxtLink>
+        <NuxtLink to="/shop" class="nav-link" exact-active-class="active-link">
+          Магазин
+        </NuxtLink>
         <NuxtLink
           v-if="!userStore.user"
           to="/login"
@@ -23,18 +26,25 @@
         >
           Войти
         </NuxtLink>
-        <NuxtLink
-          v-else
-          to="/profile"
-          class="nav-link"
-          exact-active-class="active-link"
-        >
-          {{ userStore.user.firstName + " " + userStore.user.lastName }}
+        <NuxtLink to="/profile" class="profile" v-else>
+          <IconProfile />
+          <div class="profile-menu">
+            <NuxtLink
+              to="/profile"
+              class="nav-link"
+              exact-active-class="active-link"
+            >
+              {{ userStore.user.firstName + " " + userStore.user.lastName }}
+            </NuxtLink>
+            <NuxtLink
+              to="/profile"
+              class="nav-link__counter"
+              exact-active-class="active-link"
+            >
+              Баланс: {{ userStore.user.coins.toLocaleString("ru-RU") }} ₽
+            </NuxtLink>
+          </div>
         </NuxtLink>
-        <div v-if="userStore.user" :class="giftStatusClass">
-          <Reward @click="getPresent"> Получить подарок </Reward>
-        </div>
-        <Switcher class="switcher" />
       </div>
     </nav>
   </header>
@@ -42,44 +52,9 @@
 
 <script setup lang="ts">
 const userStore = useUserStore();
-
-const getPresent = () => {
-  const currentDate = new Date();
-
-  if (!userStore.user.gift || new Date(userStore.user.gift) < currentDate) {
-    userStore.user.gift = new Date(
-      currentDate.setUTCHours(currentDate.getUTCHours() + 24)
-    );
-    userStore.user.coins += 10;
-    userStore.user.lives += 3;
-    userStore.user.mana += 30;
-
-    userStore.openModal(
-      "Подарок получен",
-      "Вы получили 10 монет, 3 жизни и 30 маны"
-    );
-    userStore.updateUserDataOnServer(false);
-  } else {
-    const nextGiftTime = new Date(userStore.user.gift).toLocaleString();
-    userStore.openModal(
-      "Подарок не доступен",
-      `Подарок доступен ${nextGiftTime}`
-    );
-  }
-};
-
-const giftStatusClass = computed(() => {
-  const currentDate = new Date();
-  return new Date(userStore.user.gift) < currentDate || !userStore.user.gift
-    ? "gift-button-wrapper available"
-    : "gift-button-wrapper not-available";
-});
 </script>
 
 <style scoped lang="scss">
-.switcher {
-  margin-top: 1px;
-}
 .header {
   background: var(--color-header-background);
   color: white;
@@ -89,7 +64,21 @@ const giftStatusClass = computed(() => {
   padding: 24px 32px;
   border-radius: 0 0 24px 24px;
 }
-
+.profile {
+  display: flex;
+  align-items: center;
+  margin: -12px 0px;
+  gap: 8px;
+  border-radius: 12px 4px;
+  border: 1px solid var(--color-border);
+  right: 0;
+  padding: 8px;
+  .profile-menu {
+    top: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+}
 .nav {
   display: flex;
   justify-content: space-between;
@@ -124,37 +113,22 @@ const giftStatusClass = computed(() => {
   text-decoration: none;
   color: white;
   transition: color 0.3s ease;
+
+  &__counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    color: white;
+    transition: color 0.3s ease;
+  }
   &:hover {
-    color: #fbbf24;
+    color: var(--color-active-link);
   }
 }
 
 .nav-link.active-link {
-  color: #fbbf24;
-}
-
-.gift-button-wrapper {
-  border-radius: 24px;
-  &.available {
-    border: 2px solid var(--color-success);
-    box-shadow: 0 0 8px var(--color-success);
-  }
-
-  &.not-available {
-    border: 2px solid var(--color-danger);
-    box-shadow: 0 0 8px var(--color-danger);
-  }
-}
-
-.reset-gift-btn {
-  margin-top: 10px;
-
-  UiButton {
-    background-color: #fbbf24;
-    color: #fff;
-    &:hover {
-      background-color: #f59e0b;
-    }
-  }
+  color: var(--color-active-link);
 }
 </style>

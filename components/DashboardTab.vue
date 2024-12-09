@@ -4,7 +4,9 @@
     <div class="dashboard-cards" v-if="userStore.user">
       <div class="card">
         <p class="card-title">Кошелек</p>
-        <p class="card-value">{{ userStore.user.coins }} монет</p>
+        <p class="card-value">
+          {{ userStore.user.coins.toLocaleString("ru-RU") }} ₽
+        </p>
 
         <p class="card-detail">Используя нашего телеграм бота</p>
         <UiButton class="btn btn-small" @click="openModal">
@@ -33,7 +35,7 @@
               ? "Эксперт"
               : userStore.subscription.type === 4
               ? "Эксперт+"
-              : userStore.subscription.type
+              : userStore.subscription.type || "Без подписки"
           }}
         </p>
         <div v-if="remainingTime != 'Срок истёк'" class="card-detail">

@@ -166,7 +166,7 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
       // Перенаправляем на страницу профиля
       router.push("/profile");
 
-      toast("Успешная авторизация!", "success", 6000);
+      toast("Успешная авторизация!", "success", 3000);
     } else {
       error.value = "Login failed: " + response.data.message; // В случае ошибки логина
     }

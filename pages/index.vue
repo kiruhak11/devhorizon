@@ -13,7 +13,6 @@
         <h2 class="subscription-title">Самый популярный курс:</h2>
         <CourseCard :key="1" :course="userStore.courses[0]" />
       </div>
-
       <div class="subscription-container" :theme="'easy'" v-else>
         <h2 class="subscription-title">Наши курсы:</h2>
         <div class="subscription-container__courses">

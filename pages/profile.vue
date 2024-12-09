@@ -1,8 +1,10 @@
 <template>
   <NuxtLayout name="default">
     <div class="container">
-      <h3 class="profile-title">Ваш профиль</h3>
-
+      <div class="profile">
+        <h3 class="profile-title">Ваш профиль</h3>
+        <Switcher class="profile-switcher" />
+      </div>
       <nav class="tabs">
         <button
           class="tab-button"
@@ -58,12 +60,23 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.profile-title {
-  font-size: 1.75rem;
-  color: var(--color-primary);
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 24px;
+.profile {
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  gap: 24px;
+  &-title {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  &-switcher {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+  }
 }
 
 .tabs {

@@ -15,20 +15,20 @@ services:
     networks:
       - app-network
 
-  bot:
-    container_name: dev-horizon-bot
-    build:
-      context: ./server
-      dockerfile: ./Dockerfile
-    image: dev-horizon-bot
-    restart: always
-    environment:
-      BOT_TOKEN: "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8" # Укажите токен вашего бота
-      DATABASE_URL: "mysql://user:password@db/devhorizon" # Подключение к MySQL
-    depends_on:
-      - db
-    networks:
-      - app-network
+  # bot:
+  #   container_name: dev-horizon-bot
+  #   build:
+  #     context: ./server
+  #     dockerfile: ./Dockerfile
+  #   image: dev-horizon-bot
+  #   restart: always
+  #   environment:
+  #     BOT_TOKEN: "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8" # Укажите токен вашего бота
+  #     DATABASE_URL: "mysql://user:password@db/devhorizon" # Подключение к MySQL
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - app-network
 
   db:
     image: mysql:8.0

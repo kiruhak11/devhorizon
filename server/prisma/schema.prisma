@@ -1,0 +1,43 @@
+generator client {
+  provider        = "prisma-client-js"
+  engineType      = "binary"
+}
+
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  telegramId   Int          @unique
+  username     String?      @default("")
+  firstName    String?      @default("")
+  lastName     String?      @default("")
+  phone        String?      @default("")
+  coins        Int          @default(0)
+  mana         Int          @default(0)
+  lives        Int          @default(3)
+  subscription Subscription[]
+  password     String
+  gift         DateTime?
+  createdAt    DateTime     @default(now())
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  type      Int      @default(1)
+  end       DateTime
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  price       Int
+  description String
+  theme       String
+  createdAt   DateTime @default(now())
+}

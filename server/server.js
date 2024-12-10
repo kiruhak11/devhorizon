@@ -1,4 +1,4 @@
-import { Telegraf } from "telegraf";
+import { Telegraf, Markup } from "telegraf";
 import express from "express";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
@@ -7,215 +7,259 @@ import axios from "axios";
 const prisma = new PrismaClient();
 const app = express();
 const botToken = "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8";
-const bot = new Telegraf(botToken); // Замените на токен вашего бота
-app.use(express.json()); // Для парсинга JSON в запросах
-
-let isChangingPassword = {}; // Для отслеживания смены пароля
-let isAddMoney = {}; // Для отслеживания добавления монет
-
-// Обработка команды /start
+const bot = new Telegraf(botToken);
+const course = 2.15;
+app.use(express.json());
+const paidUsers = new Map();
+// Временные переменные для состояния пользователей
+let userState = {};
 bot.start(async (ctx) => {
-  const telegramId = ctx.message?.from.id;
+  const welcomeMessage = `
+Привет, я ваш бот! Вот что я умею:
 
-  if (!telegramId) {
-    return ctx.reply("Ошибка: не удалось определить Telegram ID.");
-  }
+- Регистрация
+- Управление паролем
+- Добавление монет
+- Совершение покупок
+- Запрос возврата средств
 
+Выберите команду с помощью кнопок ниже:
+  `;
+  ctx.reply(
+    welcomeMessage,
+    Markup.keyboard([
+      ["Регистрация", "Сменить пароль"],
+      ["Добавить монеты", "Оплатить", "Запросить возврат"],
+    ])
+      .resize()
+      .oneTime()
+  );
+});
+
+// Проверка регистрации пользователя
+async function checkRegistration(ctx, next) {
+  const telegramId = ctx.message.from.id;
   const user = await prisma.user.findUnique({ where: { telegramId } });
 
-  if (user) {
+  if (!user) {
     return ctx.reply(
-      `Привет, ${user.firstName || "пользователь"}! Вы уже зарегистрированы.`
+      "Вы ещё не зарегистрированы. Пожалуйста, нажмите 'Регистрация' для начала работы."
     );
   }
 
-  ctx.reply("Привет! Чтобы зарегистрироваться, введите пароль.");
+  return next();
+}
+// Обработка регистрации
+bot.hears("Регистрация", async (ctx) => {
+  const telegramId = ctx.message.from.id;
+  const user = await prisma.user.findUnique({ where: { telegramId } });
+
+  if (user) {
+    return ctx.reply("Вы уже зарегистрированы.");
+  }
+
+  userState[telegramId] = { isRegistering: true };
+  ctx.reply("Введите пароль для регистрации:");
 });
 
-// команда /pay, возвращает один товар. С объектом думаю разберешься
-bot.command("pay", (ctx) => {
-  return ctx.replyWithInvoice({
-    chat_id: ctx.chat.id,
-    title: "Test Product",
-    description: "Test description",
-    payload: "{}", // хз что это, надо разбираться
-    provider_token: "", // если пусто, то это звезды
-    currency: "XTR", // звезды
-    prices: [
-      { amount: 1, label: "Test Product" }, // Product variants
-    ],
-  });
+// Команда смены пароля
+bot.hears("Сменить пароль", checkRegistration, async (ctx) => {
+  const telegramId = ctx.message.from.id;
+  userState[telegramId] = { isChangingPassword: true };
+  ctx.reply("Введите новый пароль:");
 });
 
-// сюда сохраняется список всех покупок в боте, надо будет в БД унести
-const paidUsers = new Map();
+// Команда добавления монет
+bot.hears("Добавить монеты", checkRegistration, async (ctx) => {
+  const telegramId = ctx.message.from.id;
+  userState[telegramId] = { isAddingCoins: true };
+  ctx.reply("Сколько монет вы хотите добавить?");
+});
 
-// Запрос на возврат средств
-bot.command("refund", async (ctx) => {
-  const userId = ctx.from.id;
+// Команда оплаты
+bot.hears("Оплатить", checkRegistration, (ctx) => {
+  const telegramId = ctx.message.from.id;
+  userState[telegramId] = { isBuyCoins: true };
+  ctx.reply("Введите количество монет для покупки:");
+});
+
+// Команда запроса возврата средств
+bot.hears("Запросить возврат", checkRegistration, async (ctx) => {
+  const userId = ctx.message.from.id;
+
   if (!paidUsers.has(userId)) {
-    return ctx.reply("You have not paid yet, there is nothing to refund");
+    return ctx.reply("Вы ещё не совершали оплату.");
   }
 
   try {
-    // Да-дааа, я сделал это через API телеграма, потому что библиотека пока не умеет в такое
-    const url = `https://api.telegram.org/bot${botToken}/refundStarPayment`;
-    const response = await axios.post(url, {
-      user_id: userId,
-      telegram_payment_charge_id: paidUsers.get(userId), // Параметр payment_id обязателен
-    });
+    const response = await axios.post(
+      `https://api.telegram.org/bot${botToken}/refundStarPayment`,
+      {
+        user_id: userId,
+        telegram_payment_charge_id: paidUsers.get(userId),
+      }
+    );
 
-    // Проверяем успешный ответ
     if (response.data.ok) {
-      // Тут надо будет удалять подписку у юзера
       paidUsers.delete(userId);
-      return ctx.reply("Refund successful");
+      ctx.reply("Возврат средств выполнен успешно.");
     } else {
-      console.error("Ошибка от Telegram API:", response.data);
+      console.error("Ошибка Telegram API:", response.data);
+      ctx.reply("Ошибка при запросе возврата средств.");
     }
   } catch (error) {
     console.error("Ошибка запроса:", error.response?.data || error.message);
+    ctx.reply("Произошла ошибка при запросе возврата средств.");
   }
 });
 
-// Обработка текстовых сообщений
-bot.command("text", async (ctx) => {
-  const message = ctx.message?.text;
-  const user = ctx.message?.from;
+// Общий обработчик для завершения регистрации, смены пароля и добавления монет
+bot.on("text", async (ctx) => {
+  const telegramId = ctx.message.from.id;
+  const message = ctx.message.text;
+  if (ctx.update.message.successful_payment) {
+    // Извлекаем информацию из payload
 
-  if (!message || !user) return;
+    const coinsPurchased = Math.round(parseInt(message, 10));
 
-  const telegramId = user.id;
+    // Добавляем монеты пользователю в БД
+    try {
+      const user = await prisma.user.findUnique({ where: { telegramId } });
 
-  try {
-    // Обработка смены пароля
-    if (isChangingPassword[telegramId]) {
-      const newPassword = message;
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      if (!user) {
+        return ctx.reply("Пользователь не найден. Обратитесь в поддержку.");
+      }
 
+      const updatedUser = await prisma.user.update({
+        where: { telegramId },
+        data: { coins: user.coins + coinsPurchased },
+      });
+
+      // Сообщение пользователю
+      ctx.reply(
+        `Оплата прошла успешно! Ваш баланс пополнен на ${coinsPurchased} монет. Теперь у вас ${updatedUser.coins} монет.`
+      );
+    } catch (error) {
+      console.error("Ошибка обновления монет в БД:", error);
+      ctx.reply(
+        "Произошла ошибка при обработке платежа. Свяжитесь с поддержкой."
+      );
+    }
+  }
+  if (userState[telegramId]?.isRegistering) {
+    const gift = new Date(
+      new Date().setUTCHours(new Date().getUTCHours() - 24)
+    );
+
+    try {
+      if (!ctx.message || !ctx.message.from) {
+        ctx.reply("Не удалось получить данные пользователя.");
+        return;
+      }
+
+      const {
+        username = "",
+        first_name = "",
+        last_name = "",
+      } = ctx.message.from;
+
+      const newUser = await prisma.user.create({
+        data: {
+          telegramId: Number(ctx.message.from.id),
+          username,
+          firstName: first_name,
+          lastName: last_name,
+          password: await bcrypt.hash(ctx.message.text, 10), // Передаем текст сообщения как пароль
+          gift,
+        },
+      });
+      const newSubscription = await prisma.subscription.create({
+        data: {
+          id: newUser.id,
+          type: 1,
+          userId: newUser.id,
+          end: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+        },
+      });
+
+      ctx.reply(`Регистрация завершена! Ваш ID: ${newUser.telegramId}`);
+    } catch (error) {
+      console.error("Ошибка при регистрации:", error);
+      ctx.reply("Произошла ошибка при регистрации. Попробуйте снова.");
+    }
+
+    delete userState[telegramId].isRegistering;
+    return;
+  }
+
+  if (userState[telegramId]?.isChangingPassword) {
+    const hashedPassword = await bcrypt.hash(message, 10);
+
+    try {
       await prisma.user.update({
         where: { telegramId },
         data: { password: hashedPassword },
       });
 
       ctx.reply("Пароль успешно изменён!");
-      isChangingPassword[telegramId] = false;
-      return;
+    } catch (error) {
+      console.error("Ошибка при смене пароля:", error);
+      ctx.reply("Произошла ошибка при смене пароля. Попробуйте снова.");
     }
 
-    // Обработка добавления монет
-    if (isAddMoney[telegramId]) {
-      const money = parseInt(message, 10); // Преобразуем сообщение в число
-
-      if (isNaN(money)) {
-        ctx.reply("Введите корректное число.");
-        return;
-      }
-
-      // Получаем текущего пользователя
-      const user = await prisma.user.findUnique({ where: { telegramId } });
-
-      if (!user) {
-        ctx.reply("Пользователь не найден.");
-        isAddMoney[telegramId] = false;
-        return;
-      }
-
-      try {
-        // Обновляем количество монет в базе данных
-
-        prisma.user.update({
-          where: { telegramId },
-          data: { coins: user.coins + 2 }, // Например, обновление типа подписки
-        }),
-          // Отправляем пользователю информацию об обновлении
-          ctx.reply(
-            `Монеты успешно добавлены! Теперь у вас ${user.coins} монет.`
-          );
-        isAddMoney[telegramId] = false;
-      } catch (error) {
-        console.error("Ошибка при добавлении монет:", error);
-        ctx.reply("Произошла ошибка при обновлении монет. Попробуйте снова.");
-      }
-      return;
-    }
-
-    // Смена пароля
-    if (message.toLowerCase() === "password") {
-      const user = await prisma.user.findUnique({ where: { telegramId } });
-
-      if (!user) {
-        return ctx.reply("Вы ещё не зарегистрированы.");
-      }
-
-      ctx.reply("Введите новый пароль:");
-      isChangingPassword[telegramId] = true;
-      return;
-    }
-
-    // Добавление монет
-    if (message.toLowerCase() === "addmoney") {
-      const user = await prisma.user.findUnique({ where: { telegramId } });
-
-      if (!user) {
-        return ctx.reply("Вы ещё не зарегистрированы.");
-      }
-
-      ctx.reply("Сколько монет вы хотите добавить?");
-      isAddMoney[telegramId] = true;
-      return;
-    }
-
-    // Регистрация нового пользователя
-    const hashedPassword = await bcrypt.hash(message, 10);
-
-    const existingUser = await prisma.user.findUnique({
-      where: { telegramId },
-    });
-
-    if (existingUser) {
-      return ctx.reply("Вы уже зарегистрированы.");
-    }
-
-    const newUser = await prisma.user.create({
-      data: {
-        telegramId,
-        username: user.username || "",
-        firstName: user.first_name || "",
-        lastName: user.last_name || "",
-        password: hashedPassword,
-        subscription: {
-          create: {
-            type: 1, // Тип подписки (по умолчанию 1)
-            end: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Годовая подписка
-          },
-        },
-      },
-    });
-
-    ctx.reply(`Регистрация завершена! Ваш ID: ${newUser.telegramId}`);
-  } catch (error) {
-    console.error("Ошибка при обработке сообщения:", error);
-    ctx.reply("Произошла ошибка. Попробуйте ещё раз.");
+    delete userState[telegramId].isChangingPassword;
+    return;
   }
-});
-
-// хз зачем, но пусть будет
-bot.on("pre_checkout_query", (ctx) => {
-  ctx.answerPreCheckoutQuery(true);
-});
-
-// держи это в самом блять конце иначе команды работать не будут. Эта штука после успешной оплаты записывает покупку в БД
-bot.on("message", (ctx) => {
-  if (ctx.update.message.successful_payment != undefined) {
-    ctx.reply("Thanks for the purchase!");
-    paidUsers.set(
-      ctx.from.id,
-      ctx.message.successful_payment.telegram_payment_charge_id
-    );
+  if (userState[telegramId]?.isBuyCoins) {
+    return ctx.replyWithInvoice({
+      chat_id: ctx.chat.id,
+      title: "Купить монеты",
+      description: `Вы желаете приобрести ${parseInt(message, 10)} монет?`,
+      payload: "{}", // хз что это, надо разбираться
+      provider_token: "", // если пусто, то это звезды
+      currency: "XTR", // звезды
+      prices: [
+        {
+          amount: Math.round(parseInt(message, 10) / course),
+          label: "Приобрести",
+        }, // Product variants
+      ],
+    });
   }
-});
+  if (userState[telegramId]?.isAddingCoins) {
+    const coins = parseInt(message, 10);
 
+    if (isNaN(coins)) {
+      ctx.reply("Введите корректное число.");
+      return;
+    }
+
+    try {
+      const user = await prisma.user.findUnique({ where: { telegramId } });
+
+      if (!user) {
+        return ctx.reply("Пользователь не найден.");
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { telegramId },
+        data: { coins: user.coins + coins },
+      });
+
+      ctx.reply(
+        `Монеты успешно добавлены! Теперь у вас ${updatedUser.coins} монет.`
+      );
+    } catch (error) {
+      console.error("Ошибка при добавлении монет:", error);
+      ctx.reply("Произошла ошибка при добавлении монет.");
+    }
+
+    delete userState[telegramId].isAddingCoins;
+    return;
+  }
+
+  ctx.reply("Выберите команду с помощью кнопок.");
+});
 // Старт сервера
 app.listen(3001, () => {
   console.log("Server running on port 3001");

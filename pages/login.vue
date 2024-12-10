@@ -174,20 +174,6 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
     error.value = "Неверный пароль";
   }
 };
-const options = {
-  // Настройки toast-сообщений
-  position: "top-right",
-  timeout: 5000,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true,
-  draggablePercent: 0.6,
-  showCloseButtonOnHover: false,
-  hideProgressBar: false,
-  closeButton: "button",
-  icon: true,
-  rtl: false,
-};
 const encodeBase64 = (str: string) => {
   try {
     // Используем TextEncoder для работы с Unicode символами
@@ -251,6 +237,9 @@ const testCallback_login = async (user: any) => {
       user.setUser(response.data.user, response.data.subscription); // Сохраняем пользователя в хранилище
 
       router.push("/profile"); // Перенаправляем на страницу профиля
+    } else if (response.data.message.includes("Invalid credentials")) {
+      toast("Аккаунт не существует!", "warning", 3000);
+      isLogin.value = false;
     } else {
       error.value = "Login failed:" + response.data.message;
     }

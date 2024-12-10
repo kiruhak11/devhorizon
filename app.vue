@@ -54,7 +54,7 @@ onMounted(async () => {
   }
 
   try {
-    const response = await axios.post("/api/updateUser", {
+    const response = await axios.post("/api/updateUserOnServer", {
       userId: userStore.user.id,
       userData: userStore.user,
       subscriptionData: userStore.subscription,

@@ -7,24 +7,31 @@ export default defineEventHandler(async (event) => {
   );
 
   try {
-    if (isPassword) {
-      userData.password = await bcrypt.hash(userData.password, 10);
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
+
+    const subscription = await prisma.subscription.findUnique({
+      where: { id: Number(userId) },
+    });
+    if (!user || !subscription) {
+      throw createError({ statusCode: 401, message: "Invalid credentials" });
     }
 
     // Обновление данных пользователя
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        username: userData.username || "",
-        firstName: userData.firstName || "",
-        lastName: userData.lastName || "",
-        phone: userData.phone || "",
-        coins: userData.coins || 0,
-        mana: userData.mana || 0,
-        password: userData.password || "",
-        lives: userData.lives || 0,
+        username: user.username || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phone: user.phone || "",
+        coins: user.coins || 0,
+        mana: user.mana || 0,
+        password: user.password || "",
+        lives: user.lives || 0,
         gift:
-          userData.gift ||
+          user.gift ||
           new Date(new Date().setUTCHours(new Date().getUTCHours() - 24)),
       },
     });
@@ -32,9 +39,9 @@ export default defineEventHandler(async (event) => {
     const updatedSubscription = await prisma.subscription.update({
       where: { id: userId },
       data: {
-        type: subscriptionData.type || 1,
+        type: subscription.type || 1,
         end:
-          subscriptionData.end ||
+          subscription.end ||
           new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
       },
     });

@@ -1,20 +1,14 @@
-# Используем официальный образ Node.js
+# Dockerfile для бота
+
 FROM node:20
 
-# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем package.json и package-lock.json в контейнер
-COPY ./server/package*.json ./
-
-# Устанавливаем зависимости
+COPY package*.json ./
 RUN npm install
 
-# Копируем все остальные файлы в контейнер
-COPY ./server ./
+COPY . ./
 
-# Указываем порт, который будет использовать контейнер
 EXPOSE 3000
 
-# Запускаем сервер с помощью node (или вашей команды для запуска)
 CMD ["node", "server.js"]

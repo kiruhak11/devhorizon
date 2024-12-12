@@ -112,6 +112,28 @@ bot.hears("Запросить возврат", checkRegistration, async (ctx) =>
     ctx.reply("Произошла ошибка при запросе возврата средств.");
   }
 });
+bot.on("successful_payment", async (ctx) => {
+  const { telegramId } = ctx.message.from;
+  const { invoice_payload } = ctx.message.successful_payment;
+
+  try {
+    const user = await prisma.user.findUnique({ where: { telegramId } });
+    if (!user) {
+      return ctx.reply("Пользователь не найден. Свяжитесь с поддержкой.");
+    }
+
+    const coins = JSON.parse(invoice_payload).coins;
+    await prisma.user.update({
+      where: { telegramId },
+      data: { coins: user.coins + coins },
+    });
+
+    ctx.reply(`Оплата прошла успешно! Ваш баланс пополнен на ${coins} монет.`);
+  } catch (error) {
+    console.error("Ошибка обработки успешного платежа:", error);
+    ctx.reply("Произошла ошибка. Свяжитесь с поддержкой.");
+  }
+});
 
 // Общий обработчик для завершения регистрации, смены пароля и добавления монет
 bot.on("text", async (ctx) => {
@@ -192,7 +214,7 @@ bot.on("text", async (ctx) => {
       chat_id: ctx.chat.id,
       title: "Купить монеты",
       description: `Вы желаете приобрести ${amount} монет?`,
-      payload: "{}", // хз что это, надо разбираться
+      payload: JSON.stringify({ telegramId, coins: amount }), // хз что это, надо разбираться
       provider_token: "", // если пусто, то это звезды
       currency: "XTR", // звезды
       prices: [
@@ -233,35 +255,6 @@ bot.on("text", async (ctx) => {
 
     delete userState[telegramId].isAddingCoins;
     return;
-  }
-  if (ctx.update.message.successful_payment) {
-    // Извлекаем информацию из payload
-
-    const coinsPurchased = parseInt(message, 10);
-
-    // Добавляем монеты пользователю в БД
-    try {
-      const user = await prisma.user.findUnique({ where: { telegramId } });
-
-      if (!user) {
-        return ctx.reply("Пользователь не найден. Обратитесь в поддержку.");
-      }
-
-      const updatedUser = await prisma.user.update({
-        where: { telegramId },
-        data: { coins: user.coins + coinsPurchased },
-      });
-
-      // Сообщение пользователю
-      ctx.reply(
-        `Оплата прошла успешно! Ваш баланс пополнен на ${coinsPurchased} монет. Теперь у вас ${updatedUser.coins} монет.`
-      );
-    } catch (error) {
-      console.error("Ошибка обновления монет в БД:", error);
-      ctx.reply(
-        "Произошла ошибка при обработке платежа. Свяжитесь с поддержкой."
-      );
-    }
   }
   ctx.reply("Выберите команду с помощью кнопок.");
 });

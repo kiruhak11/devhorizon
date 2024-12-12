@@ -117,35 +117,6 @@ bot.hears("Запросить возврат", checkRegistration, async (ctx) =>
 bot.on("text", async (ctx) => {
   const telegramId = ctx.message.from.id;
   const message = ctx.message.text;
-  if (ctx.update.message.successful_payment) {
-    // Извлекаем информацию из payload
-
-    const coinsPurchased = Math.round(parseInt(message, 10));
-
-    // Добавляем монеты пользователю в БД
-    try {
-      const user = await prisma.user.findUnique({ where: { telegramId } });
-
-      if (!user) {
-        return ctx.reply("Пользователь не найден. Обратитесь в поддержку.");
-      }
-
-      const updatedUser = await prisma.user.update({
-        where: { telegramId },
-        data: { coins: user.coins + coinsPurchased },
-      });
-
-      // Сообщение пользователю
-      ctx.reply(
-        `Оплата прошла успешно! Ваш баланс пополнен на ${coinsPurchased} монет. Теперь у вас ${updatedUser.coins} монет.`
-      );
-    } catch (error) {
-      console.error("Ошибка обновления монет в БД:", error);
-      ctx.reply(
-        "Произошла ошибка при обработке платежа. Свяжитесь с поддержкой."
-      );
-    }
-  }
   if (userState[telegramId]?.isRegistering) {
     const gift = new Date(
       new Date().setUTCHours(new Date().getUTCHours() - 24)
@@ -211,16 +182,22 @@ bot.on("text", async (ctx) => {
     return;
   }
   if (userState[telegramId]?.isBuyCoins) {
+    const amount = parseInt(message, 10);
+    // Проверка, что message - число в диапазоне от 2 до 100000
+    if (!Number.isInteger(amount) || amount < 2 || amount > 100000) {
+      return ctx.reply("Введите число от 2 до 100000.");
+    }
+
     return ctx.replyWithInvoice({
       chat_id: ctx.chat.id,
       title: "Купить монеты",
-      description: `Вы желаете приобрести ${parseInt(message, 10)} монет?`,
+      description: `Вы желаете приобрести ${amount} монет?`,
       payload: "{}", // хз что это, надо разбираться
       provider_token: "", // если пусто, то это звезды
       currency: "XTR", // звезды
       prices: [
         {
-          amount: Math.round(parseInt(message, 10) / course),
+          amount: Math.round(amount / course),
           label: "Приобрести",
         }, // Product variants
       ],
@@ -257,7 +234,35 @@ bot.on("text", async (ctx) => {
     delete userState[telegramId].isAddingCoins;
     return;
   }
+  if (ctx.update.message.successful_payment) {
+    // Извлекаем информацию из payload
 
+    const coinsPurchased = parseInt(message, 10);
+
+    // Добавляем монеты пользователю в БД
+    try {
+      const user = await prisma.user.findUnique({ where: { telegramId } });
+
+      if (!user) {
+        return ctx.reply("Пользователь не найден. Обратитесь в поддержку.");
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { telegramId },
+        data: { coins: user.coins + coinsPurchased },
+      });
+
+      // Сообщение пользователю
+      ctx.reply(
+        `Оплата прошла успешно! Ваш баланс пополнен на ${coinsPurchased} монет. Теперь у вас ${updatedUser.coins} монет.`
+      );
+    } catch (error) {
+      console.error("Ошибка обновления монет в БД:", error);
+      ctx.reply(
+        "Произошла ошибка при обработке платежа. Свяжитесь с поддержкой."
+      );
+    }
+  }
   ctx.reply("Выберите команду с помощью кнопок.");
 });
 // Старт сервера

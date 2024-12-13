@@ -85,24 +85,45 @@ bot.hears("Оплатить", checkRegistration, (ctx) => {
 
 // Команда запроса возврата средств
 bot.hears("Запросить возврат", checkRegistration, async (ctx) => {
-  const userId = ctx.message.from.id;
+  const telegramId = ctx.message.from.id;
+  const user = await prisma.user.findUnique({ where: { telegramId } });
+  const userId = user.id;
 
-  if (!paidUsers.has(userId)) {
+  // Ищем платёж в базе данных с помощью Prisma
+  const payment = await prisma.payment.findFirst({
+    where: { userId: userId, status: "paid" }, // Проверяем, что пользователь уже оплатил
+  });
+
+  if (!payment) {
     return ctx.reply("Вы ещё не совершали оплату.");
   }
 
   try {
+    // Отправляем запрос на возврат средств через Telegram API
     const response = await axios.post(
       `https://api.telegram.org/bot${botToken}/refundStarPayment`,
       {
-        user_id: userId,
-        telegram_payment_charge_id: paidUsers.get(userId),
+        user_id: telegramId,
+        telegram_payment_charge_id: payment.telegramPaymentChargeId, // Используем paymentChargeId из базы данных
       }
     );
 
     if (response.data.ok) {
-      paidUsers.delete(userId);
+      // Обновляем статус платежа на "возвращено" или удаляем его
+      await prisma.payment.update({
+        where: { id: payment.id },
+        data: { status: "refunded" }, // Обновляем статус или используем delete(), если хотите удалить
+      });
+
+      // Отправляем сообщение пользователю о возврате
       ctx.reply("Возврат средств выполнен успешно.");
+
+      // Отправляем сообщение админу о возврате
+      const adminId = 502773482; // ID администратора
+      await bot.telegram.sendMessage(
+        adminId,
+        `Пользователь с ID ${userId} запросил возврат средств. Платёж был возвращён.`
+      );
     } else {
       console.error("Ошибка Telegram API:", response.data);
       ctx.reply("Ошибка при запросе возврата средств.");
@@ -110,28 +131,6 @@ bot.hears("Запросить возврат", checkRegistration, async (ctx) =>
   } catch (error) {
     console.error("Ошибка запроса:", error.response?.data || error.message);
     ctx.reply("Произошла ошибка при запросе возврата средств.");
-  }
-});
-bot.on("successful_payment", async (ctx) => {
-  const { telegramId } = ctx.message.from;
-  const { invoice_payload } = ctx.message.successful_payment;
-
-  try {
-    const user = await prisma.user.findUnique({ where: { telegramId } });
-    if (!user) {
-      return ctx.reply("Пользователь не найден. Свяжитесь с поддержкой.");
-    }
-
-    const coins = JSON.parse(invoice_payload).coins;
-    await prisma.user.update({
-      where: { telegramId },
-      data: { coins: user.coins + coins },
-    });
-
-    ctx.reply(`Оплата прошла успешно! Ваш баланс пополнен на ${coins} монет.`);
-  } catch (error) {
-    console.error("Ошибка обработки успешного платежа:", error);
-    ctx.reply("Произошла ошибка. Свяжитесь с поддержкой.");
   }
 });
 
@@ -258,6 +257,62 @@ bot.on("text", async (ctx) => {
   }
   ctx.reply("Выберите команду с помощью кнопок.");
 });
+// хз зачем, но пусть будет
+bot.on("pre_checkout_query", (ctx) => {
+  ctx.answerPreCheckoutQuery(true);
+});
+bot.on("message", async (ctx) => {
+  if (ctx.update.message.successful_payment != undefined) {
+    ctx.reply("Thanks for the purchase!");
+
+    // Получаем данные о платеже
+    const telegramId = ctx.from.id; // Извлекаем Telegram ID из ctx.from.id
+    const chargeId = ctx.message.successful_payment.telegram_payment_charge_id;
+    const invoicePayload = ctx.message.successful_payment.invoice_payload;
+    const payload = JSON.parse(invoicePayload);
+    const coins = payload.coins;
+
+    try {
+      // Проверяем, существует ли пользователь
+      const user = await prisma.user.findUnique({ where: { telegramId } });
+
+      if (!user) {
+        return ctx.reply("Пользователь не найден. Свяжитесь с поддержкой.");
+      }
+
+      // Сохраняем информацию о платеже в базе данных
+      await prisma.payment.create({
+        data: {
+          telegramPaymentChargeId: chargeId,
+          userId: user.id,
+          amount: coins,
+          status: "paid", // Статус платежа "paid"
+        },
+      });
+
+      // Обновляем количество монет пользователя
+      await prisma.user.update({
+        where: { telegramId },
+        data: { coins: user.coins + coins },
+      });
+
+      ctx.reply(
+        `Оплата прошла успешно! Ваш баланс пополнен на ${coins} монет.`
+      );
+
+      // Отправка сообщения администратору
+      const adminId = 502773482; // ID администратора
+      await bot.telegram.sendMessage(
+        adminId,
+        `Пользователь с ID ${telegramId} только что оплатил ${coins} монет.`
+      );
+    } catch (error) {
+      console.error("Ошибка обработки успешного платежа:", error);
+      ctx.reply("Произошла ошибка. Свяжитесь с поддержкой.");
+    }
+  }
+});
+
 // Старт сервера
 app.listen(3001, () => {
   console.log("Server running on port 3001");

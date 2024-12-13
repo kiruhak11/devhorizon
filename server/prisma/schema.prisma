@@ -23,6 +23,8 @@ model User {
   password     String
   gift         DateTime?
   createdAt    DateTime     @default(now())
+
+  payments     Payment[]
 }
 
 model Subscription {
@@ -41,3 +43,13 @@ model Course {
   theme       String
   createdAt   DateTime @default(now())
 }
+model Payment {
+  id                        Int      @id @default(autoincrement())
+  userId                    Int
+  user                      User     @relation(fields: [userId], references: [id])
+  telegramPaymentChargeId   String
+  amount                    Int      // Количество монет
+  status                    String   // Статус платежа: "paid", "refunded"
+  createdAt                 DateTime @default(now())
+}
+

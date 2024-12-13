@@ -18,8 +18,19 @@ const props = defineProps<{
 }>();
 
 const userStore = useUserStore();
-
+const router = useRouter();
 const onBuyModal = () => {
+  if (!userStore.user) {
+    userStore.openModal(
+      "Внимание",
+      "Для покупки подписки войдите в систему.",
+      "Войти",
+      () => {
+        router.push("/login");
+      }
+    );
+    return;
+  }
   if (
     props.type === "subscription" &&
     userStore.subscription.type >= props.effect

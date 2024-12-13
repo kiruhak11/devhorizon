@@ -90,7 +90,6 @@
 import { Container } from "tsparticles-engine";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import { useColorMode } from "@vueuse/core";
 useSeoMeta({
   title: "Авторизация",
 });

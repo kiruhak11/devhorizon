@@ -8,10 +8,8 @@
       <div v-if="userStore.user" :class="giftStatusClass">
         <Reward @click="getPresent"> Получить подарок </Reward>
       </div>
-      <TheFooter v-if="isMobile" />
+      <!-- <TheFooter /> -->
     </main>
-
-    <TheFooter v-if="!isMobile" />
   </div>
 </template>
 <script setup lang="ts">

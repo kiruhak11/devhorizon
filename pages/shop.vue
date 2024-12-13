@@ -44,7 +44,7 @@
 
       <transition :name="transitionName" mode="out-in">
         <div :key="activeTab">
-          <SubscriptionsTab v-if="activeTab === 'subscriptions'" />
+          <ShopSubscriptionsTab v-if="activeTab === 'subscriptions'" />
           <ResourcesTab v-if="activeTab === 'resources'" />
         </div>
       </transition>

@@ -26,17 +26,7 @@
       <div class="card">
         <p class="card-title">Подписка</p>
         <p class="card-value">
-          {{
-            userStore.subscription.type === 1
-              ? "Базовая"
-              : userStore.subscription.type === 2
-              ? "Премиум"
-              : userStore.subscription.type === 3
-              ? "Эксперт"
-              : userStore.subscription.type === 4
-              ? "Эксперт+"
-              : userStore.subscription.type || "Без подписки"
-          }}
+          {{ subscriptionTypes[userStore.subscription.type] || "Неизвестно" }}
         </p>
         <div v-if="remainingTime != 'Срок истёк'" class="card-detail">
           <p>Осталось: {{ remainingTime }}</p>
@@ -88,16 +78,12 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useUserStore } from "@/stores/userStore"; // импорт хранилища пользователя
-import axios from "axios";
-
-// Типизация данных пользователя
-interface User {
-  coins: number;
-  lives: number;
-  mana: number;
-  subscription: string;
-}
+const subscriptionTypes: Record<string, string> = {
+  1: "Базовая",
+  2: "Премиум",
+  3: "Элита",
+  4: "Элита+",
+};
 
 const userStore = useUserStore();
 

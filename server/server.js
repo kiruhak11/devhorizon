@@ -114,7 +114,10 @@ bot.hears("Запросить возврат", checkRegistration, async (ctx) =>
         where: { id: payment.id },
         data: { status: "refunded" }, // Обновляем статус или используем delete(), если хотите удалить
       });
-
+      await prisma.user.update({
+        where: { telegramId },
+        data: { coins: { decrement: payment.amount } },
+      });
       // Отправляем сообщение пользователю о возврате
       ctx.reply("Возврат средств выполнен успешно.");
 

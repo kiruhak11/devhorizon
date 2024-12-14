@@ -30,43 +30,35 @@
         <
       </UiButton>
 
-      <span class="step-id"
-        >Шаг {{ currentStepIndex + 1 }} из {{ currentSteps.length }}</span
-      >
+      <span class="step-id">
+        Шаг {{ currentStepIndex + 1 }} из {{ currentSteps.length }}
+      </span>
 
       <UiButton
         :disabled="isCorrect !== true && currentStep?.type === 'task'"
         @click="goToNextStep"
         class="nav-button right"
       >
-        ></UiButton
-      >
+        >
+      </UiButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { steps1, steps2 } from "~/data/steps";
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch } from "vue"; // Import the API function
 
 const userStore = useUserStore();
-const lastChar = Number(window.location.href.slice(-1));
+const lastChar = Number(window.location.href.slice(-1)); // Get the course ID from the URL
 const userProgressKey = `userCourseProgress_${lastChar}`;
 
 const currentStepIndex = ref(
   Number(localStorage.getItem(userProgressKey)) || 0
 );
-
 const currentSteps = computed(() => {
-  if (lastChar === 1) {
-    return steps1;
-  } else if (lastChar === 2) {
-    return steps2;
-  } else {
-    return steps1;
-  }
+  return lastChar === 1 ? steps1 : lastChar === 2 ? steps2 : steps1;
 });
-
 const currentStep = computed(() => currentSteps.value[currentStepIndex.value]);
 const isLastStep = computed(
   () => currentStepIndex.value === currentSteps.value.length - 1
@@ -74,6 +66,43 @@ const isLastStep = computed(
 
 const userAnswer = ref("");
 const isCorrect = ref<boolean | null>(null);
+
+const saveProgress = async () => {
+  const progressData = {
+    userId: userStore.user.id, // userStore should contain user data
+    courseId: lastChar, // Course ID from the URL
+    progress: currentStepIndex.value * 4, // Current step index as progress
+    createdAt: new Date().toISOString(), // Current timestamp
+  };
+
+  // Find the course progress entry in the userStore.progress array
+  const existingProgressIndex = userStore.progress.findIndex(
+    (progress: { userId: any; courseId: number }) =>
+      progress.userId === userStore.user.id && progress.courseId === lastChar
+  );
+
+  if (existingProgressIndex !== -1) {
+    // If the progress entry for the course exists, update it
+    userStore.progress[existingProgressIndex] = {
+      ...userStore.progress[existingProgressIndex],
+      ...progressData,
+    };
+  } else {
+    // If no progress entry exists for this course, create a new entry
+    userStore.progress.push(progressData);
+  }
+
+  try {
+    // Send the progress to the server
+    await userStore.updateUserDataOnServer(false);
+  } catch (error) {
+    // Log any errors that occur during the update
+    console.error("Failed to update progress:", error);
+  }
+
+  // Optionally, update the progress in localStorage
+  localStorage.setItem(userProgressKey, currentStepIndex.value.toString());
+};
 
 const goToNextStep = () => {
   if (!isLastStep.value) {
@@ -131,7 +160,8 @@ const checkAnswer = () => {
       }
       if (userStore.user.lives > 0) {
         userStore.user.lives--;
-        userStore.updateUserDataOnServer(false);
+        console.log("Lives remaining: ", userStore.user.lives); // Логируем оставшиеся жизни
+        userStore.updateUserDataOnServer(false); // Обновляем данные пользователя на сервере
       } else {
         userStore.openModal("Ошибка", "У вас нет жизни");
         return;
@@ -140,21 +170,18 @@ const checkAnswer = () => {
         "Ошибка",
         `Ваш ответ неверен. У вас осталось: ${userStore.user.lives} жизней. 
         Пожалуйста, обратите внимание на следующие моменты:
-            ${errorMessage.trim()}
-          `
+            ${errorMessage.trim()}`
       );
     }
   }
-};
-
-const saveProgress = () => {
-  localStorage.setItem(userProgressKey, String(currentStepIndex.value));
 };
 
 const clearAnswerAndError = () => {
   userAnswer.value = "";
   isCorrect.value = null;
 };
+
+// Watcher to save progress whenever the step index changes
 watch(currentStepIndex, saveProgress);
 </script>
 

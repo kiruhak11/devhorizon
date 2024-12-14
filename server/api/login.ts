@@ -15,10 +15,15 @@ export default defineEventHandler(async (event) => {
       where: { id: Number(user.id) },
     });
 
+    const progress = await prisma.progress.findUnique({
+      where: { userId: Number(user.id) },
+    });
+
     return {
       message: "Login successful",
       user: user,
       subscription: subscription,
+      progress: progress,
     };
   } else if (type === "telegram" && method === "login") {
     const user = await prisma.user.findUnique({
@@ -32,11 +37,14 @@ export default defineEventHandler(async (event) => {
     const subscription = await prisma.subscription.findUnique({
       where: { id: Number(user.id) },
     });
-
+    const progress = await prisma.progress.findMany({
+      where: { userId: Number(user.id) },
+    });
     return {
       message: "Login successful",
       user: user,
       subscription: subscription,
+      progress: progress,
     };
   } else if (type === "telegram" && method === "register") {
     console.warn(tguser);
@@ -80,10 +88,35 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    const progressData = await prisma.progress.createMany({
+      data: [
+        {
+          userId: newUser.id,
+          progress: 0,
+          courseId: 1, // Course 1
+        },
+        {
+          userId: newUser.id,
+          progress: 0,
+          courseId: 2, // Course 2 (you can add more courses here)
+        },
+        {
+          userId: newUser.id,
+          progress: 0,
+          courseId: 3, // Course 3 (you can add more courses here)
+        },
+        {
+          userId: newUser.id,
+          progress: 0,
+          courseId: 4, // Course 4 (you can add more courses here)
+        },
+      ],
+    });
     return {
       message: "Login successful",
       user: newUser,
       subscription: newSubscription,
+      progress: progressData,
     };
   }
 

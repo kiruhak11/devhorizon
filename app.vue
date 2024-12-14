@@ -58,13 +58,17 @@ onMounted(async () => {
       userId: userStore.user.id,
       userData: userStore.user,
       subscriptionData: userStore.subscription,
+      progressUpdates: userStore.progress,
     });
-
     if (
       response.data.message &&
       response.data.message.includes("Login successful")
     ) {
-      userStore.setUser(response.data.user, response.data.subscription);
+      userStore.setUser(
+        response.data.user,
+        response.data.subscription,
+        response.data.progress
+      );
       userStore.loadUserFromLocalStorage();
     } else {
       console.error(

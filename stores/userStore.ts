@@ -1,14 +1,23 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import Modal from "~/components/MyModal.vue";
+import GiftModal from "~/components/gift/index.vue";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: null as any | null,
     subscription: null as any | null,
     courses: null as any | null,
+    progress: null as any | null,
   }),
   actions: {
+    openGiftModal() {
+      const [setModal] = useFrogModal({
+        closeOnOverlayClick: false,
+        closeOnEsc: false,
+      });
+      setModal(GiftModal, {});
+    },
     openModal(
       modalTitle: string,
       modalText: string,
@@ -60,6 +69,25 @@ export const useUserStore = defineStore("user", {
         console.error("Ошибка при покупке курса:", error);
       }
     },
+
+    userSubscription() {
+      try {
+        if (this.subscription.type == 1) {
+          return "Базовая";
+        } else if (this.subscription.type == 2) {
+          return "Премиум";
+        } else if (this.subscription.type == 3) {
+          return "Эксперт";
+        } else if (this.subscription.type >= 4) {
+          return "Эксперт+";
+        } else {
+          return "Ошибка";
+        }
+      } catch (error) {
+        console.error("Error loading user subscription:", error);
+        return null;
+      }
+    },
     async buyCourseF(course: any) {
       if (this.user && course ? this.user.coins >= course?.price : false) {
         this.user.coins -= course ? course?.price : 0;
@@ -71,14 +99,16 @@ export const useUserStore = defineStore("user", {
       this.courses = courses;
       localStorage.setItem("coursesData", JSON.stringify(courses));
     },
-    setUser(userData: any, subscriptionData: any) {
+    setUser(userData: any, subscriptionData: any, progressData: any) {
       this.user = userData;
       this.subscription = subscriptionData;
+      this.progress = progressData;
       localStorage.setItem("userData", JSON.stringify(userData));
       localStorage.setItem(
         "subscriptionData",
         JSON.stringify(subscriptionData)
       );
+      localStorage.setItem("userProgress", JSON.stringify(progressData));
     },
     loadCoursesFromLocalStorage() {
       const coursesData = localStorage.getItem("coursesData");
@@ -92,14 +122,25 @@ export const useUserStore = defineStore("user", {
         console.error("Ошибка при разборе данных из localStorage:", error);
       }
     },
+    // Пример метода в userStore
+    updateCourseProgress(courseId: number, progress: number) {
+      const courseProgress = this.progress.find(
+        (p: { courseId: number }) => p.courseId === courseId
+      );
+      if (courseProgress) {
+        courseProgress.progress = progress;
+      } else {
+        this.progress.push({ courseId, progress });
+      }
+      this.updateUserDataOnServer(false); // Обновляем данные пользователя на сервере
+    },
+
     loadUserFromLocalStorage() {
       const userData = localStorage.getItem("userData");
       const subscriptionData = localStorage.getItem("subscriptionData");
-
+      const userProgress = localStorage.getItem("userProgress");
       try {
-        if (!userData) {
-          return;
-        }
+        // Ensure the data exists and is not undefined or null before parsing
         if (userData) {
           this.user = JSON.parse(userData);
         } else {
@@ -111,6 +152,12 @@ export const useUserStore = defineStore("user", {
         } else {
           console.error("No subscription data found in localStorage");
         }
+
+        if (userProgress) {
+          this.progress = JSON.parse(userProgress);
+        } else {
+          console.error("No progress data found in localStorage");
+        }
       } catch (error) {
         console.error("Ошибка при разборе данных из localStorage:", error);
       }
@@ -118,8 +165,10 @@ export const useUserStore = defineStore("user", {
     clearUser() {
       this.user = null;
       this.subscription = null;
+      this.progress = null;
       localStorage.removeItem("subscriptionData");
       localStorage.removeItem("userData");
+      localStorage.removeItem("userProgress");
     },
     async updateUserDataOnServer(password: boolean) {
       try {
@@ -130,11 +179,14 @@ export const useUserStore = defineStore("user", {
           const oldSubscriptionData = JSON.parse(
             localStorage.getItem("subscriptionData") || "{}"
           );
-
+          const oldProgressData = JSON.parse(
+            localStorage.getItem("userProgress") || "{}"
+          );
           const response = await axios.post("/api/updateUser", {
             userId: this.user.id,
             userData: this.user,
             subscriptionData: this.subscription,
+            progressData: this.progress,
             isPassword: password,
           });
 
@@ -144,15 +196,13 @@ export const useUserStore = defineStore("user", {
               response.data.error
             );
           } else {
-            this.setUser(response.data.user, response.data.subscription);
+            this.setUser(
+              response.data.user,
+              response.data.subscription,
+              response.data.progress
+            );
 
             const changedFields = [];
-            const subscriptionTypes: Record<string, string> = {
-              1: "Базовая",
-              2: "Премиум",
-              3: "Элита",
-              4: "Элита+",
-            };
 
             const userFieldDescriptions: Record<string, string> = {
               username: "Имя пользователя",
@@ -184,7 +234,11 @@ export const useUserStore = defineStore("user", {
                   );
                 } else {
                   changedFields.push(
-                    `${description}: ${oldUserData[key]} → ${this.user[key]} \n`
+                    `${description}: ${
+                      this.user[key] - oldUserData[key] > 0
+                        ? `+${this.user[key] - oldUserData[key]}`
+                        : `${this.user[key] - oldUserData[key]}`
+                    } \n`
                   );
                 }
               }
@@ -194,13 +248,17 @@ export const useUserStore = defineStore("user", {
               if (this.subscription[key] !== oldSubscriptionData[key]) {
                 if (key === "type") {
                   const oldTypeName =
-                    subscriptionTypes[
-                      oldSubscriptionData[key] as keyof typeof subscriptionTypes
-                    ] || "Неизвестная";
+                    this.userSubscription[
+                      oldSubscriptionData[
+                        key
+                      ] as keyof typeof this.userSubscription
+                    ] || this.userSubscription();
                   const newTypeName =
-                    subscriptionTypes[
-                      this.subscription[key] as keyof typeof subscriptionTypes
-                    ] || "Неизвестная";
+                    this.userSubscription[
+                      this.subscription[
+                        key
+                      ] as keyof typeof this.userSubscription
+                    ] || this.userSubscription();
                   changedFields.push(
                     `Подписка: \n"${oldTypeName}" → "${newTypeName}"`
                   );
@@ -223,8 +281,6 @@ export const useUserStore = defineStore("user", {
               changedFields.forEach((message) => {
                 toast(message, "success", 3500);
               });
-            } else {
-              toast("Нет изменений для сохранения", "info", 3500);
             }
           }
         }

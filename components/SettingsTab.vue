@@ -34,7 +34,7 @@
         />
       </form>
 
-      <div class="form-group">
+      <div class="form-group" v-if="isAdmin">
         <label for="subscription">subscription</label>
         <input
           v-model="PushSubscription"
@@ -43,7 +43,7 @@
           :placeholder="`Подписка: ${userStore.subscription.type}`"
         />
       </div>
-      <div class="form-group">
+      <div class="form-group" v-if="isAdmin">
         <label for="coins">coins</label>
         <input
           v-model="PushCoins"
@@ -52,7 +52,7 @@
           :placeholder="`coins: ${userStore.user.coins}`"
         />
       </div>
-      <div class="form-group">
+      <div class="form-group" v-if="isAdmin">
         <label for="lives">lives</label>
         <input
           v-model="PushLives"
@@ -89,7 +89,7 @@ import { useRouter } from "vue-router";
 const { isMobile } = useDevice();
 const userStore = useUserStore();
 const router = useRouter();
-
+const isAdmin = userStore.subscription.type >= 5;
 const name = ref<string>(userStore.user?.firstName || "");
 const lastname = ref<string>(userStore.user?.lastName || "");
 const password = ref<string>();
@@ -99,9 +99,6 @@ const PushSubscription = ref<number>(userStore.subscription.type || 0);
 const PushCoins = ref<number>(userStore.user.coins || 0);
 const PushLives = ref<number>(userStore.user.lives || 0);
 
-const togglePasswordVisibility = () => {
-  passwordVisible.value = !passwordVisible.value;
-};
 const updateProfile = () => {
   if (userStore.user) {
     userStore.user.firstName = name.value;

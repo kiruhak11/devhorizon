@@ -26,7 +26,7 @@
       <div class="card">
         <p class="card-title">Подписка</p>
         <p class="card-value">
-          {{ subscriptionTypes[userStore.subscription.type] || "Неизвестно" }}
+          {{ userStore.userSubscription() }}
         </p>
         <div v-if="remainingTime != 'Срок истёк'" class="card-detail">
           <p>Осталось: {{ remainingTime }}</p>
@@ -41,6 +41,12 @@
           </UiButton>
         </div>
       </div>
+      <div class="card" v-if="userStore.subscription.type >= 5">
+        <p class="card-title">Статус</p>
+        <p class="card-value">Админ</p>
+        <p class="card-detail">Доступ к админ панели</p>
+        <UiButton class="btn btn-small" to="/admin"> Перейти </UiButton>
+      </div>
     </div>
 
     <!-- Прогресс по курсам -->
@@ -48,23 +54,27 @@
       <h4 class="courses-title">Прогресс по курсам</h4>
       <ul class="course-list">
         <li
-          v-for="(course, index) in userCourses"
-          :key="index"
+          v-for="(course, index) in userStore.courses"
+          :key="course.id"
           class="course-item"
         >
           <div class="course-header" @click="toggleProgress(index)">
             <h5 class="course-name">{{ course.title }}</h5>
-            <span class="progress-percent">{{ course.progress }}%</span>
+            <span class="progress-percent"
+              >{{ getCourseProgress(course.id) }}%</span
+            >
           </div>
           <transition name="fade">
             <div v-show="activeCourse === index" class="course-progress-detail">
-              <p>Прогресс: {{ course.progress }}%</p>
+              <p>Прогресс: {{ getCourseProgress(course.id) }}%</p>
               <div class="progress-bar">
                 <div
                   class="progress-bar-fill"
                   :style="{
-                    width: course.progress + '%',
-                    backgroundColor: getProgressBarColor(course.progress),
+                    width: getCourseProgress(course.id) + '%',
+                    backgroundColor: getProgressBarColor(
+                      getCourseProgress(course.id)
+                    ),
                   }"
                 ></div>
               </div>
@@ -77,16 +87,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-const subscriptionTypes: Record<string, string> = {
-  1: "Базовая",
-  2: "Премиум",
-  3: "Элита",
-  4: "Элита+",
-};
-
 const userStore = useUserStore();
 
+const getCourseProgress = (courseId: number): number => {
+  const courseProgress = userStore.progress.find(
+    (item: { courseId: number }) => item.courseId === courseId
+  );
+  return courseProgress ? courseProgress.progress : 0;
+};
 const remainingTime = computed(() => {
   if (!userStore.subscription?.end) return "Неизвестно";
 
@@ -109,11 +117,6 @@ const remainingTime = computed(() => {
 });
 
 // Массив с курсами и прогрессом
-const userCourses = [
-  { title: "Основы HTML и CSS", progress: 60 },
-  { title: "JavaScript для начинающих", progress: 28 },
-  { title: "Введение в Vue.js", progress: 80 },
-];
 
 // Функция для покупки маны
 const buyMana = async () => {

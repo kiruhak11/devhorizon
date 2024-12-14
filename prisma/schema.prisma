@@ -25,8 +25,16 @@ model User {
   createdAt    DateTime     @default(now())
 
   payments     Payment[]
+  progress     Progress[]
 }
-
+model Progress {
+  id        Int      @id @default(autoincrement())
+  userId    Int      
+  courseId  Int     
+  progress  Int      @default(0)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
 model Subscription {
   id        Int      @id @default(autoincrement())
   type      Int      @default(1)

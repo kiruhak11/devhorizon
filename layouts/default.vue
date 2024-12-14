@@ -22,15 +22,8 @@ const getPresent = () => {
     userStore.user.gift = new Date(
       currentDate.setUTCHours(currentDate.getUTCHours() + 24)
     );
-    userStore.user.coins += 10;
-    userStore.user.lives += 3;
-    userStore.user.mana += 30;
 
-    userStore.openModal(
-      "Подарок получен",
-      "Вы получили 10 монет, 3 жизни и 30 маны"
-    );
-    userStore.updateUserDataOnServer(false);
+    userStore.openGiftModal();
   } else {
     const nextGiftTime = new Date(userStore.user.gift).toLocaleString();
     userStore.openModal(

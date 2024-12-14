@@ -160,7 +160,11 @@ const handleLogin = async (event: { preventDefault: () => void }) => {
     if (response.data.message.includes("Login successful")) {
       // Сохраняем данные пользователя в хранилище Pinia
       const userStore = useUserStore();
-      userStore.setUser(response.data.user, response.data.subscription); // Сохраняем пользователя в хранилище
+      userStore.setUser(
+        response.data.user,
+        response.data.subscription,
+        response.data.progress
+      ); // Сохраняем пользователя в хранилище
 
       // Перенаправляем на страницу профиля
       router.push("/profile");
@@ -211,7 +215,11 @@ const testCallback_register = async (user: any) => {
     }
     if (response.data.message.includes("Login successful")) {
       const userStore = useUserStore();
-      userStore.setUser(response.data.user, response.data.subscription);
+      userStore.setUser(
+        response.data.user,
+        response.data.subscription,
+        response.data.progress
+      );
       router.push("/profile"); // Перенаправляем на страницу профиля
     } else {
       error.value = "Login failed:" + response.data.message;
@@ -233,7 +241,11 @@ const testCallback_login = async (user: any) => {
     });
     if (response.data.message.includes("Login successful")) {
       const user = useUserStore();
-      user.setUser(response.data.user, response.data.subscription); // Сохраняем пользователя в хранилище
+      user.setUser(
+        response.data.user,
+        response.data.subscription,
+        response.data.progress
+      ); // Сохраняем пользователя в хранилище
 
       router.push("/profile"); // Перенаправляем на страницу профиля
     } else if (response.data.message.includes("Invalid credentials")) {

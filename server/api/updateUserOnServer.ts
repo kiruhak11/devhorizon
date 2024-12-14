@@ -1,5 +1,4 @@
 import prisma from "../prisma";
-import bcrypt from "bcrypt";
 
 export default defineEventHandler(async (event) => {
   const { userId, userData, subscriptionData, isPassword } = await readBody(
@@ -7,14 +6,22 @@ export default defineEventHandler(async (event) => {
   );
 
   try {
+    // Получение пользователя
     const user = await prisma.user.findUnique({
       where: { id: Number(userId) },
     });
 
+    // Получение подписки
     const subscription = await prisma.subscription.findUnique({
       where: { id: Number(userId) },
     });
-    if (!user || !subscription) {
+
+    // Получение всех прогрессов для пользователя
+    const userProgresses = await prisma.progress.findMany({
+      where: { userId: Number(userId) },
+    });
+
+    if (!user || !subscription || userProgresses.length === 0) {
       throw createError({ statusCode: 401, message: "Invalid credentials" });
     }
 
@@ -36,6 +43,19 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // Обновление прогресса для каждого курса
+    const updatedProgresses = await Promise.all(
+      userProgresses.map(async (progress) => {
+        return await prisma.progress.update({
+          where: { id: progress.id },
+          data: {
+            progress: progress.progress, // Прогресс из объекта обновлений
+            courseId: progress.courseId,
+          },
+        });
+      })
+    );
+    // Обновление подписки
     const updatedSubscription = await prisma.subscription.update({
       where: { id: userId },
       data: {
@@ -50,6 +70,7 @@ export default defineEventHandler(async (event) => {
       message: "Login successful",
       user: updatedUser,
       subscription: updatedSubscription,
+      progress: updatedProgresses,
     };
   } catch (error) {
     console.warn("Error updating user data", error);

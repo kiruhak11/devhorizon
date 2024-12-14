@@ -1,11 +1,10 @@
+import { data } from "autoprefixer";
 import prisma from "../prisma";
 import bcrypt from "bcrypt";
 
 export default defineEventHandler(async (event) => {
-  const { userId, userData, subscriptionData, isPassword } = await readBody(
-    event
-  );
-
+  const { userId, userData, subscriptionData, progressData, isPassword } =
+    await readBody(event);
   try {
     if (isPassword) {
       userData.password = await bcrypt.hash(userData.password, 10);
@@ -28,7 +27,24 @@ export default defineEventHandler(async (event) => {
           new Date(new Date().setUTCHours(new Date().getUTCHours() - 24)),
       },
     });
+    const updatedProgress = [];
+    for (const item of progressData) {
+      await prisma.progress.updateMany({
+        where: {
+          userId: userId,
+          courseId: item.courseId,
+        },
+        data: {
+          progress: item.progress || 0, // если progress не задан, то будет 0
+        },
+      });
 
+      // Добавляем информацию о прогрессе
+      updatedProgress.push({
+        courseId: item.courseId,
+        progress: item.progress || 0,
+      });
+    }
     const updatedSubscription = await prisma.subscription.update({
       where: { id: userId },
       data: {
@@ -43,6 +59,7 @@ export default defineEventHandler(async (event) => {
       message: "Login successful",
       user: updatedUser,
       subscription: updatedSubscription,
+      progress: updatedProgress,
     };
   } catch (error) {
     console.warn("Error updating user data", error);

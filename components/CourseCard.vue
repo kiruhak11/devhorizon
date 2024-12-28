@@ -4,9 +4,12 @@
     class="subscription-card"
     :class="`subscription-card__${course.theme}`"
   >
-    <h3 class="subscription-title">{{ course.title }}</h3>
-    <p class="subscription-price">{{ course.price }}</p>
-    <p class="subscription-description">{{ course.description }}</p>
+    <div class="card-content">
+      <h3 class="subscription-title">{{ course.title }}</h3>
+      <p class="subscription-price">{{ course.price }}</p>
+      <p class="subscription-description">{{ course.description }}</p>
+    </div>
+    <div class="card-overlay"></div>
   </NuxtLink>
 </template>
 
@@ -21,62 +24,83 @@ defineProps({
 
 <style scoped lang="scss">
 .subscription-card {
-  background-color: var(--color-header-background);
-  border-radius: 12px;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(145deg, #f9f9fb, #ffffff);
+  border-radius: 16px;
+  padding: 32px 24px;
   text-align: center;
-  flex: 1;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  &__easy {
-    border: 3px solid #8bc34a;
-    .subscription-title {
-      color: #8bc34a;
-    }
-  }
-
-  &__medium {
-    border: 3px solid #ff9800;
-    .subscription-title {
-      color: #ff9800;
-    }
-  }
-
-  &__hard {
-    border: 3px solid #f44336;
-    .subscription-title {
-      color: #f44336;
-    }
-  }
-  &__hardPlus {
-    border: 3px solid #490702;
-    .subscription-title {
-      color: #490702;
-    }
-  }
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  min-height: 300px;
+  min-width: 280px;
+  transition: all 0.4s ease;
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-6px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
   }
 
-  .subscription-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 16px;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #8bc34a, #ff9800, #f44336, #490702);
+    border-radius: inherit;
+    padding: 2px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 1;
+    transition: opacity 0.4s ease;
+    opacity: 0;
   }
 
-  .subscription-price {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--color-primary);
+  &:hover::before {
+    opacity: 1;
   }
 
-  .subscription-description {
-    font-size: 1rem;
-    color: var(--color-text);
+  .card-content {
+    position: relative;
+    z-index: 2;
+
+    .subscription-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .subscription-price {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--color-primary);
+    }
+
+    .subscription-description {
+      font-size: 1rem;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 0;
+    transition: opacity 0.4s ease;
+    opacity: 0;
+  }
+
+  &:hover .card-overlay {
+    opacity: 1;
   }
 }
 </style>

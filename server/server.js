@@ -3,16 +3,17 @@ import express from "express";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 import axios from "axios";
+import bodyParser from "body-parser";
 
 const prisma = new PrismaClient();
 const app = express();
-const botToken = "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8";
+const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new Telegraf(botToken);
 const course = 2.15;
 app.use(express.json());
-const paidUsers = new Map();
-// Временные переменные для состояния пользователей
+app.use(bodyParser.json());
 let userState = {};
+
 bot.start(async (ctx) => {
   const welcomeMessage = `
 Привет, я ваш бот! Вот что я умею:
@@ -28,15 +29,33 @@ bot.start(async (ctx) => {
   ctx.reply(
     welcomeMessage,
     Markup.keyboard([
-      ["Регистрация", "Сменить пароль"],
+      ["Регистрация", "Сменить пароль", "Отправить сообщение"],
       ["Добавить монеты", "Оплатить", "Запросить возврат"],
     ])
       .resize()
       .oneTime()
   );
 });
+let sender = 0;
+bot.on("callback_query", async (ctx) => {
+  const callbackData = ctx.callbackQuery.data;
+  if (callbackData.startsWith("select_user_")) {
+    const userId = parseInt(callbackData.split("_")[2], 10); // Извлекаем ID пользователя
 
-// Проверка регистрации пользователя
+    // Сохраняем состояние отправки сообщения
+    userState[ctx.callbackQuery.from.id] = { isSendingTo: userId };
+
+    await ctx.reply(`Введите сообщение для пользователя с ID ${userId}:`);
+  }
+  if (callbackData.startsWith("reply_to_")) {
+    const userId = parseInt(callbackData.split("_")[2], 10); // Извлекаем ID пользователя
+    const sanderId = ctx.callbackQuery.from.id; // ID администратора
+    sender = userId;
+    // Записываем состояние администратора
+    userState[sanderId] = { isReplyingTo: userId };
+    await ctx.reply(`Введите сообщение для пользователя с ID ${userId}:`);
+  }
+});
 async function checkRegistration(ctx, next) {
   const telegramId = ctx.message.from.id;
   const user = await prisma.user.findUnique({ where: { telegramId } });
@@ -62,7 +81,6 @@ bot.hears("Регистрация", async (ctx) => {
   ctx.reply("Введите пароль для регистрации:");
 });
 
-// Команда смены пароля
 bot.hears("Сменить пароль", checkRegistration, async (ctx) => {
   const telegramId = ctx.message.from.id;
   userState[telegramId] = { isChangingPassword: true };
@@ -82,7 +100,32 @@ bot.hears("Оплатить", checkRegistration, (ctx) => {
   userState[telegramId] = { isBuyCoins: true };
   ctx.reply("Введите количество монет для покупки:");
 });
+bot.hears("Отправить сообщение", checkRegistration, async (ctx) => {
+  try {
+    // Получаем список пользователей
+    const users = await prisma.user.findMany();
 
+    if (users.length === 0) {
+      await ctx.reply("Нет доступных пользователей.");
+      return;
+    }
+
+    // Формируем inline-кнопки с именами пользователей
+    const inlineKeyboard = users.map((user) => [
+      {
+        text: `${user.firstName || ""} ${user.lastName || ""}`.trim(), // Имя пользователя
+        callback_data: `select_user_${user.telegramId}`, // Callback data содержит ID пользователя
+      },
+    ]);
+
+    await ctx.reply("Выберите пользователя:", {
+      reply_markup: { inline_keyboard: inlineKeyboard },
+    });
+  } catch (error) {
+    console.error("Ошибка при получении пользователей:", error);
+    await ctx.reply("Произошла ошибка при получении списка пользователей.");
+  }
+});
 // Команда запроса возврата средств
 bot.hears("Запросить возврат", checkRegistration, async (ctx) => {
   const telegramId = ctx.message.from.id;
@@ -256,6 +299,84 @@ bot.on("text", async (ctx) => {
     }
 
     delete userState[telegramId].isAddingCoins;
+    return;
+  }
+  // Проверяем, отвечает ли администратор пользователю
+  if (userState[telegramId]?.isReplyingTo) {
+    const userId = userState[telegramId].isReplyingTo;
+
+    try {
+      // Отправляем сообщение пользователю
+      try {
+        // Проходим по всем ID админов
+        const _message = ` Ответ от пользователя ${telegramId}:\n${message}`;
+        // Отправляем сообщение каждому администратору
+        await axios.post(
+          `https://api.telegram.org/bot${botToken}/sendMessage`,
+          {
+            chat_id: userId,
+            text: _message,
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  {
+                    text: "Ответить", // Текст на кнопке
+                    callback_data: `reply_to_${telegramId}`, // Данные, которые вернутся боту при нажатии
+                  },
+                ],
+              ],
+            },
+          }
+        );
+      } catch (error) {
+        console.error("Error sending message to Telegram:", error);
+        throw new Error("Failed to send message to Telegram");
+      }
+
+      // Уведомляем администратора об успешной отправке
+      await ctx.reply("Сообщение успешно отправлено!");
+
+      // Очищаем состояние администратора
+      delete userState[telegramId].isReplyingTo;
+    } catch (error) {
+      console.error("Error replying to user:", error);
+      await ctx.reply("Произошла ошибка при отправке сообщения.");
+    }
+
+    return;
+  }
+  if (userState[telegramId]?.isSendingTo) {
+    const userId = userState[telegramId].isSendingTo;
+
+    try {
+      // Отправляем сообщение выбранному пользователю
+      const _message = ` Ответ от пользователя ${telegramId}:\n${message}`;
+      // Отправляем сообщение каждому администратору
+      await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        chat_id: userId,
+        text: _message,
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Ответить", // Текст на кнопке
+                callback_data: `reply_to_${telegramId}`, // Данные, которые вернутся боту при нажатии
+              },
+            ],
+          ],
+        },
+      });
+
+      // Уведомляем администратора об успешной отправке
+      await ctx.reply("Сообщение успешно отправлено!");
+
+      // Очищаем состояние
+      delete userState[telegramId].isSendingTo;
+    } catch (error) {
+      console.error("Ошибка отправки сообщения:", error);
+      await ctx.reply("Произошла ошибка при отправке сообщения.");
+    }
+
     return;
   }
   ctx.reply("Выберите команду с помощью кнопок.");

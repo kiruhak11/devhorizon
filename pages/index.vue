@@ -1,137 +1,470 @@
 <template>
-  <NuxtLayout name="default">
-    <div class="welcome-container container">
-      <!-- Вводный баннер -->
-      <div class="welcome-banner">
-        <img src="/images/banner.webp" alt="DevHorizon" class="banner-image" />
-        <div class="banner-content">
-          <h2 class="welcome-title">Ваш путь к мастерству в разработке</h2>
-          <p class="welcome-description">
-            Присоединяйтесь к DevHorizon и начните создавать современные
-            веб-приложения с нуля.
-          </p>
-          <UiButton theme="primary" to="/courses">Начать сейчас</UiButton>
+  <NuxtLayout class="container" name="default">
+    <div class="homepage">
+      <!-- Header Section -->
+      <section class="header">
+        <div class="header-left">
+          <div class="header-content">
+            <h1 class="brand">DevHorizon —</h1>
+            <p class="description">
+              Это ваш надежный проводник в мире разработки. Мы помогаем
+              начинающим и опытным разработчикам достичь мастерства в
+              программировании и создавать крутые проекты.
+            </p>
+            <div class="auth-buttons">
+              <UiButton theme="accent" to="/login">
+                Войти или создать аккаунт
+              </UiButton>
+              <!-- Кнопка "Перейти" с проверкой на существование курса -->
+              <UiButton
+                theme="primary-rev"
+                v-if="currentCourse"
+                :to="`course/${currentCourse.id}`"
+              >
+                Перейти
+              </UiButton>
+            </div>
+          </div>
         </div>
-      </div>
+        <div class="header-right">
+          <div class="slider">
+            <div
+              class="course"
+              v-for="(course, index) in visibleCourses"
+              :key="course.id"
+              :class="{ active: index === 0, next: index === 1 }"
+            >
+              <div class="course-card">
+                <h3>{{ course.title }}</h3>
+                <p>{{ course.description }}</p>
+              </div>
+            </div>
 
-      <!-- Почему выбирают нас -->
-      <section class="why-us">
-        <h2 class="section-title">Почему выбирают нас</h2>
-        <div class="features">
-          <div class="feature">
-            <img src="/images/icon-experience.webp" alt="Опыт" />
-            <h3>Для любого уровня</h3>
-            <p>Курсы подходят как новичкам, так и профессионалам.</p>
-          </div>
-          <div class="feature">
-            <img src="/images/icon-flexible.webp" alt="Гибкость" />
-            <h3>Гибкий график</h3>
-            <p>Учитесь в любое время и с любого устройства.</p>
-          </div>
-          <div class="feature">
-            <img src="/images/icon-flexible.webp" alt="Сообщество" />
-            <h3>Поддержка сообщества</h3>
-            <p>Получайте помощь от опытных менторов и участников.</p>
+            <!-- Стрелочки для переключения -->
+            <div class="slider-controls">
+              <button
+                class="prev-btn"
+                @click="prevCourse"
+                v-if="userStore.courses.length > 1"
+              >
+                &#8592;
+                <!-- Стрелочка влево -->
+              </button>
+              <button
+                class="next-btn"
+                @click="nextCourse"
+                v-if="userStore.courses.length > 1"
+              >
+                &#8594;
+                <!-- Стрелочка вправо -->
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Популярные курсы -->
-      <section class="popular-courses">
-        <h2 class="section-title">Популярные курсы</h2>
-        <div class="courses">
-          <CourseCard
-            v-for="course in userStore.courses"
-            :key="course.id"
-            :course="course"
-          />
-        </div>
-        <UiButton theme="primary" to="/courses">Смотреть все курсы</UiButton>
-      </section>
-
-      <!-- Отзывы студентов -->
-      <section class="reviews">
-        <h2 class="section-title">Что говорят наши студенты</h2>
-        <div class="review-slider">
-          <div class="review">
-            <p class="review-text">" Я очень доволен курсами DevHorizon."</p>
-            <p class="review-author">— John Doe</p>
-          </div>
+      <!-- Новые пользователи -->
+      <section class="new-users-container">
+        <div class="new-users">
+          <h3 class="section-title-new-users">Новые пользователи</h3>
+          <ul class="user-list">
+            <UiButton
+              :to="`/usersprofile/${user.id}`"
+              class="user full"
+              v-for="user in latestUsers"
+              :key="user.id"
+            >
+              <IconProfile />{{ user.firstName }}
+            </UiButton>
+          </ul>
         </div>
       </section>
-
-      <!-- Авторизация -->
-      <div class="auth-buttons" v-if="!userStore.user">
-        <UiButton :class="isMobile ? 'full' : ''" to="/login"
-          >Войти или создать аккаунт</UiButton
-        >
-      </div>
-      <div class="auth-buttons" v-else>
-        <UiButton :class="isMobile ? 'full' : ''" to="/profile"
-          >Перейти в личный кабинет</UiButton
-        >
-        <UiButton
-          :class="isMobile ? 'full' : ''"
-          theme="danger"
-          @click="userStore.clearUser"
-          >Выход</UiButton
-        >
-      </div>
     </div>
+    <section class="courses">
+      <h2 class="section-title">Наши курсы</h2>
+      <div class="courses-grid">
+        <CourseCard
+          v-for="course in userStore.courses"
+          :key="course.id"
+          :course="course"
+        />
+      </div>
+    </section>
+
+    <section class="courses">
+      <h2 class="section-title">Написать админу</h2>
+      <div class="courses-grid">
+        <input v-model="name" type="text" placeholder="Ваше имя" />
+        <input v-model="email" type="email" placeholder="Ваш email" />
+        <textarea v-model="message" placeholder="Ваше сообщение"></textarea>
+        <UiButton theme="accent" @click="sendMessage">Отправить</UiButton>
+      </div>
+    </section>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
+const name = ref("");
+const email = ref("");
+const message = ref("");
+
+// Функция для отправки сообщения админу
+const sendMessage = async () => {
+  if (!name.value || !email.value || !message.value) {
+    userStore.openModal("Ошибка", "Пожалуйста, заполните все поля.");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/sendMessage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name.value,
+        email: email.value,
+        message: message.value,
+        tgId: userStore.user.telegramId,
+        Id: userStore.user.id,
+        type: "admin",
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      userStore.openModal(
+        "Успех",
+        `Сообщение: \n${message.value}\nуспешно отправлено`
+      );
+      name.value = "";
+      email.value = "";
+      message.value = "";
+    } else {
+      userStore.openModal(
+        "Ошибка",
+        `Произошла ошибка при отправке сообщения: ${data.error}`
+      );
+    }
+  } catch (error) {
+    console.error("Ошибка отправки сообщения:", error);
+    userStore.openModal("Ошибка", "Произошла ошибка при отправке сообщения");
+  }
+};
+
 const userStore = useUserStore();
-const { isMobile } = useDevice();
+
+// Текущий индекс курса
+const currentIndex = ref(0);
+
+// Получение текущего курса
+const currentCourse = computed(
+  () => userStore.courses[currentIndex.value] || null
+);
+
+// Отображаемые курсы: текущий и следующий
+const visibleCourses = computed(() => {
+  if (userStore.courses.length === 0) return [];
+  return [
+    userStore.courses[currentIndex.value],
+    userStore.courses[(currentIndex.value + 1) % userStore.courses.length],
+  ];
+});
+
+// Переключение на следующий курс
+const nextCourse = () => {
+  currentIndex.value = (currentIndex.value + 1) % userStore.courses.length;
+};
+
+// Переключение на предыдущий курс
+const prevCourse = () => {
+  currentIndex.value =
+    (currentIndex.value - 1 + userStore.courses.length) %
+    userStore.courses.length;
+};
+
+userStore.fetchUsers();
+
+// Вычисляем список двух последних пользователей
+const latestUsers = computed(() => {
+  return [...userStore.users]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice(0, 2);
+});
 </script>
 
-<style scoped lang="scss">
-.welcome-container {
+<style lang="scss" scoped>
+.header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 40px 20px;
+  background: var(--color-grad-banner);
+  color: #fff;
+  border-radius: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.header-left {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+}
+
+.header-right {
+  display: flex;
+  justify-content: center;
   align-items: center;
-  padding: 30px 16px;
+  position: relative;
+  padding: 24px;
+}
 
-  .welcome-banner {
-    position: relative;
-    .banner-image {
-      width: 100%;
-      border-radius: 8px;
-    }
-    .banner-content {
-      position: absolute;
-      top: 20%;
-      left: 10%;
-      color: white;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-      h2 {
-        font-size: 3rem;
-      }
-    }
+.header-content {
+  h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
   }
 
-  .why-us,
-  .popular-courses,
-  .reviews {
-    margin: 40px 0;
-    .section-title {
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-    .features,
-    .courses,
-    .review-slider {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-    }
+  p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
   }
+}
 
-  .auth-buttons {
-    margin-top: 60px;
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+
+/* Слайдер */
+.slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 20px;
+  background-color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+.course {
+  position: absolute;
+  width: 80%;
+  text-align: center;
+  transition: all 0.5s ease;
+}
+
+.course.active {
+  transform: translateX(0);
+  opacity: 1;
+  z-index: 2;
+}
+
+.course.next {
+  transform: translateX(50%);
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.course-card {
+  color: var(--color-text);
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.course-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.course h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.course p {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* Кнопки "Следующий" и "Предыдущий" */
+.slider-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+.prev-btn {
+  padding-right: 4px;
+}
+.next-btn {
+  padding-left: 4px;
+}
+.prev-btn,
+.next-btn {
+  padding-bottom: 5px;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 1px, 0px, 1px, 0px;
+  width: 50px;
+  height: 50px;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 15;
+}
+
+.prev-btn {
+  border-radius: 0 50% 50% 0 / 50%;
+}
+.next-btn {
+  border-radius: 50% 0 0 50% / 50%;
+}
+.prev-btn,
+.next-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--color-grad-banner); /* Применяем градиентный фон хедера */
+}
+
+/* Новые пользователи */
+.new-users {
+  margin-top: -30px;
+  background-color: #fff;
+  padding: 20px 15px;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  position: absolute;
+  margin-left: auto;
+  transform: translateY(10px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  &-container {
     display: flex;
-    gap: 24px;
+    justify-content: flex-end;
+    position: relative;
+  }
+}
+
+.section-title-new-users {
+  color: var(--color-text);
+  display: flex;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.user-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+.courses {
+  background-color: var(--color-grad-banner);
+  padding: 32px 32px;
+  border-radius: 20px;
+  margin-top: 140px;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-background);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.courses-grid {
+  display: flex;
+  flex-wrap: wrap; /* Позволяет карточкам переноситься на новую строку */
+  justify-content: center; /* Центровка карточек */
+  gap: 20px; /* Расстояние между карточками */
+  input {
+    border-radius: 12px;
+    border: 1.5px solid var(--color-border);
+    padding: 8px;
+    &:focus {
+      box-shadow: 0 0 25px var(--color-border);
+    }
+  }
+  textarea {
+    border-radius: 12px;
+    border: 1.5px solid var(--color-border);
+    padding: 8px;
+    height: 100px;
+    min-height: 60px;
+    &:focus {
+      box-shadow: 0 0 25px var(--color-border);
+    }
+  }
+}
+
+.courses-grid > * {
+  flex: 1 1 calc(25% - 20px); /* Карточки занимают 25% ширины с учетом отступов */
+  max-width: calc(25% - 20px); /* Максимальная ширина карточки */
+  min-width: 280px; /* Минимальная ширина для узких экранов */
+  box-sizing: border-box; /* Учет паддингов в ширине */
+}
+
+@media (max-width: 1200px) {
+  .courses-grid > * {
+    flex: 1 1 calc(33.33% - 20px); /* 3 карточки в строке на средних экранах */
+    max-width: calc(33.33% - 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .courses-grid > * {
+    flex: 1 1 calc(50% - 20px); /* 2 карточки в строке на узких экранах */
+    max-width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .courses-grid > * {
+    flex: 1 1 100%; /* 1 карточка на очень узких экранах */
+    max-width: 100%;
   }
 }
 </style>

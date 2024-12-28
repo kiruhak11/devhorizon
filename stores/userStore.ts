@@ -9,8 +9,26 @@ export const useUserStore = defineStore("user", {
     subscription: null as any | null,
     courses: null as any | null,
     progress: null as any | null,
+    users: [] as any | null,
+    subscriptions: [] as any | null,
   }),
   actions: {
+    async fetchUsers() {
+      try {
+        const response = await axios.get("/api/users");
+        this.users = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async fetchSubscriptions() {
+      try {
+        const response = await axios.get("/api/subscriptions");
+        this.subscriptions = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
     openGiftModal() {
       const [setModal] = useFrogModal({
         closeOnOverlayClick: false,

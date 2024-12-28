@@ -1,12 +1,13 @@
 .button {
   display: flex;
+  align-items: center;
   justify-content: center;
   width: fit-content;
   padding: 16px 32px;
   text-align: center;
   text-decoration: none;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 12.41px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
 
@@ -14,32 +15,56 @@
     width: 100%;
   }
 
+  &.mini {
+    padding: 8px 16px;
+  }
+
   &--primary {
-    color: white;
-    font-weight: bold;
-    background-color: var(--color-primary);
+    color: var(--color-text);
+    border: 1.5px solid var(--color-border);
+    transition: background-color 0.3s ease, transform 0.2s ease;
 
     &:hover {
-      color: var(--color-primary);
-      background-color: var(--color-background);
-      border: 1px solid var(--color-border);
-      box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+      color: var(--color-background);
+      background-color: var(--color-text);
       transform: translateY(-2px);
     }
   }
 
-  &--danger {
-    display: flex;
-    justify-content: center;
-    color: white;
-    background-color: var(--color-danger);
-    border: none;
+  &--primary-rev {
+    color: var(--color-background);
+    border: 1.5px solid var(--color-text);
+    transition: background-color 0.3s ease, transform 0.2s ease;
 
     &:hover {
-      color: var(--color-danger);
+      color: var(--color-text);
       background-color: var(--color-background);
-      border: 1px solid var(--color-border);
-      box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+      transform: translateY(-2px);
+    }
+  }
+
+  &--accent {
+    color: var(--color-background);
+    background-color: var(--color-text);
+    border: 1.5px solid var(--color-border);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+      color: var(--color-text);
+      background-color: var(--color-background);
+      transform: translateY(-2px);
+    }
+  }
+
+  &--accent-rev {
+    color: var(--color-text);
+    background-color: var(--color-background);
+    border: 1.5px solid var(--color-border);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+      color: var(--color-background);
+      background-color: var(--color-text);
       transform: translateY(-2px);
     }
   }

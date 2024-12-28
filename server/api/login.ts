@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
       where: { id: Number(user.id) },
     });
 
-    const progress = await prisma.progress.findUnique({
+    const progress = await prisma.progress.findMany({
       where: { userId: Number(user.id) },
     });
 

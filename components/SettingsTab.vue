@@ -72,7 +72,7 @@
         >
         <UiButton
           :class="isMobile ? 'full' : ''"
-          theme="danger"
+          theme="primary-rev"
           @click="deleteAccount"
         >
           Выйти

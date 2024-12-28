@@ -64,6 +64,7 @@
     "@rushstack/eslint-patch": "^1.10.2",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
+    "@types/next": "^8.0.7",
     "autoprefixer": "^10.4.20",
     "nuxt-particles": "^0.3.0",
     "postcss": "^8.4.49",

@@ -1,5 +1,5 @@
 export interface ButtonProps {
   to?: string;
-  theme?: "primary" | "danger";
+  theme?: "primary" | "accent" | "accent-rev" | "primary-rev";
   full?: boolean;
 }

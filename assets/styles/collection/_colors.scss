@@ -1,45 +1,15 @@
 :root {
-  --color-header-background: linear-gradient(to right, #4ca1ff, #82eaff);
-  --color-primary: #4ca1ff;
-  --color-secondary: #ffe066;
-  --color-background: #fff;
-  --color-active-link: #1f2937;
-  --color-text: #2d3748;
-  --color-success: #38a169;
-  --color-shadow: #2d374850;
-  --color-border: #e0e6ed;
-  --color-header-text: #1a202c;
-  --color-footer-background: #2d3748;
-  --color-danger: #e53e3e;
-  --color-footer-text: #fff;
-  --color-button-background: #4ca1ff;
-  --color-button-hover: #3b82e6;
-  --color-blur: radial-gradient(
-    circle,
-    rgb(255 245 136 / 80%),
-    rgb(255 223 136 / 40%)
-  );
+  --color-grad-banner: #5117d8;
+  --color-text: #222;
+  --color-border: #222;
+  --color-background: #f2f2f2;
+  --color-text-light: #222222a8;
 }
 
 .dark {
-  --color-header-background: linear-gradient(to right, #1e40af, #1f2937);
-  --color-primary: #4f94ff;
-  --color-secondary: #ffc44d;
-  --color-background: #121826;
-  --color-text: #e5e7eb;
-  --color-shadow: #1a202c80;
-  --color-active-link: #fbbf24;
-  --color-border: #374151;
-  --color-success: #38a169;
-  --color-header-text: #f3f4f6;
-  --color-danger: #992a2a;
-  --color-footer-background: #111827;
-  --color-footer-text: #e5e7eb;
-  --color-button-background: #4f94ff;
-  --color-button-hover: #3c74d3;
-  --color-blur: radial-gradient(
-    circle,
-    rgb(150 200 255 / 70%),
-    rgb(80 90 150 / 40%)
-  );
+  --color-grad-banner: #9b3fe3; /* Более тёмный оттенок фиолетового */
+  --color-text: #e0e0e0; /* Светлый цвет текста для тёмной темы */
+  --color-border: #444; /* Тёмный бордер */
+  --color-background: #222; /* Тёмный фон */
+  --color-text-light: #bbb; /* Светлый текст для менее важной информации */
 }

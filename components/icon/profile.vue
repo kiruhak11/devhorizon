@@ -45,6 +45,6 @@
 
 <style scoped lang="scss">
 .icon-path {
-  fill: white; /* Используем текущий цвет родительского элемента */
+  fill: var(--color-text); /* Используем текущий цвет родительского элемента */
 }
 </style>

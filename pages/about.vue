@@ -92,11 +92,11 @@ try {
     height: 50px;
     width: 100%;
     align-items: center;
-    background-color: #f4f4f4;
+    background-color: var(--color-background);
     padding: 10px;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(-color-shadow);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 
     &:hover {

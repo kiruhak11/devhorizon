@@ -214,7 +214,8 @@ onMounted(() => {
 
 .start-button:hover,
 .buy-button:hover {
-  background: var(--color-primary-hover);
+  background: var(--color-background);
+  color: var(--color-primary);
   transform: scale(1.01);
 }
 

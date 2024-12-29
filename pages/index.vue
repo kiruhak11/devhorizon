@@ -73,8 +73,13 @@
               class="user full"
               v-for="user in latestUsers"
               :key="user.id"
+              @mouseover="hoveredUser = user.id"
+              @mouseleave="hoveredUser = null"
             >
-              <IconProfile />{{ user.firstName }}
+              <IconProfile
+                :class="{ 'icon-hovered': hoveredUser === user.id }"
+              />
+              {{ user.firstName }}
             </UiButton>
           </ul>
         </div>
@@ -91,13 +96,13 @@
       </div>
     </section>
 
-    <section class="courses">
+    <section class="courses admin">
       <h2 class="section-title">Написать админу</h2>
       <div class="courses-grid">
         <input v-model="name" type="text" placeholder="Ваше имя" />
         <input v-model="email" type="email" placeholder="Ваш email" />
         <textarea v-model="message" placeholder="Ваше сообщение"></textarea>
-        <UiButton theme="accent" @click="sendMessage">Отправить</UiButton>
+        <UiButton theme="accent-rev" @click="sendMessage">Отправить</UiButton>
       </div>
     </section>
   </NuxtLayout>
@@ -107,7 +112,7 @@
 const name = ref("");
 const email = ref("");
 const message = ref("");
-
+const hoveredUser = ref(null);
 // Функция для отправки сообщения админу
 const sendMessage = async () => {
   if (!name.value || !email.value || !message.value) {
@@ -254,7 +259,7 @@ const latestUsers = computed(() => {
   height: 100%;
   overflow: hidden;
   border-radius: 20px;
-  background-color: #fff;
+  background-color: var(--color-background);
   overflow: hidden;
   position: relative;
 }
@@ -281,7 +286,7 @@ const latestUsers = computed(() => {
 .course-card {
   color: var(--color-text);
   padding: 20px;
-  background-color: #f4f4f4;
+  background-color: var(--color-background);
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -355,7 +360,7 @@ const latestUsers = computed(() => {
 /* Новые пользователи */
 .new-users {
   margin-top: -30px;
-  background-color: #fff;
+  background-color: var(--color-background);
   padding: 20px 15px;
   border-radius: 20px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
@@ -384,19 +389,26 @@ const latestUsers = computed(() => {
 
 .user-list {
   list-style: none;
-  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
   flex-wrap: wrap;
 }
+.user-list .user:hover {
+  background-color: var(--color-text);
+}
 
+.user-list .user:hover .icon-hovered {
+  background-color: var(--color-background);
+  padding: 1%;
+  border-radius: 50%;
+}
 .user {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 20px;
-  background-color: #f4f4f4;
+  background-color: var(--color-background);
   border-radius: 10px;
   font-size: 1rem;
 }
@@ -406,11 +418,13 @@ const latestUsers = computed(() => {
   border-radius: 20px;
   margin-top: 140px;
 }
-
+.admin {
+  margin-bottom: 100px;
+}
 .section-title {
   font-size: 2rem;
   font-weight: bold;
-  color: var(--color-background);
+  color: #f2f2f2;
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -424,12 +438,14 @@ const latestUsers = computed(() => {
     border-radius: 12px;
     border: 1.5px solid var(--color-border);
     padding: 8px;
+    background-color: var(--color-background);
     &:focus {
       box-shadow: 0 0 25px var(--color-border);
     }
   }
   textarea {
     border-radius: 12px;
+    background-color: var(--color-background);
     border: 1.5px solid var(--color-border);
     padding: 8px;
     height: 100px;

@@ -27,6 +27,7 @@
             Зарегистрироваться
           </button>
         </div>
+
         <form v-if="isLogin" @submit="handleLogin">
           <div class="input-group">
             <label for="telegram_id">Login</label>
@@ -50,7 +51,7 @@
               required
             />
           </div>
-          <button type="submit" class="submit-button">Войти</button>
+          <UiButton type="submit" class="full mini1">Войти</UiButton>
           <div class="submit-telegram">
             <TelegramLoginWidget
               telegram-login="devhorizon_bot"
@@ -78,6 +79,7 @@
             />
           </div>
         </form>
+
         <a class="error-message">{{ error }}</a>
         <div class="auth-box__back"></div>
       </div>
@@ -86,13 +88,9 @@
 </template>
 
 <script setup lang="ts">
-//@ts-ignore
-import { Container } from "tsparticles-engine";
 import axios from "axios";
 import { useRouter } from "vue-router";
-useSeoMeta({
-  title: "Авторизация",
-});
+useSeoMeta({ title: "Авторизация" });
 
 const isLogin = ref(true);
 const telegramId = ref("");
@@ -105,85 +103,60 @@ const isDark = computed(() => colorMode.value === "dark");
 const userStore = useUserStore();
 
 const isShowParticles = ref(true);
-const ParticlesOptions = computed((): {} => {
-  return {
-    particles: {
-      color: { value: isDark.value ? "#fff" : "#333" },
-      move: {
-        direction: "bottom",
-        enable: true,
-        outModes: "out",
-        speed: 2,
-      },
-      number: {
-        density: {
-          enable: true,
-          area: 800,
-        },
-        value: 400,
-      },
-      opacity: {
-        value: 0.7,
-      },
-      shape: {
-        type: "circle",
-      },
-      size: {
-        value: 10,
-      },
-      wobble: {
-        enable: true,
-        distance: 10,
-        speed: 10,
-      },
-      zIndex: {
-        value: { min: 0, max: 100 },
-      },
+const ParticlesOptions = computed(() => ({
+  particles: {
+    color: { value: isDark.value ? "#fff" : "#333" },
+    move: {
+      direction: "bottom" as const,
+      enable: true,
+      outModes: "out" as const,
+      speed: 2,
     },
-  };
-});
+    number: {
+      density: { enable: true, area: 800 },
+      value: 400,
+    },
+    opacity: { value: 0.7 },
+    shape: { type: "circle" },
+    size: { value: 10 },
+    wobble: { enable: true, distance: 10, speed: 10 },
+    zIndex: { value: { min: 0, max: 100 } },
+  },
+}));
 
 const handleLogin = async (event: { preventDefault: () => void }) => {
   event.preventDefault();
   error.value = ""; // Сброс ошибок
 
   try {
-    // Отправляем данные на сервер для логина
     const response = await axios.post("/api/login", {
       telegramId: telegramId.value,
       password: password_login.value,
       type: "password",
       method: "login",
-      tguser: null, // Можно передавать данные Telegram пользователя, если нужно
+      tguser: null,
     });
 
     if (response.data.message.includes("Login successful")) {
-      // Сохраняем данные пользователя в хранилище Pinia
-      const userStore = useUserStore();
       userStore.setUser(
         response.data.user,
         response.data.subscription,
         response.data.progress
-      ); // Сохраняем пользователя в хранилище
-
-      // Перенаправляем на страницу профиля
+      );
       router.push("/profile");
-
       toast("Успешная авторизация!", "success", 3000);
     } else {
-      error.value = "Login failed: " + response.data.message; // В случае ошибки логина
+      error.value = "Login failed: " + response.data.message;
     }
   } catch (er) {
     error.value = "Неверный пароль";
   }
 };
+
 const encodeBase64 = (str: string) => {
   try {
-    // Используем TextEncoder для работы с Unicode символами
     const encoder = new TextEncoder();
     const uint8Array = encoder.encode(str);
-
-    // Преобразуем результат в base64
     let base64String = "";
     for (let i = 0; i < uint8Array.length; i++) {
       base64String += String.fromCharCode(uint8Array[i]);
@@ -196,10 +169,8 @@ const encodeBase64 = (str: string) => {
 };
 
 const testCallback_register = async (user: any) => {
-  console.log("a", user);
   error.value = "";
   try {
-    // Преобразуем имя пользователя в безопасный для base64 формат
     const encodedUserName = encodeBase64(user.username);
 
     const response = await axios.post("/api/login", {
@@ -207,20 +178,19 @@ const testCallback_register = async (user: any) => {
       password: password.value,
       type: "telegram",
       method: "register",
-      tguser: { ...user, username: encodedUserName }, // отправляем закодированное имя
+      tguser: { ...user, username: encodedUserName },
     });
 
     if (response.data.message.includes("User already exists")) {
-      error.value = "Такой пользователь уже существует.";
+      error.value = "Такой пользователь уже существует.";
     }
     if (response.data.message.includes("Login successful")) {
-      const userStore = useUserStore();
       userStore.setUser(
         response.data.user,
         response.data.subscription,
         response.data.progress
       );
-      router.push("/profile"); // Перенаправляем на страницу профиля
+      router.push("/profile");
     } else {
       error.value = "Login failed:" + response.data.message;
     }
@@ -239,15 +209,14 @@ const testCallback_login = async (user: any) => {
       method: "login",
       tguser: user,
     });
+
     if (response.data.message.includes("Login successful")) {
-      const user = useUserStore();
-      user.setUser(
+      userStore.setUser(
         response.data.user,
         response.data.subscription,
         response.data.progress
-      ); // Сохраняем пользователя в хранилище
-
-      router.push("/profile"); // Перенаправляем на страницу профиля
+      );
+      router.push("/profile");
     } else if (response.data.message.includes("Invalid credentials")) {
       toast("Аккаунт не существует!", "warning", 3000);
       isLogin.value = false;
@@ -258,7 +227,8 @@ const testCallback_login = async (user: any) => {
     error.value = "Login failed:" + er;
   }
 };
-const onLoad = (container: Container) => {
+
+const onLoad = (container: any) => {
   container.pause();
   setTimeout(() => container.play(), 1);
 };
@@ -272,6 +242,7 @@ watch(
     }, 100);
   }
 );
+
 onMounted(() => {
   if (userStore.user) router.push("/profile");
 });
@@ -287,36 +258,20 @@ onMounted(() => {
   min-height: 100vh;
   padding: 10px;
 }
-@media (max-width: 768px) {
-  .auth-box {
-    max-width: 100%;
-    padding: 15px;
-  }
-  .auth-title {
-    font-size: 20px;
-  }
-  .toggle-button {
-    font-size: 16px;
-    padding: 8px 16px;
-  }
-  .submit-button {
-    font-size: 14px;
-  }
-}
+
 .bg-overlay {
-  @media (max-width: 768px) {
-    width: 300px;
-    height: 300px;
-    filter: blur(40px);
-  }
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  background: var(--color-blur);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(50px);
+  z-index: -2;
 }
 
-.error-message {
-  display: flex;
-  justify-content: center;
-  color: var(--color-danger);
-  text-align: center;
-}
 .auth-box {
   position: relative;
   z-index: 10;
@@ -327,13 +282,10 @@ onMounted(() => {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
-  &__back {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-  }
 }
-
+.mini1 {
+  padding: 10px 24px;
+}
 .auth-title {
   text-align: center;
   font-size: 24px;
@@ -358,12 +310,12 @@ onMounted(() => {
     margin: 0 10px;
 
     &.active {
-      color: #3498db;
-      border-bottom: 2px solid #3498db;
+      color: var(--color-primary);
+      border-bottom: 2px solid var(--color-primary);
     }
 
     &:hover {
-      color: #3498db;
+      color: var(--color-primary);
     }
   }
 }
@@ -395,41 +347,28 @@ onMounted(() => {
   }
 }
 
-.submit {
-  &-button {
-    width: 100%;
-    padding: 12px;
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    transition: transform 0.2s;
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  transition: transform 0.2s;
 
-    &:hover {
-      transform: scale(1.01);
-      background-color: #2980b9;
-    }
-  }
-  &-telegram {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+  &:hover {
+    transform: scale(1.01);
+    background-color: #2980b9;
   }
 }
 
-.bg-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 400px;
-  height: 400px;
-  background: var(--color-blur);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  filter: blur(50px);
-  z-index: -2;
+.error-message {
+  display: flex;
+  justify-content: center;
+  color: var(--color-danger);
+  text-align: center;
 }
 </style>

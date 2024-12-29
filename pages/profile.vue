@@ -31,6 +31,7 @@
     </div>
   </NuxtLayout>
 </template>
+
 <script setup lang="ts">
 const router = useRouter();
 const activeTab = ref("dashboard");
@@ -49,6 +50,7 @@ onMounted(() => {
   if (!userStore.user) router.push("/");
 });
 </script>
+
 <style scoped lang="scss">
 .container {
   margin: 40px auto;
@@ -58,6 +60,7 @@ onMounted(() => {
   border: 1px solid var(--color-border);
   position: relative;
   overflow: hidden;
+  background-color: var(--color-background);
 }
 
 .profile {
@@ -65,6 +68,7 @@ onMounted(() => {
   justify-self: center;
   align-items: center;
   gap: 24px;
+
   &-title {
     font-size: 1.75rem;
     color: var(--color-primary);
@@ -72,6 +76,7 @@ onMounted(() => {
     text-align: center;
     margin-bottom: 24px;
   }
+
   &-switcher {
     position: absolute;
     top: 24px;
@@ -100,6 +105,7 @@ onMounted(() => {
       background-color: var(--color-primary);
       color: white;
     }
+
     &:hover {
       background-color: var(--color-primary);
       color: white;

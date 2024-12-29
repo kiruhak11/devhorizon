@@ -61,7 +61,7 @@
           :placeholder="`Lives: ${userStore.user.lives}`"
         />
       </div>
-      <div class="form-group">
+      <div class="form-group" v-if="isAdmin">
         <UiButton class="full" @click="resetGiftTimer"
           >Сбросить таймер подарка</UiButton
         >
@@ -72,7 +72,7 @@
         >
         <UiButton
           :class="isMobile ? 'full' : ''"
-          theme="primary-rev"
+          type="accent"
           @click="deleteAccount"
         >
           Выйти
@@ -89,7 +89,7 @@ import { useRouter } from "vue-router";
 const { isMobile } = useDevice();
 const userStore = useUserStore();
 const router = useRouter();
-const isAdmin = userStore.subscription.type >= 5;
+const isAdmin = userStore.user.isAdmin;
 const name = ref<string>(userStore.user?.firstName || "");
 const lastname = ref<string>(userStore.user?.lastName || "");
 const password = ref<string>();

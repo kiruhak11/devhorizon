@@ -20,7 +20,7 @@
   }
 
   &--primary {
-    color: var(--color-text);
+    color: var(--color-boeder);
     border: 1.5px solid var(--color-border);
     transition: background-color 0.3s ease, transform 0.2s ease;
 
@@ -32,13 +32,13 @@
   }
 
   &--primary-rev {
-    color: var(--color-background);
+    color: var(--color-text);
     border: 1.5px solid var(--color-text);
     transition: background-color 0.3s ease, transform 0.2s ease;
 
     &:hover {
-      color: var(--color-text);
-      background-color: var(--color-background);
+      color: var(--color-background);
+      background-color: var(--color-text);
       transform: translateY(-2px);
     }
   }

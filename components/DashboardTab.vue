@@ -16,12 +16,12 @@
       <div class="card">
         <p class="card-title">Оставшиеся жизни</p>
         <p class="card-value">{{ userStore.user.lives }}</p>
-        <UiButton class="btn btn-small" to="/shop"> Мазазин </UiButton>
+        <UiButton class="btn btn-small" to="/shop"> Магазин </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Мана</p>
         <p class="card-value">{{ userStore.user.mana }}</p>
-        <UiButton class="btn btn-small" to="/shop"> Мазазин </UiButton>
+        <UiButton class="btn btn-small" to="/shop"> Магазин </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Подписка</p>

@@ -258,7 +258,8 @@ textarea {
   transition: background 0.3s ease, transform 0.2s ease;
 
   &:hover {
-    background: var(--color-primary-hover);
+    background: var(--color-background);
+    color: var(--color-primary);
     transform: scale(1.1);
   }
 

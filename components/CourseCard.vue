@@ -28,7 +28,8 @@ defineProps({
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(145deg, #f9f9fb, #ffffff);
+  background: var(--color-background-card);
+  border: 1.5px solid var(--color-border);
   border-radius: 16px;
   padding: 32px 24px;
   text-align: center;
@@ -41,18 +42,20 @@ defineProps({
 
   &:hover {
     transform: translateY(-6px);
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 15px 25px var(--color-shadow);
+    background-color: var(--color-background-card);
+    color: var(--color-border);
   }
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, #8bc34a, #ff9800, #f44336, #490702);
     border-radius: inherit;
     padding: 2px;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: var(--color-webkit-mask);
+    mask: var(--color-mask);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     z-index: 1;

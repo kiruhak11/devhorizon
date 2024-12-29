@@ -10,17 +10,7 @@
         <div v-if="userStore.user" class="profile-subscription">
           <p>
             Подписка:
-            {{
-              userStore.subscription.type === 1
-                ? "Базовая"
-                : userStore.subscription.type === 2
-                ? "Премиум"
-                : userStore.subscription.type === 3
-                ? "Эксперт"
-                : userStore.subscription.type === 4
-                ? "Эксперт+"
-                : userStore.subscription.type || "Без подписки"
-            }}
+            {{ userStore.userSubscription() }}
           </p>
           <p>Действительна до: {{ formattedEndDate }}</p>
         </div>
@@ -84,6 +74,7 @@ const transitionName = computed(() => {
   justify-self: center;
   align-items: center;
   gap: 24px;
+
   &-title {
     font-size: 1.75rem;
     color: var(--color-primary);
@@ -91,23 +82,26 @@ const transitionName = computed(() => {
     text-align: center;
     margin-bottom: 24px;
   }
+
   &-switcher {
     position: absolute;
     top: 24px;
     right: 24px;
     p {
-      color: var(--color-primary);
+      color: var(--color-text-light);
     }
   }
+
   &-subscription {
     position: absolute;
     top: 24px;
     left: 24px;
     p {
-      color: var(--color-primary);
+      color: var(--color-text-light);
     }
   }
 }
+
 .shop-container {
   margin: 40px auto;
   padding: 24px;
@@ -116,6 +110,7 @@ const transitionName = computed(() => {
   border: 1px solid var(--color-border);
   position: relative;
   overflow: hidden;
+  background-color: var(--color-background);
 }
 
 .shop-title {
@@ -147,6 +142,7 @@ const transitionName = computed(() => {
       background-color: var(--color-primary);
       color: white;
     }
+
     &:hover {
       background-color: var(--color-primary);
       color: white;

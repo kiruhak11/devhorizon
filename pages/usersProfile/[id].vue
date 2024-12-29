@@ -160,7 +160,7 @@ const getSubscriptionType = (type: number) => {
   margin: 0 auto;
   padding: 20px;
   border-radius: 12px;
-  background-color: #f4f7fc;
+  background-color: var(--color-background);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -177,7 +177,7 @@ const getSubscriptionType = (type: number) => {
 
 .profile-title {
   font-size: 2.5rem;
-  color: var(--color-grad-banner);
+  color: var(--color-primary);
 }
 
 .user-name {
@@ -185,7 +185,7 @@ const getSubscriptionType = (type: number) => {
   margin-bottom: 10px;
 }
 .message-user {
-  background-color: #fff;
+  background-color: var(--color-background);
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -231,7 +231,7 @@ const getSubscriptionType = (type: number) => {
 .user-info,
 .user-stats,
 .user-subscription {
-  background-color: #fff;
+  background-color: var(--color-background);
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;

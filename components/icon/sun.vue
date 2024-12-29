@@ -28,3 +28,12 @@
     </g>
   </svg>
 </template>
+
+<style scoped lang="scss">
+path {
+  fill: var(--color-background);
+}
+circle {
+  fill: var(--color-background);
+}
+</style>

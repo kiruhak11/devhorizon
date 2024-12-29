@@ -9,9 +9,9 @@
         <p>{{ modalText }}</p>
       </div>
       <footer class="modal-footer">
-        <button class="modal-button" @click="handleButtonClick">
+        <UiButton class="full" @click="handleButtonClick">
           {{ modalButtonText }}
-        </button>
+        </UiButton>
       </footer>
     </div>
   </div>
@@ -77,7 +77,7 @@ const handleButtonClick = () => {
 }
 
 .modal-header {
-  background: var(--color-header-background);
+  background: var(--color-grad-banner);
   color: var(--color-header-text);
   padding: 16px;
   display: flex;
@@ -89,6 +89,7 @@ const handleButtonClick = () => {
 .modal-title {
   margin: 0;
   font-size: 1.5rem;
+  color: var(--color-background);
 }
 
 .modal-close {
@@ -98,6 +99,8 @@ const handleButtonClick = () => {
   cursor: pointer;
   color: var(--color-header-text);
   transition: color 0.2s;
+  
+  color: var(--color-background);
 }
 
 .modal-close:hover {
@@ -117,16 +120,6 @@ const handleButtonClick = () => {
   border-top: 1px solid var(--color-border);
 }
 
-.modal-button {
-  background: var(--color-button-background);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
 
 .modal-button:hover {
   background: var(--color-button-hover);

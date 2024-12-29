@@ -14,16 +14,17 @@ const { isMobile } = useDevice();
 <style lang="scss" scoped>
 /* From Uiverse.io by vinodjangid07 */
 .reward-btn {
-  width: 40px;
-  height: 40px;
-  background-color: var(--color-header-background);
+  width: 50px;
+  height: 50px;
+  background-color: var(--color-grad-banner);
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 24px;
+  border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s;
+  border: 2px solid var(--color-grad-banner);
 }
 .IconContainer {
   display: flex;

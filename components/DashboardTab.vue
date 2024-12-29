@@ -16,12 +16,12 @@
       <div class="card">
         <p class="card-title">Оставшиеся жизни</p>
         <p class="card-value">{{ userStore.user.lives }}</p>
-        <UiButton class="btn btn-small" @click="buyLife"> +5 </UiButton>
+        <UiButton class="btn btn-small" to="/shop"> Мазазин </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Мана</p>
         <p class="card-value">{{ userStore.user.mana }}</p>
-        <UiButton class="btn btn-small" @click="buyMana"> +5 </UiButton>
+        <UiButton class="btn btn-small" to="/shop"> Мазазин </UiButton>
       </div>
       <div class="card">
         <p class="card-title">Подписка</p>
@@ -30,9 +30,7 @@
         </p>
         <div v-if="remainingTime != 'Срок истёк'" class="card-detail">
           <p>Осталось: {{ remainingTime }}</p>
-          <UiButton class="btn btn-small" @click="renewSubscription">
-            Продлить
-          </UiButton>
+          <UiButton class="btn btn-small" to="/shop"> Обновить </UiButton>
         </div>
         <div v-else class="card-detail">
           <p>{{ remainingTime }}</p>
@@ -41,7 +39,7 @@
           </UiButton>
         </div>
       </div>
-      <div class="card" v-if="userStore.subscription.type >= 5">
+      <div class="card" v-if="userStore.user.isAdmin">
         <p class="card-title">Статус</p>
         <p class="card-value">Админ</p>
         <p class="card-detail">Доступ к админ панели</p>
@@ -119,22 +117,6 @@ const remainingTime = computed(() => {
 // Массив с курсами и прогрессом
 
 // Функция для покупки маны
-const buyMana = async () => {
-  if (userStore.user) {
-    userStore.user.mana += 5;
-    userStore.updateUserDataOnServer(false);
-  } else {
-    console.error("User data not found");
-  }
-};
-const buyLife = async () => {
-  if (userStore.user) {
-    userStore.user.lives += 5;
-    userStore.updateUserDataOnServer(false);
-  } else {
-    console.error("User data not found");
-  }
-};
 
 // Состояние текущего открытого курса
 const activeCourse = ref<number | null>(null);
@@ -153,8 +135,37 @@ const getProgressBarColor = (progress: number): string => {
 
 // Функция для продления подписки
 const renewSubscription = () => {
-  userStore.subscription.type += 1;
-  userStore.updateUserDataOnServer(false);
+  if (userStore.user.coins < countSubscriptionPrice()) {
+    userStore.openModal(
+      "Ошибка",
+      "Недостаточно средств на счету. Пополните кошелек."
+    );
+    return;
+  }
+
+  userStore.openModal(
+    "Продление подписки",
+    `Вы действительно хотите продлить подписку за ${countSubscriptionPrice()} ₽?`,
+    "Продлить",
+    () => {
+      if (new Date(userStore.subscription.end) >= new Date(Date.now())) {
+        const currentEndDate = new Date(userStore.subscription.end);
+        currentEndDate.setMonth(currentEndDate.getMonth() + 1);
+        userStore.subscription.end = currentEndDate;
+        userStore.user.coins -= countSubscriptionPrice();
+      } else {
+        userStore.subscription.end = new Date(Date.now());
+        userStore.subscription.end.setMonth(
+          userStore.subscription.end.getMonth() + 1
+        );
+        userStore.user.coins -= countSubscriptionPrice();
+      }
+      userStore.updateUserDataOnServer(false);
+    }
+  );
+};
+const countSubscriptionPrice = () => {
+  return userStore.courses[userStore.subscription.type - 1].price;
 };
 const openModal = () => {
   userStore.openModal(

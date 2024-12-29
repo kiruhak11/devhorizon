@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 import bodyParser from "body-parser";
 
+const CHANNEL_USERNAME = "@GScompany_tg";
 const prisma = new PrismaClient();
 const app = express();
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -16,14 +17,16 @@ let userState = {};
 
 bot.start(async (ctx) => {
   const welcomeMessage = `
-Привет, я ваш бот! Вот что я умею:
+Привет, ${ctx.message.from.first_name || ""} я ваш бот! Вот что я умею:
 
 - Регистрация
 - Управление паролем
 - Добавление монет
 - Совершение покупок
 - Запрос возврата средств
+- Получение бонуса
 
+Бонус: Подпишитесь на наш канал ${CHANNEL_USERNAME} и получите 199 монет!
 Выберите команду с помощью кнопок ниже:
   `;
   ctx.reply(
@@ -100,6 +103,63 @@ bot.hears("Оплатить", checkRegistration, (ctx) => {
   userState[telegramId] = { isBuyCoins: true };
   ctx.reply("Введите количество монет для покупки:");
 });
+
+bot.hears("Получить бонус", checkRegistration, async (ctx) => {
+  const telegramId = ctx.message.from.id;
+
+  try {
+    // Проверяем, есть ли пользователь в базе
+    const user = await prisma.user.findUnique({ where: { telegramId } });
+
+    if (!user) {
+      return ctx.reply("Пользователь не найден.");
+    }
+
+    // Проверяем, получал ли пользователь бонус ранее
+    if (user.hasReceivedBonus) {
+      return ctx.reply("Вы уже получили бонус за подписку.");
+    }
+
+    // Проверяем статус подписки пользователя
+    const response = await axios.get(
+      `https://api.telegram.org/bot${botToken}/getChatMember`,
+      {
+        params: {
+          chat_id: CHANNEL_USERNAME,
+          user_id: telegramId,
+        },
+      }
+    );
+
+    const status = response.data.result.status;
+
+    // Если пользователь подписан
+    if (["member", "administrator", "creator"].includes(status)) {
+      // Обновляем баланс и помечаем, что бонус был получен
+      const updatedUser = await prisma.user.update({
+        where: { telegramId },
+        data: {
+          coins: user.coins + 199,
+          hasReceivedBonus: true,
+        },
+      });
+
+      ctx.reply(
+        `Спасибо за подписку! Вам начислено 199 монет. Теперь у вас ${updatedUser.coins} монет.`
+      );
+    } else {
+      ctx.reply(
+        `Пожалуйста, подпишитесь на наш канал ${CHANNEL_USERNAME} и повторите команду.`
+      );
+    }
+  } catch (error) {
+    console.error("Ошибка проверки подписки:", error.response?.data || error);
+    ctx.reply(
+      "Не удалось проверить подписку. Убедитесь, что вы подписались, и попробуйте снова."
+    );
+  }
+});
+
 bot.hears("Отправить сообщение", checkRegistration, async (ctx) => {
   try {
     // Получаем список пользователей
@@ -219,7 +279,30 @@ bot.on("text", async (ctx) => {
           end: new Date(new Date().setMonth(new Date().getMonth() + 1)),
         },
       });
-
+      const progressData = await prisma.progress.createMany({
+        data: [
+          {
+            userId: newUser.id,
+            progress: 0,
+            courseId: 1, // Course 1
+          },
+          {
+            userId: newUser.id,
+            progress: 0,
+            courseId: 2, // Course 2 (you can add more courses here)
+          },
+          {
+            userId: newUser.id,
+            progress: 0,
+            courseId: 3, // Course 3 (you can add more courses here)
+          },
+          {
+            userId: newUser.id,
+            progress: 0,
+            courseId: 4, // Course 4 (you can add more courses here)
+          },
+        ],
+      });
       ctx.reply(`Регистрация завершена! Ваш ID: ${newUser.telegramId}`);
     } catch (error) {
       console.error("Ошибка при регистрации:", error);

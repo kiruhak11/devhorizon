@@ -72,7 +72,7 @@ const userStore = useUserStore();
 
 // Проверяем доступ к странице
 onMounted(() => {
-  if (userStore.subscription.type < 5) {
+  if (!userStore.user.isAdmin) {
     router.push("/");
   }
 });

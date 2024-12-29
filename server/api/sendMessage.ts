@@ -7,19 +7,9 @@ const botToken = "7696869877:AAHYLtyjbqbSSjhWrFBVLeLMis6kWtwaIK8";
 let adminsTgId: number[] = [];
 const getAdmins = async () => {
   try {
-    // Получаем все пользователей с их подписками
-    const subscriptions = await prisma.subscription.findMany({
-      where: {
-        type: {
-          gte: 5, // gte означает "больше или равно"
-        },
-      },
-    });
     const admins = await prisma.user.findMany({
       where: {
-        id: {
-          in: subscriptions.map((subscription) => subscription.userId),
-        },
+        isAdmin: true,
       },
     });
     adminsTgId = admins.map((admin) => admin.telegramId);

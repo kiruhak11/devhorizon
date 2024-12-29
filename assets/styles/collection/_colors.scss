@@ -4,6 +4,14 @@
   --color-border: #222;
   --color-background: #f2f2f2;
   --color-text-light: #222222a8;
+  --color-primary: #ff6f61; /* Основной акцентный цвет (например, для кнопок) */
+  --color-secondary: #4caf50; /* Дополнительный акцентный цвет (например, для ссылок) */
+  --color-link: #1e88e5; /* Цвет ссылок */
+  --color-heading: #333; /* Цвет заголовков */
+  --color-muted: #888; /* Для менее важного текста */
+  --color-card-background: #fff; /* Цвет фона карточек */
+  --color-highlight: #ffeb3b; /* Выделение текста, подсветка */
+  --color-shadow: rgb(0 0 0 / 10%); /* Тень */
 }
 
 .dark {
@@ -12,4 +20,12 @@
   --color-border: #444; /* Тёмный бордер */
   --color-background: #222; /* Тёмный фон */
   --color-text-light: #bbb; /* Светлый текст для менее важной информации */
+  --color-primary: #ff7043; /* Тёмный оттенок акцентного цвета для тёмной темы */
+  --color-secondary: #66bb6a; /* Более светлый оттенок для дополнительного акцента */
+  --color-link: #81d4fa; /* Светлый акцент для ссылок */
+  --color-heading: #f1f1f1; /* Светлый цвет заголовков */
+  --color-muted: #888; /* Для менее важного текста */
+  --color-card-background: #333; /* Фон карточек в тёмной теме */
+  --color-highlight: #ffeb3b; /* Подсветка */
+  --color-shadow: rgb(0 0 0 / 40%); /* Тень */
 }

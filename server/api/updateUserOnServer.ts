@@ -37,6 +37,8 @@ export default defineEventHandler(async (event) => {
         mana: user.mana || 0,
         password: user.password || "",
         lives: user.lives || 0,
+        isAdmin: user.isAdmin || false,
+        hasReceivedBonus: user.hasReceivedBonus || false,
         gift:
           user.gift ||
           new Date(new Date().setUTCHours(new Date().getUTCHours() - 24)),

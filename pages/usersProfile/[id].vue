@@ -6,10 +6,7 @@
           <h1 class="profile-title">Профиль пользователя</h1>
           <h2 class="user-name">{{ user.firstName }} {{ user.lastName }}</h2>
           <p class="user-id">ID: {{ user.telegramId }}</p>
-          <div
-            v-if="subscription && subscription.type >= 5"
-            class="admin-badge"
-          >
+          <div v-if="user.isAdmin" class="admin-badge">
             <strong>ADMIN!</strong>
           </div>
         </div>
@@ -17,7 +14,7 @@
           <img
             class="profile-avatar"
             src="https://via.placeholder.com/150"
-            alt="User Avatar"
+            alt="User Avatwar"
           />
         </div>
       </section>

@@ -23,7 +23,8 @@ model User {
   password     String
   gift         DateTime?
   createdAt    DateTime     @default(now())
-
+  hasReceivedBonus Boolean  @default(false)
+  isAdmin Boolean  @default(false)
   payments     Payment[]
   progress     Progress[]
 }

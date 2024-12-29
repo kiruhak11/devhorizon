@@ -69,7 +69,7 @@ const course = computed(() =>
 
 const isCourseActive = computed(() => {
   if (course.value && userStore.subscription?.type) {
-    return Number(userStore.subscription.type) >= course.value.id;
+    return Number(userStore.subscription.type) > course.value.id;
   }
   return false;
 });

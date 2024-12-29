@@ -30,27 +30,15 @@
 import axios from "axios";
 
 let users: any[] = [];
-let subscriptions: any[] = [];
+const admins: any[] = [];
 // Вызываем функцию для получения пользователей
 try {
   const response = await axios.get("/api/users");
   users = response.data;
-  const responseSubscriptions = await axios.get("/api/subscriptions");
-  subscriptions = responseSubscriptions.data;
+  admins.push(...users.filter((user) => user.isAdmin));
 } catch (error) {
   console.error(error);
 }
-console.log(users);
-// Вычисляем список админов с фильтрацией по условию subscription.type >= 5
-const admins = computed(() =>
-  users.filter((user) => {
-    const subscription = subscriptions.find(
-      (subscription) => subscription.userId === user.id
-    );
-    return subscription && subscription.type >= 5;
-  })
-);
-console.log(admins.value);
 </script>
 
 <style scoped lang="scss">
